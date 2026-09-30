@@ -1,0 +1,438 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Daybreak — design tokens
+
+   One system, two properties: the agency site at / and the foundation, crawl
+   space and siding reference build it hosts under /work. They deliberately share type, colour, radius and
+   motion so the demo reads as Daybreak's work rather than a stray template.
+
+   Type:   three roles, three faces. Display carries headlines, sans carries
+           reading text, and numeric is reserved for measured things — square
+           footage, crack widths, response times, pipeline, stage indices. Both
+           businesses sell measurement, so the numeric face is doing brand
+           work, not decoration; never use it for prose.
+   Radius: architectural. Square by default, 2–3px where a corner would
+           otherwise cut, full circles only where the shape is a circle.
+   Color:  ink = deep navy structure. ember/dawn = sunrise accent. bone = paper.
+   Contrast: on ink-900/950, ink-500 sits at ~2.8:1 and ink-400 at ~4.4:1 —
+           prose on dark uses ink-300 or lighter; ink-400 is for indices and
+           micro-labels only.
+
+   The brand spec is Founders Grotesk (or Söhne Breit) for headlines, Söhne for
+   body, DIN for numbers. All three are commercial licences that cannot be
+   served from a CDN, so every role currently carries the nearest open-licence
+   stand-in, loaded in app/layout.tsx:
+
+       --font-display   Schibsted Grotesk      → Founders Grotesk
+       --font-sans      Inter                  → Söhne
+       --font-numeric   Barlow Semi Condensed  → DIN
+
+   To swap in the licensed files: drop the .woff2 into src/fonts/, change the
+   three next/font/google calls in layout.tsx to next/font/local, and keep the
+   --font-display-face / --font-body-face / --font-numeric-face variable names.
+   Nothing else in the app refers to a family by name. Re-check display-xl and
+   the `numeric` tracking afterwards — both are tuned to the stand-ins.
+   ========================================================================== */
+@theme {
+  --color-ink-950: #04090f;
+  --color-ink-900: #0a1522;
+  --color-ink-800: #12202f;
+  --color-ink-700: #1b2f43;
+  --color-ink-600: #2a4359;
+  --color-ink-500: #3d5b74;
+  --color-ink-400: #5c7a94;
+  --color-ink-300: #8ba4b8;
+  --color-ink-200: #bccddb;
+  --color-ink-100: #dde7ef;
+  --color-ink-50: #eff4f8;
+
+  --color-ember-700: #b23c05;
+  --color-ember-600: #d94b06;
+  --color-ember-500: #f2600c;
+  --color-ember-400: #ff7a2f;
+  --color-ember-50: #fff3ea;
+
+  --color-dawn-400: #ffb020;
+  --color-dawn-300: #ffc85c;
+
+  --color-bone-50: #fdfbf8;
+  --color-bone-100: #f8f4ee;
+  --color-bone-200: #efe8de;
+
+  --color-moss-500: #1f8a5f;
+  --color-moss-100: #d9f2e6;
+
+  /* ---- Home-services template (the reference build under /work) ----
+     The design language follows Crest (crestroofing.framer.website): a
+     sky-gradient hero with a real house standing in it, soft sentence-case
+     headlines, pill labels and pill buttons, light grey rounded cards, and
+     neutral greys rather than tinted ones. Nothing here is trade-specific —
+     it is the Daybreak home-services system, and foundation repair is one
+     vertical.
+
+     Semantic names, because this layer is what a client re-brand overrides:
+     change these on the site wrapper (see `siteTheme` in lib/demo-site.ts)
+     and every template component follows. The agency site never uses them.
+
+     fg / muted  #1c1c1c and #6e6e73 — 16.7:1 and 5.0:1 on white.
+     accent      primary action. Black pills, as Crest uses them.
+     signal      measured things (outlines, figures). 4.6:1 on white.
+     sky-1..5    the sky, deep to pale. Crest's own sky is paler, but white
+                 text on it measures 2.4:1 and fails AA; ours stays at or
+                 below sky-2 (4.65:1) wherever text sits, then opens up to
+                 Crest's pale blues where the house stands. */
+  --color-fg: #1c1c1c;
+  --color-muted: #6e6e73;
+  --color-line: #e6e6ea;
+  --color-card: #f2f2f2;
+  --color-accent: #111111;
+  --color-accent-strong: #333333;
+  --color-accent-soft: #ededed;
+  --color-signal: #2c78bd;
+  --color-surface: #ffffff;
+  --color-surface-2: #f6f6f7;
+  --color-sky-1: #33658b;
+  --color-sky-2: #3f7aa2;
+  --color-sky-3: #8fb8d3;
+  --color-sky-4: #d7e7f1;
+  --color-sky-5: #bfd7e6;
+
+  --font-home: var(--font-home-face), var(--font-body-face), ui-sans-serif, system-ui, sans-serif;
+
+  /* Agency site, below the hero: Axion's business-professional layer —
+     square grey panels, hairlines, mono labels, one small warm marker. The
+     marker is Daybreak's sunrise; it is decoration only, never text. */
+  --color-sun: #fcc600;
+  --color-panel: #f7f7f7;
+  --color-panel-2: #ececec;
+  --color-rule: #dcdcdc;
+
+  --font-display: var(--font-display-face), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-body-face), ui-sans-serif, system-ui, sans-serif;
+  /* Condensed by design — the fallbacks are the narrowest faces that ship on
+     each platform, so a stat block keeps its width if the webfont fails. */
+  --font-numeric: var(--font-numeric-face), "Roboto Condensed", "Arial Narrow", ui-sans-serif, sans-serif;
+  /* Geist Mono where a layout loads it (the agency site's labels);
+     system monospace everywhere else. */
+  --font-mono: var(--font-mono-face), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Architectural radius scale. Nothing above 4px exists on purpose —
+     xl/2xl/3xl are deliberately left at Tailwind defaults but unused. */
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+
+  /* Elevation is carried by contrast and rules, not soft shadows. The one
+     genuine shadow is for elements that physically float over the map. */
+  --shadow-float: 0 2px 4px rgb(4 9 15 / 0.16), 0 18px 40px -20px rgb(4 9 15 / 0.5);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-marquee: marquee 42s linear infinite;
+  --animate-signal: signal 7s linear infinite;
+  --animate-scan: scan 2.1s var(--ease-out-expo) infinite;
+  --animate-pulse-ring: pulse-ring 2.4s ease-out infinite;
+  /* One pass of the satellite scan on the homepage instrument. */
+  --animate-sweep: sweep 1.5s cubic-bezier(0.45, 0, 0.2, 1) both;
+}
+
+/* Hero entrance, Axion-style: copy rises in, the house settles out of a
+   slight zoom, the measurement card arrives last. Transform + opacity only. */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes house-in {
+  from { opacity: 0; transform: translateY(48px) scale(1.08); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes sweep {
+  0% { transform: translateY(-100%); opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translateY(300%); opacity: 0; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+/* A pulse travelling the length of a rule, used on the funnel rail. Painted
+   as a moving gradient rather than a translating node so it stays one element
+   and stays cheap. */
+@keyframes signal {
+  from { background-position-x: -24%; }
+  to { background-position-x: 124%; }
+}
+@keyframes scan {
+  0% { transform: translateY(-100%); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+@keyframes pulse-ring {
+  0% { transform: scale(0.7); opacity: 0.9; }
+  70% { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ---- Base ---- */
+@layer base {
+  * { border-color: var(--color-ink-100); }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--color-bone-50);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Headings inherit family and balance only. Weight, tracking and size are
+     decided per section so the page has a real hierarchy rather than one
+     bold/tight treatment repeated at four scales. */
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+
+  p { text-wrap: pretty; }
+
+  ::selection {
+    background: var(--color-ember-500);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ember-500);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  input, select, textarea, button { font-family: inherit; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---- Utilities ---- */
+
+/* Default measure. Sections that want to break the grid opt out of it
+   rather than every section being funnelled through one max-width. */
+@utility container-x {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 82rem;
+  padding-inline: 1.25rem;
+  @media (min-width: 1024px) { padding-inline: 2.5rem; }
+}
+
+/* Display setting. The display face has a weight axis but no width axis, so
+   the tightness comes from weight and tracking rather than a condensed cut.
+   Only for 32px and up — this tracking is too tight at body sizes. */
+@utility display-xl {
+  font-weight: 800;
+  letter-spacing: -0.032em;
+  line-height: 0.97;
+}
+
+@utility display-lg {
+  font-weight: 700;
+  letter-spacing: -0.026em;
+  line-height: 1.03;
+}
+
+/* Measured values: square footage, pitch, prices, indices. Tabular figures so
+   a column of numbers lines up. Tracking sits at zero — the face is already
+   condensed, and pulling it tighter closes the counters on 1 and 4. */
+@utility numeric {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: 0;
+}
+
+/* Micro-label, set in the numeric face to read as signage or a drawing
+   annotation. A condensed face loses a little presence at this size, so it
+   runs one step heavier than the old mono did. */
+@utility annotation {
+  font-family: var(--font-numeric);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Left padding that lands on the same line as container-x content, for
+   layouts where one column bleeds to the viewport edge and the other has to
+   stay on the grid. Percent padding resolves against the full-width parent,
+   so this stays exact with or without a scrollbar (100vw would not). */
+@utility pl-container {
+  padding-left: 1.25rem;
+  @media (min-width: 1024px) { padding-left: max(2.5rem, calc(50% - 38.5rem)); }
+}
+
+/* ---- Template type ----
+   Manrope at 500 for every headline, as Crest sets it: large, light-footed,
+   tracked slightly in. Sizes are set per use; these fix family, weight,
+   tracking and leading so every heading on the template shares one voice. */
+@utility home-display {
+  font-family: var(--font-home);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+@utility home-heading {
+  font-family: var(--font-home);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.07;
+}
+
+@utility home-title {
+  font-family: var(--font-home);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* The small grey pill that labels a section ("Services", "Reviews"). */
+@utility pill-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+/* The sky. Stops are anchored in pixels from the top, not percentages, so
+   the band behind the headline and input stays dark enough for white text
+   however tall the section is. --sky-text is where the text zone ends; it
+   runs longer on phones because the copy stacks deeper. */
+@utility sky-hero {
+  --sky-text: 820px;
+  background-image: linear-gradient(
+    180deg,
+    var(--color-sky-1) 0px,
+    var(--color-sky-2) var(--sky-text),
+    var(--color-sky-3) calc(var(--sky-text) + 240px),
+    var(--color-sky-4) calc(var(--sky-text) + 440px),
+    #ffffff calc(var(--sky-text) + 680px)
+  );
+  @media (min-width: 640px) { --sky-text: 700px; }
+}
+
+@utility sky-page {
+  --sky-text: 100%;
+  background-image: linear-gradient(180deg, var(--color-sky-1) 0%, var(--color-sky-2) var(--sky-text));
+}
+
+@utility sky-close {
+  --sky-text: 560px;
+  background-image: linear-gradient(
+    180deg,
+    var(--color-sky-2) 0px,
+    var(--color-sky-2) var(--sky-text),
+    var(--color-sky-3) calc(var(--sky-text) + 220px),
+    var(--color-sky-4) calc(var(--sky-text) + 420px),
+    var(--color-sky-5) 100%
+  );
+  @media (min-width: 640px) { --sky-text: 470px; }
+}
+
+/* House cut-outs dissolve at the sides and base instead of ending on a
+   rectangle. Prefixed for Safari's mask-composite. */
+.house-fade {
+  -webkit-mask-image:
+    linear-gradient(to bottom, #000 58%, transparent 97%),
+    linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to bottom, #000 58%, transparent 97%),
+    linear-gradient(to right, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-composite: intersect;
+}
+
+/* Axion's section label: small monospace capitals. Pair with a 6px square
+   in --color-sun before the text. */
+@utility mono-label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* Axion runs nearly edge to edge: full width with a small gutter. */
+@utility container-wide {
+  width: 100%;
+  padding-inline: 1.25rem;
+  @media (min-width: 640px) { padding-inline: 1.5rem; }
+  @media (min-width: 1024px) { padding-inline: 2rem; }
+}
+
+/* Scroll-linked text reveal (the About statement). The paragraph carries
+   --p (0→1 scroll progress) and --n (word count); each word its index --i.
+   One custom-property write per frame; the rest is opacity. */
+.word-reveal > span {
+  opacity: clamp(0.18, calc(var(--p) * var(--n) * 1.2 - var(--i)), 1);
+  transition: opacity 0.2s linear;
+}
+
+/* Horizontal rails scroll natively (no scroll-jacking); the bar is hidden
+   because the rail carries its own progress indicator. */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* Diagonal hatching — the "waiting" segments in the comparison diagram. */
+@utility hatch {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgb(10 21 34 / 0.14) 0 1px,
+    transparent 1px 7px
+  );
+}
+
+/* Fine architectural grid, used behind dark sections */
+@utility grid-blueprint {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+

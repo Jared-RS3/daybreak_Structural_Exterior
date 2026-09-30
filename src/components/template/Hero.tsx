@@ -1,0 +1,102 @@
+import type { Cta, ImageRef, TrustItem } from "@/lib/template/types";
+import { Img } from "@/components/ui/Img";
+import { ArrowLink, Illustrative, PillLabel } from "./primitives";
+import { TrustMarquee } from "./TrustMarquee";
+import { TrustRow } from "./TrustRow";
+
+/**
+ * Crest's hero: a sky, a centred headline, the actions, and a real house
+ * standing in the sky below it. The headline sells the contractor; the tool
+ * that makes the site different floats over the house as a card, one click
+ * from the primary action rather than in place of it.
+ *
+ * The house is a cut-out (transparent WebP) so it sits in the gradient with
+ * no rectangle around it; its base dissolves into the white page. The header
+ * reads #header-overlay-end to know when the sky has scrolled away.
+ */
+export function Hero({
+  kicker,
+  title,
+  lede,
+  action,
+  secondary,
+  contact,
+  house,
+  inset,
+  proof,
+  trust,
+  trustMarquee = false,
+  trustNote = <Illustrative>Illustrative figures — fictional contractor</Illustrative>,
+}: {
+  kicker: string;
+  title: React.ReactNode;
+  lede: React.ReactNode;
+  action: React.ReactNode;
+  secondary?: Cta;
+  /** A line under the actions, e.g. "or call (817) 555-0142". */
+  contact?: { prefix: string; label: string; href: string };
+  house: ImageRef & { width: number; height: number };
+  inset?: React.ReactNode;
+  /** Proof shown under the actions, above the house (e.g. founders and a track record). */
+  proof?: React.ReactNode;
+  trust: TrustItem[];
+  /** Tag under the trust row — the "illustrative" label on a demo, null on a real site. */
+  trustNote?: React.ReactNode;
+  /** Run the trust facts as a full-width moving strip instead of a static row. */
+  trustMarquee?: boolean;
+}) {
+  return (
+    <>
+      <section aria-labelledby="hero-title" className="sky-hero relative -mt-[72px] overflow-hidden pt-[72px]">
+        <div className="container-x relative z-10 pt-14 text-center sm:pt-20 lg:pt-24">
+          <PillLabel tone="sky" className="animate-[rise-in_0.9s_var(--ease-out-expo)_both]">
+            {kicker}
+          </PillLabel>
+          <h1
+            id="hero-title"
+            className="home-display mx-auto mt-6 max-w-[17ch] animate-[rise-in_1.1s_var(--ease-out-expo)_0.08s_both] text-[clamp(2.6rem,6vw,5.25rem)] text-white"
+          >
+            {title}
+          </h1>
+          <p className="mx-auto mt-6 max-w-[36rem] animate-[rise-in_1.1s_var(--ease-out-expo)_0.2s_both] text-[17px] leading-[1.55] text-white sm:text-[19px]">
+            {lede}
+          </p>
+          <div className="mx-auto mt-9 max-w-xl animate-[rise-in_1.1s_var(--ease-out-expo)_0.32s_both]">{action}</div>
+          <div className="mt-6 flex animate-[rise-in_1.1s_var(--ease-out-expo)_0.42s_both] flex-wrap items-center justify-center gap-x-7 gap-y-2">
+            {secondary && (
+              <ArrowLink href={secondary.href} tone="light">
+                {secondary.label}
+              </ArrowLink>
+            )}
+            {contact && (
+              <a href={contact.href} className="text-[15px] text-white hover:text-white/80">
+                {contact.prefix} <span className="font-medium tabular-nums">{contact.label}</span>
+              </a>
+            )}
+          </div>
+          {proof && <div className="mt-8 animate-[rise-in_1.1s_var(--ease-out-expo)_0.52s_both]">{proof}</div>}
+        </div>
+
+        <div className="relative mx-auto mt-10 w-full max-w-[1080px] sm:mt-4">
+          <span id="header-overlay-end" aria-hidden className="absolute top-[18%]" />
+          <div
+            className="house-fade relative w-full animate-[house-in_2.2s_var(--ease-out-expo)_0.25s_both]"
+            style={{ aspectRatio: `${house.width} / ${house.height}` }}
+          >
+            <Img src={house.src} alt={house.alt} priority sizes="(min-width:1080px) 1080px, 100vw" className="object-contain object-bottom" />
+          </div>
+          {inset && (
+            <div className="relative z-10 -mt-24 flex animate-[card-in_1s_var(--ease-out-expo)_1.1s_both] justify-center px-5 sm:absolute sm:right-[5%] sm:top-[16%] sm:mt-0 sm:block sm:px-0 lg:right-[3%]">
+              {inset}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <div className={trustMarquee ? "bg-white" : "bg-white pb-6 pt-4"}>
+        {trustMarquee ? <TrustMarquee items={trust} /> : <TrustRow items={trust} />}
+        {trustNote && <div className="mt-5 flex justify-center">{trustNote}</div>}
+      </div>
+    </>
+  );
+}
