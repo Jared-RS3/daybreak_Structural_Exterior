@@ -35,7 +35,7 @@ export const bookingHref =
 
 export const daybreak = {
   name: agency.name,
-  descriptor: "Websites for foundation & exterior contractors",
+  descriptor: "",
   email: agency.email,
   offerHref: "/#free-design",
   workHref: "/work/daybreak-foundation",
@@ -94,7 +94,7 @@ export const offer = {
  */
 export const promise: { title: string; lede: string; items: Guarantee[] } = {
   title: "You don't pay until you love the design.",
-  lede: "We'll change your homepage design as many times as it takes. If it still isn't right, you walk away and owe us nothing.",
+  lede: "We’ll refine your homepage with your feedback before you commit. If the direction still isn’t right after the initial design process, you’re free to walk away.",
   items: [
     {
       title: "Our names on every site",
@@ -118,7 +118,6 @@ export const promise: { title: string; lede: string; items: Guarantee[] } = {
 export const heroPromises = [
   "Free homepage design before you pay",
   "Built to book more inspections",
-  "Foundation, crawl space & siding only",
 ];
 
 /**

@@ -1,12 +1,26 @@
 import type { ProcessStep } from "@/lib/template/types";
 import { AxHead } from "./ax";
 
-/** Three steps in ruled columns: the number in mono, the step, the detail. */
-export function AxProcess({ steps, title }: { steps: ProcessStep[]; title: React.ReactNode }) {
+/**
+ * Three steps in ruled columns: the number in mono, the step, the detail.
+ * With `lede` and `action` it doubles as the offer: step one is the free
+ * design, so the ask sits in the head beside it.
+ */
+export function AxProcess({
+  steps,
+  title,
+  lede,
+  action,
+}: {
+  steps: ProcessStep[];
+  title: React.ReactNode;
+  lede?: React.ReactNode;
+  action?: React.ReactNode;
+}) {
   return (
     <section aria-labelledby="process-title" className="bg-white py-20 sm:py-24 lg:py-28">
       <div className="container-wide">
-        <AxHead id="process-title" label="How we start" title={title} />
+        <AxHead id="process-title" label="How we start" title={title} lede={lede} aside={action} />
         <ol className="mt-14 grid gap-10 sm:grid-cols-3 sm:gap-8 lg:mt-16">
           {steps.map((s, i) => (
             <li key={s.title} className="border-t border-fg pt-5">

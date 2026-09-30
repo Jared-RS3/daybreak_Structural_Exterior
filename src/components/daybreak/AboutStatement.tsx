@@ -11,10 +11,12 @@ import { AxButton, AxLabel } from "./ax";
  * that roll into place like an odometer.
  */
 export function AboutStatement({
+  label = "About us",
   statement,
   stats,
   people,
 }: {
+  label?: string;
   statement: string;
   stats: { value: string; label: string }[];
   people: { name: string; role: string; src: string }[];
@@ -23,7 +25,7 @@ export function AboutStatement({
     <section id="about" aria-labelledby="about-title" className="flex min-h-svh scroll-mt-20 flex-col bg-panel py-16 sm:py-20">
       <div className="container-wide flex flex-1 flex-col">
         <div className="border-t border-rule pt-6">
-          <AxLabel>About us</AxLabel>
+          <AxLabel>{label}</AxLabel>
         </div>
         <h2 id="about-title" className="sr-only">
           About Daybreak

@@ -354,6 +354,25 @@
   @media (min-width: 640px) { --sky-text: 700px; }
 }
 
+/* The agency home's phone sky: a brighter, bluer version of the same sky. It
+   holds a colour white text passes 4.5:1 on (#2d7aaf, 4.65:1) down past the
+   ticked promises, then opens up quickly behind the house. Desktop keeps
+   sky-hero's stops. */
+@utility sky-hero-bright {
+  @media (max-width: 639px) {
+    --sky-text: 660px;
+    background-image: linear-gradient(
+      180deg,
+      #236ea4 0px,
+      #2d7aaf var(--sky-text),
+      #8cc3e7 calc(var(--sky-text) + 90px),
+      #cae3f1 calc(var(--sky-text) + 170px),
+      #ecf2f7 calc(var(--sky-text) + 250px),
+      #ffffff calc(var(--sky-text) + 340px)
+    );
+  }
+}
+
 @utility sky-page {
   --sky-text: 100%;
   background-image: linear-gradient(180deg, var(--color-sky-1) 0%, var(--color-sky-2) var(--sky-text));

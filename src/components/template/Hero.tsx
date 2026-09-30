@@ -1,5 +1,6 @@
 import type { Cta, ImageRef, TrustItem } from "@/lib/template/types";
 import { Img } from "@/components/ui/Img";
+import { cn } from "@/lib/utils";
 import { ArrowLink, Illustrative, PillLabel } from "./primitives";
 import { TrustMarquee } from "./TrustMarquee";
 import { TrustRow } from "./TrustRow";
@@ -13,6 +14,11 @@ import { TrustRow } from "./TrustRow";
  * The house is a cut-out (transparent WebP) so it sits in the gradient with
  * no rectangle around it; its base dissolves into the white page. The header
  * reads #header-overlay-end to know when the sky has scrolled away.
+ *
+ * `phone="proof-first"` is the agency home's phone layout (desktop is
+ * unchanged): no kicker, the proof pill on top, a heavier three-line
+ * headline, buttons sized to their labels, the inset floated on the house,
+ * and a brighter sky. The contractor template keeps the default stack.
  */
 export function Hero({
   kicker,
@@ -27,6 +33,7 @@ export function Hero({
   trust,
   trustMarquee = false,
   trustNote = <Illustrative>Illustrative figures — fictional contractor</Illustrative>,
+  phone = "stacked",
 }: {
   kicker: string;
   title: React.ReactNode;
@@ -44,40 +51,81 @@ export function Hero({
   trustNote?: React.ReactNode;
   /** Run the trust facts as a full-width moving strip instead of a static row. */
   trustMarquee?: boolean;
+  /** Phone layout; see above. */
+  phone?: "stacked" | "proof-first";
 }) {
+  const pf = phone === "proof-first";
   return (
     <>
-      <section aria-labelledby="hero-title" className="sky-hero relative -mt-[72px] overflow-hidden pt-[72px]">
-        <div className="container-x relative z-10 pt-14 text-center sm:pt-20 lg:pt-24">
-          <PillLabel tone="sky" className="animate-[rise-in_0.9s_var(--ease-out-expo)_both]">
-            {kicker}
-          </PillLabel>
+      <section
+        aria-labelledby="hero-title"
+        className={cn("sky-hero relative -mt-[72px] overflow-hidden pt-[72px]", pf && "sky-hero-bright")}
+      >
+        <div
+          className={cn(
+            "container-x relative z-10 pt-14 text-center sm:pt-20 lg:pt-24",
+            pf && "max-sm:flex max-sm:flex-col max-sm:items-center max-sm:px-4 max-sm:pt-6",
+          )}
+        >
+          {kicker && (
+            <PillLabel tone="sky" className={cn("animate-[rise-in_0.9s_var(--ease-out-expo)_both]", pf && "max-sm:hidden")}>
+              {kicker}
+            </PillLabel>
+          )}
           <h1
             id="hero-title"
-            className="home-display mx-auto mt-6 max-w-[17ch] animate-[rise-in_1.1s_var(--ease-out-expo)_0.08s_both] text-[clamp(2.6rem,6vw,5.25rem)] text-white"
+            className={cn(
+              "home-display mx-auto mt-6 max-w-[17ch] animate-[rise-in_1.1s_var(--ease-out-expo)_0.08s_both] text-[clamp(2.6rem,6vw,5.25rem)] text-white",
+              // Sized to the screen so it always breaks "Websites that book /
+              // foundation, crawl / space & siding jobs."
+              pf && "max-sm:mt-5 max-sm:max-w-none max-sm:text-[8.9vw] max-sm:font-bold max-sm:leading-[1.04] max-sm:tracking-[-0.045em]",
+            )}
           >
             {title}
           </h1>
-          <p className="mx-auto mt-6 max-w-[36rem] animate-[rise-in_1.1s_var(--ease-out-expo)_0.2s_both] text-[17px] leading-[1.55] text-white sm:text-[19px]">
+          <p
+            className={cn(
+              "mx-auto mt-6 max-w-[36rem] animate-[rise-in_1.1s_var(--ease-out-expo)_0.2s_both] text-[17px] leading-[1.55] text-white sm:text-[19px]",
+              pf && "max-sm:mt-4 max-sm:max-w-[21.5rem] max-sm:text-[15px] max-sm:leading-[1.5]",
+            )}
+          >
             {lede}
           </p>
-          <div className="mx-auto mt-9 max-w-xl animate-[rise-in_1.1s_var(--ease-out-expo)_0.32s_both]">{action}</div>
-          <div className="mt-6 flex animate-[rise-in_1.1s_var(--ease-out-expo)_0.42s_both] flex-wrap items-center justify-center gap-x-7 gap-y-2">
-            {secondary && (
-              <ArrowLink href={secondary.href} tone="light">
-                {secondary.label}
-              </ArrowLink>
+          <div
+            className={cn(
+              "mx-auto mt-9 max-w-xl animate-[rise-in_1.1s_var(--ease-out-expo)_0.32s_both]",
+              pf && "max-sm:mt-6 max-sm:w-full",
             )}
-            {contact && (
-              <a href={contact.href} className="text-[15px] text-white hover:text-white/80">
-                {contact.prefix} <span className="font-medium tabular-nums">{contact.label}</span>
-              </a>
-            )}
+          >
+            {action}
           </div>
-          {proof && <div className="mt-8 animate-[rise-in_1.1s_var(--ease-out-expo)_0.52s_both]">{proof}</div>}
+          {(secondary || contact) && (
+            <div className="mt-6 flex animate-[rise-in_1.1s_var(--ease-out-expo)_0.42s_both] flex-wrap items-center justify-center gap-x-7 gap-y-2">
+              {secondary && (
+                <ArrowLink href={secondary.href} tone="light">
+                  {secondary.label}
+                </ArrowLink>
+              )}
+              {contact && (
+                <a href={contact.href} className="text-[15px] text-white hover:text-white/80">
+                  {contact.prefix} <span className="font-medium tabular-nums">{contact.label}</span>
+                </a>
+              )}
+            </div>
+          )}
+          {proof && (
+            <div
+              className={cn(
+                "mt-8 animate-[rise-in_1.1s_var(--ease-out-expo)_0.52s_both]",
+                pf && "max-sm:order-first max-sm:mt-0",
+              )}
+            >
+              {proof}
+            </div>
+          )}
         </div>
 
-        <div className="relative mx-auto mt-10 w-full max-w-[1080px] sm:mt-4">
+        <div className={cn("relative mx-auto mt-10 w-full max-w-[1080px] sm:mt-4", pf && "max-sm:mt-9")}>
           <span id="header-overlay-end" aria-hidden className="absolute top-[18%]" />
           <div
             className="house-fade relative w-full animate-[house-in_2.2s_var(--ease-out-expo)_0.25s_both]"
@@ -86,7 +134,12 @@ export function Hero({
             <Img src={house.src} alt={house.alt} priority sizes="(min-width:1080px) 1080px, 100vw" className="object-contain object-bottom" />
           </div>
           {inset && (
-            <div className="relative z-10 -mt-24 flex animate-[card-in_1s_var(--ease-out-expo)_1.1s_both] justify-center px-5 sm:absolute sm:right-[5%] sm:top-[16%] sm:mt-0 sm:block sm:px-0 lg:right-[3%]">
+            <div
+              className={cn(
+                "relative z-10 -mt-24 flex animate-[card-in_1s_var(--ease-out-expo)_1.1s_both] justify-center px-5 sm:absolute sm:right-[5%] sm:top-[16%] sm:mt-0 sm:block sm:px-0 lg:right-[3%]",
+                pf && "max-sm:absolute max-sm:right-4 max-sm:top-[7%] max-sm:mt-0 max-sm:block max-sm:px-0",
+              )}
+            >
               {inset}
             </div>
           )}

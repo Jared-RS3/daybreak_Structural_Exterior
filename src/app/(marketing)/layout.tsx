@@ -1,14 +1,14 @@
+import { DaybreakFooter } from "@/components/daybreak/DaybreakFooter";
 import { SiteHeader } from "@/components/template/SiteHeader";
 import { StickyCta } from "@/components/template/StickyCta";
-import { DaybreakFooter } from "@/components/daybreak/DaybreakFooter";
-import { daybreak } from "@/lib/daybreak";
 import { legal } from "@/lib/agency";
+import { daybreak } from "@/lib/daybreak";
 
 const nav = [
-  { label: "Trades", href: "/#trades" },
   { label: "Our work", href: "/#work" },
-  { label: "How it works", href: "/#system" },
   { label: "Try the crack checker", href: "/#tools" },
+  { label: "How it works", href: "/#system" },
+  { label: "Value calculator", href: "/#calculator" },
   { label: "FAQ", href: "/#faq" },
 ];
 
@@ -19,7 +19,11 @@ const secondary = { label: "See a site we built", href: daybreak.workHref };
  * The agency's own chrome, in the same design language as the contractor
  * sites it builds — so the site that sells the work looks like the work.
  */
-export default function MarketingLayout({ children }: { children: React.ReactNode }) {
+export default function MarketingLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex min-h-full flex-1 flex-col bg-white text-fg">
       <SiteHeader
@@ -42,10 +46,10 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           {
             title: "Daybreak",
             links: [
-              { label: "The trades we build for", href: "/#trades" },
               { label: "Our work", href: "/#work" },
               { label: "How it works", href: "/#system" },
               { label: "Value calculator", href: "/#calculator" },
+              { label: "Who you'll work with", href: "/#about" },
               { label: "Free homepage design", href: daybreak.offerHref },
             ],
           },
@@ -54,8 +58,14 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             links: [
               { label: "Contractor site we built", href: daybreak.workHref },
               { label: "Crack & symptom checker", href: daybreak.toolHref },
-              { label: "Service page example", href: `${daybreak.workHref}/services/foundation-repair` },
-              { label: "Case study example", href: `${daybreak.workHref}/projects/arlington-brick-ranch-piers` },
+              {
+                label: "Service page example",
+                href: `${daybreak.workHref}/services/foundation-repair`,
+              },
+              {
+                label: "Case study example",
+                href: `${daybreak.workHref}/projects/arlington-brick-ranch-piers`,
+              },
             ],
           },
           {

@@ -4,9 +4,11 @@ import { WorkTabs, type WorkItem } from "./WorkTabs";
 
 /**
  * The work showcase: five concept homepages across the three trades, each
- * labelled as a concept for a fictional company, all drawn in code.
+ * labelled as a concept for a fictional company, all drawn in code. `tool`
+ * (the live crack checker) follows the tabs, so the proof ends with something
+ * the contractor can try for themselves.
  */
-export function WorkShowcase({ offerHref }: { offerHref: string }) {
+export function WorkShowcase({ offerHref, tool }: { offerHref: string; tool?: React.ReactNode }) {
   const items: WorkItem[] = [
     {
       id: "cornerstone",
@@ -15,7 +17,6 @@ export function WorkShowcase({ offerHref }: { offerHref: string }) {
       domain: "cornerstonefoundation.example",
       kind: "concept",
       blurb: "For a high end foundation company. Calm and confident, and it shows homeowners where each pier goes before showing the price.",
-      points: ["Pier positions called out on the photo", "Elevation survey explained up front", "Estimate given as a price range", "Inspection booked from the estimate"],
     },
     {
       id: "bedrock",
@@ -24,7 +25,6 @@ export function WorkShowcase({ offerHref }: { offerHref: string }) {
       domain: "bedrockfoundation.example",
       kind: "concept",
       blurb: "For a busy foundation repair company. Bold and easy to act on, with the crack checker right at the top.",
-      points: ["Crack checker in the first screen", "Phone number always one tap away", "Pages for every repair method", "Reviews beside every call to action"],
     },
     {
       id: "dryline",
@@ -33,7 +33,6 @@ export function WorkShowcase({ offerHref }: { offerHref: string }) {
       domain: "drylinecrawlspaces.example",
       kind: "concept",
       blurb: "For a crawl space company that wants to explain the problem clearly, with the numbers up front.",
-      points: ["Musty-smell and moisture question paths", "Humidity before & after on every project", "Encapsulation explained step by step", "Town pages for local search"],
     },
     {
       id: "clapboard",
@@ -42,7 +41,6 @@ export function WorkShowcase({ offerHref }: { offerHref: string }) {
       domain: "clapboardandco.example",
       kind: "concept",
       blurb: "For a siding contractor. Big photos, plus a material and colour picker near the top of the page.",
-      points: ["Material & colour picker", "Price range by home size", "HOA & permit guidance", "Book a site visit in two taps"],
     },
     {
       id: "keystone",
@@ -51,7 +49,6 @@ export function WorkShowcase({ offerHref }: { offerHref: string }) {
       domain: "keystonebasements.example",
       kind: "concept",
       blurb: "For a waterproofing and foundation company. Lots of before & after photos, and a simple way to describe the problem.",
-      points: ["Before & after project pages", "Problem picker: cracks, water, floors", "Gallery filtered by repair", "Financing shown next to price"],
     },
   ];
 
@@ -83,6 +80,7 @@ export function WorkShowcase({ offerHref }: { offerHref: string }) {
             ]}
           />
         </div>
+        {tool && <div className="mt-10 lg:mt-14">{tool}</div>}
       </div>
     </section>
   );

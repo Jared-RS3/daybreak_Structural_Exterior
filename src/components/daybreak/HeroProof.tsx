@@ -16,17 +16,17 @@ export function HeroProof({
   byline: string;
 }) {
   return (
-    <div className="mx-auto inline-flex items-center gap-3.5 rounded-[28px] sm:rounded-full border border-white/25 bg-white/12 py-2 pl-2 pr-5 text-left backdrop-blur-md sm:gap-4 sm:pr-6">
+    <div className="mx-auto inline-flex items-center gap-3.5 rounded-[28px] sm:rounded-full border border-white/25 bg-white/12 py-2 pl-2 pr-5 text-left backdrop-blur-md max-sm:gap-2.5 max-sm:py-1.5 max-sm:pl-1.5 max-sm:pr-3.5 sm:gap-4 sm:pr-6">
       <span className="flex shrink-0 -space-x-3">
         {people.map((p) => (
-          <span key={p.name} className="relative size-11 overflow-hidden rounded-full ring-2 ring-white sm:size-12">
+          <span key={p.name} className="relative size-11 overflow-hidden rounded-full ring-2 ring-white max-sm:size-[34px] sm:size-12">
             <Img src={p.src} alt={p.name} sizes="48px" className="object-[50%_25%]" />
           </span>
         ))}
       </span>
       <span className="min-w-0">
-        <span className="block text-[15px] font-medium leading-[1.3] text-white sm:text-[16px]">{claim}</span>
-        <span className="mt-0.5 block text-[14px] leading-[1.3] text-white/75 sm:text-[15px]">{byline}</span>
+        <span className="block text-[15px] font-medium leading-[1.3] text-white max-sm:text-[min(12px,3.05vw)] max-sm:text-balance sm:text-[16px]">{claim}</span>
+        <span className="mt-0.5 block text-[14px] leading-[1.3] text-white/75 max-sm:text-[11.5px] sm:text-[15px]">{byline}</span>
       </span>
     </div>
   );

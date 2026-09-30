@@ -96,8 +96,8 @@ export default function AccessibilityPage() {
                 The concept homepages are hidden from screen readers.
               </strong>{" "}
               The sample sites in &ldquo;Our work&rdquo; are drawn illustrations, so they are
-              marked as decorative and their text is not read out. The name, trade,
-              description and features of each one are in real text in the panel beside it.
+              marked as decorative and their text is not read out. Each one&rsquo;s name,
+              trade and description are provided as text for screen readers instead.
             </>,
             <>
               <strong className="text-ink-900">The crack checker&rsquo;s answer is a summary.</strong>{" "}
