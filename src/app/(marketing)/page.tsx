@@ -77,17 +77,12 @@ export default function AgencyHome() {
       <Hero
         kicker=""
         title="Websites that book foundation, crawl space & siding jobs."
-        lede="We design custom websites for foundation repair, crawl space and siding contractors that turn a worried homeowner's search into a call, a booked inspection and a signed job."
+        lede="Custom websites that turn a worried homeowner's search into a booked inspection and a signed job."
         action={
           <>
-            {/* Phone: stacked and sized to their labels, the second one narrower. */}
-            <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <PillLink href={daybreak.offerHref} variant="light" size="lg" className="max-sm:px-9">
+            <div className="flex justify-center">
+              <PillLink href={bookingHref} variant="light" size="lg" className="max-sm:px-9">
                 {offer.cta}
-              </PillLink>
-              <PillLink href={bookingHref} variant="glass" size="lg" className="max-sm:gap-2.5 max-sm:px-14">
-                <Icon name="calendar" className="size-4.5" />
-                Book a call
               </PillLink>
             </div>
             <ul className="mx-auto mt-6 flex w-fit flex-col items-start gap-x-5 gap-y-2 text-[15px] text-white max-sm:gap-y-2.5 max-sm:text-[16px] sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:text-[16px]">

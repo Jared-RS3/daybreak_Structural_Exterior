@@ -16,9 +16,9 @@ import { TrustRow } from "./TrustRow";
  * reads #header-overlay-end to know when the sky has scrolled away.
  *
  * `phone="proof-first"` is the agency home's phone layout (desktop is
- * unchanged): no kicker, the proof pill on top, a heavier three-line
+ * unchanged): no kicker, no proof pill, a heavier three-line
  * headline, buttons sized to their labels, the inset floated on the house,
- * and a brighter sky. The contractor template keeps the default stack.
+ * a bigger house pulled up under the actions, and a brighter sky. The contractor template keeps the default stack.
  */
 export function Hero({
   kicker,
@@ -117,7 +117,7 @@ export function Hero({
             <div
               className={cn(
                 "mt-8 animate-[rise-in_1.1s_var(--ease-out-expo)_0.52s_both]",
-                pf && "max-sm:order-first max-sm:mt-0",
+                pf && "max-sm:hidden",
               )}
             >
               {proof}
@@ -125,7 +125,13 @@ export function Hero({
           )}
         </div>
 
-        <div className={cn("relative mx-auto mt-10 w-full max-w-[1080px] sm:mt-4", pf && "max-sm:mt-9")}>
+        <div
+          className={cn(
+            "relative mx-auto mt-10 w-full max-w-[1080px] sm:mt-4",
+            // Phone: the house pulled up and a touch wider than the screen, so more of it shows.
+            pf && "max-sm:-ml-[8%] max-sm:mt-2 max-sm:w-[116%] max-sm:max-w-none",
+          )}
+        >
           <span id="header-overlay-end" aria-hidden className="absolute top-[18%]" />
           <div
             className="house-fade relative w-full animate-[house-in_2.2s_var(--ease-out-expo)_0.25s_both]"
@@ -137,7 +143,7 @@ export function Hero({
             <div
               className={cn(
                 "relative z-10 -mt-24 flex animate-[card-in_1s_var(--ease-out-expo)_1.1s_both] justify-center px-5 sm:absolute sm:right-[5%] sm:top-[16%] sm:mt-0 sm:block sm:px-0 lg:right-[3%]",
-                pf && "max-sm:absolute max-sm:right-4 max-sm:top-[7%] max-sm:mt-0 max-sm:block max-sm:px-0",
+                pf && "max-sm:absolute max-sm:right-[calc(8%+1rem)] max-sm:top-[7%] max-sm:mt-0 max-sm:block max-sm:px-0",
               )}
             >
               {inset}
