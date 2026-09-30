@@ -1,6 +1,5 @@
 import { DaybreakFooter } from "@/components/daybreak/DaybreakFooter";
 import { SiteHeader } from "@/components/template/SiteHeader";
-import { StickyCta } from "@/components/template/StickyCta";
 import { legal } from "@/lib/agency";
 import { daybreak } from "@/lib/daybreak";
 
@@ -78,12 +77,12 @@ export default function MarketingLayout({
           },
         ]}
       />
-      <StickyCta
+      {/* <StickyCta
         primary={primary}
         secondary={{ label: "Our work", href: daybreak.workHref }}
         hideOn={[]}
         spacerClassName="bg-black"
-      />
+      /> */}
     </div>
   );
 }

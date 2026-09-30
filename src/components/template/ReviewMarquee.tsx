@@ -10,8 +10,19 @@ import { cn } from "@/lib/utils";
  *
  * With reduced motion the rows stop and become ordinary horizontal scrollers,
  * so every review stays reachable.
+ *
+ * `square` swaps the warm rounded cards for the agency site's square grey
+ * panels.
  */
-export function ReviewMarquee({ reviews, speed = 90 }: { reviews: Review[]; speed?: number }) {
+export function ReviewMarquee({
+  reviews,
+  speed = 90,
+  square = false,
+}: {
+  reviews: Review[];
+  speed?: number;
+  square?: boolean;
+}) {
   const half = Math.ceil(reviews.length / 2);
   const rows = [reviews.slice(0, half), reviews.slice(half)].filter((r) => r.length);
 
@@ -29,7 +40,7 @@ export function ReviewMarquee({ reviews, speed = 90 }: { reviews: Review[]; spee
             style={{ "--dur": `${speed + i * 12}s` } as React.CSSProperties}
           >
             {[...row, ...row].map((r, j) => (
-              <ReviewCard key={`${r.id}-${j}`} review={r} hidden={j >= row.length} />
+              <ReviewCard key={`${r.id}-${j}`} review={r} hidden={j >= row.length} square={square} />
             ))}
           </ul>
         </div>
@@ -38,14 +49,28 @@ export function ReviewMarquee({ reviews, speed = 90 }: { reviews: Review[]; spee
   );
 }
 
-function ReviewCard({ review: r, hidden }: { review: Review; hidden: boolean }) {
+function ReviewCard({ review: r, hidden, square }: { review: Review; hidden: boolean; square: boolean }) {
   const initials = r.name
     .split(" ")
     .map((w) => w[0])
     .join("");
+  // On phones the stars sit above the quote, so the name has the footer's width.
+  const stars = (className: string) => (
+    <span className={cn("flex gap-0.5", className)} role="img" aria-label={`${r.rating} out of 5 stars`}>
+      {Array.from({ length: 5 }).map((_, k) => (
+        <Icon
+          key={k}
+          name="star"
+          filled
+          className={cn("size-4.5", k < r.rating ? "text-[#f2b53a]" : square ? "text-panel-2" : "text-[#e7e4dd]")}
+        />
+      ))}
+    </span>
+  );
   return (
     <li aria-hidden={hidden || undefined} className="w-[82vw] max-w-[31rem] shrink-0">
-      <figure className="flex h-full flex-col rounded-[14px] bg-[#f7f6f3] p-7 sm:p-8">
+      <figure className={cn("flex h-full flex-col p-7 sm:p-8", square ? "bg-panel" : "rounded-[14px] bg-[#f7f6f3]")}>
+        {stars("mb-5 sm:hidden")}
         <blockquote className="text-[17px] leading-[1.6] text-fg/85 sm:text-[18px]">&ldquo;{r.quote}&rdquo;</blockquote>
         <div className="mt-auto pt-8">
           <p className="flex items-center justify-between gap-4 text-[15px] text-muted">
@@ -60,10 +85,13 @@ function ReviewCard({ review: r, hidden }: { review: Review; hidden: boolean }) 
               </span>
             )}
           </p>
-          <div className="mt-6 flex items-center gap-4 border-t border-[#e7e4dd] pt-6">
+          <div className={cn("mt-6 flex items-center gap-4 border-t pt-6", square ? "border-rule" : "border-[#e7e4dd]")}>
             <span
               aria-hidden
-              className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#e9e5dc] text-[15px] font-semibold text-fg"
+              className={cn(
+                "flex size-12 shrink-0 items-center justify-center rounded-full text-[15px] font-semibold text-fg",
+                square ? "bg-panel-2" : "bg-[#e9e5dc]",
+              )}
             >
               {initials}
             </span>
@@ -71,16 +99,7 @@ function ReviewCard({ review: r, hidden }: { review: Review; hidden: boolean }) 
               <span className="font-home block truncate text-[19px] font-medium tracking-[-0.01em] text-fg">{r.name}</span>
               <span className="block truncate text-[15px] text-muted">{r.role ?? r.service}</span>
             </span>
-            <span className="flex shrink-0 gap-0.5" role="img" aria-label={`${r.rating} out of 5 stars`}>
-              {Array.from({ length: 5 }).map((_, k) => (
-                <Icon
-                  key={k}
-                  name="star"
-                  filled
-                  className={cn("size-4.5", k < r.rating ? "text-[#f2b53a]" : "text-[#e7e4dd]")}
-                />
-              ))}
-            </span>
+            {stars("shrink-0 max-sm:hidden")}
           </div>
         </div>
       </figure>

@@ -4,6 +4,7 @@ import { AxCalculator } from "@/components/daybreak/AxCalculator";
 import { AxContact } from "@/components/daybreak/AxContact";
 import { AxFaq } from "@/components/daybreak/AxFaq";
 import { AxProcess } from "@/components/daybreak/AxProcess";
+import { AxReviews } from "@/components/daybreak/AxReviews";
 import { AxTerms } from "@/components/daybreak/AxTerms";
 import { AxToolBand } from "@/components/daybreak/AxTools";
 import { HeroProof } from "@/components/daybreak/HeroProof";
@@ -32,8 +33,10 @@ import {
   heroPromises,
   heroTrust,
   offer,
-  process,
+  placeholderReviews,
+  process as startSteps,
   promise,
+  reviews,
   system,
 } from "@/lib/daybreak";
 import { houseImage, quoteCta, tool } from "@/lib/demo-site";
@@ -123,6 +126,14 @@ export default function AgencyHome() {
         }
       />
 
+      {/* Real reviews go in lib/daybreak.ts; until then the layout shows
+          placeholders in development and nothing in production. */}
+      {reviews.length ? (
+        <AxReviews reviews={reviews} />
+      ) : (
+        process.env.NODE_ENV === "development" && <AxReviews reviews={placeholderReviews} placeholder />
+      )}
+
       <section
         id="system"
         aria-labelledby="system-title"
@@ -160,7 +171,7 @@ export default function AgencyHome() {
       <AxCalculator trades={calculatorTrades} offerHref={daybreak.offerHref} />
 
       <AxProcess
-        steps={process}
+        steps={startSteps}
         title="Start with a free homepage design."
         lede=""
         action={<AxButton href={daybreak.offerHref}>{offer.cta}</AxButton>}

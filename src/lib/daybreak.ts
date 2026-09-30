@@ -14,7 +14,7 @@
 
 import type { IconKey } from "@/components/ui/Icon";
 import { agency } from "./agency";
-import type { Comparison, Faq, Guarantee, ProcessStep } from "./template/types";
+import type { Comparison, Faq, Guarantee, ProcessStep, Review } from "./template/types";
 
 /**
  * Cal.com booking for the hero's consultation button.
@@ -341,6 +341,38 @@ export const terms: Guarantee[] = [
     body: "Below what this will cost in a year, in exchange for permission to publish what happened, once there's something to publish.",
   },
 ];
+
+/**
+ * Client reviews for the homepage carousel: real ones only, in the client's
+ * own words and with their permission. While this is empty the section is
+ * hidden in production and shows `placeholderReviews` in development, so the
+ * layout can be seen without a made-up review ever going live.
+ *
+ * TODO(daybreak): add real reviews here. `role` is shown under the name
+ * ("Owner, Company"), `city` is where their business is, and `headline` and
+ * `source` aren't shown in the carousel but are required by the type.
+ */
+export const reviews: Review[] = [];
+
+/** Layout stand-ins for `reviews`, development only. Obviously not real. */
+export const placeholderReviews: Review[] = [
+  "Placeholder review. The client's own words go here: what their website was like before, and what changed after.",
+  "Placeholder review. For example, how inspection requests from Google changed, in their words.",
+  "Placeholder review. What working with the two founders was like, from the first design to launch day.",
+  "Placeholder review. A short one.",
+  "Placeholder review. What the monthly reporting showed them about where their jobs come from.",
+  "Placeholder review. How homeowners use the crack checker or the estimate before they call.",
+].map((quote, i) => ({
+  id: `placeholder-${i + 1}`,
+  headline: "Placeholder",
+  quote,
+  name: "Client Name",
+  role: "Owner, Company name",
+  city: "City, ST",
+  service: ["Foundation repair", "Crawl space", "Siding"][i % 3],
+  rating: 5,
+  source: "Placeholder",
+}));
 
 export const faqs: Faq[] = [
   {

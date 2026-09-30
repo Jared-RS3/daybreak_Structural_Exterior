@@ -1,33 +1,39 @@
 import type { Review } from "@/lib/template/types";
 import { ReviewMarquee } from "@/components/template/ReviewMarquee";
-import { Illustrative } from "@/components/template/primitives";
-import { AxHead } from "./ax";
+import { AxHead, AxLabel } from "./ax";
 
 /**
- * Reviews, as they appear on the sites Daybreak builds. These are the
- * reference build's homeowner reviews — the contractor is fictional and the
- * section says so. They are shown here as the product, not as testimonials
- * for Daybreak; client testimonials go in only once real ones are cleared.
+ * Client reviews as two slow sideways rows, full width under an Axion head.
+ * Real reviews only in production: pass `placeholder` in development to see
+ * the layout, and it carries a visible tag saying so. With nothing to show,
+ * the section renders nothing.
  */
-export function AxReviews({ reviews }: { reviews: Review[] }) {
+export function AxReviews({ reviews, placeholder = false }: { reviews: Review[]; placeholder?: boolean }) {
+  if (!reviews.length) return null;
   return (
     <section id="reviews" aria-labelledby="reviews-title" className="scroll-mt-20 overflow-hidden bg-white py-20 sm:py-24 lg:py-28">
       <div className="container-wide">
         <AxHead
           id="reviews-title"
-          label="Reviews, built in"
+          label={
+            <span className="flex flex-wrap items-center justify-center gap-3">
+              <AxLabel>Reviews</AxLabel>
+              {placeholder && (
+                <span className="mono-label bg-sun px-2.5 py-1 text-[12px] text-fg">Placeholders · hidden in production</span>
+              )}
+            </span>
+          }
           title={
             <>
-              Reviews that sell
-              <br className="hidden sm:block" /> the next job.
+              What contractors say
+              <br className="hidden sm:block" /> about working with us.
             </>
           }
-          lede="Every site we build puts real, attributed reviews next to the decision — with the town, the date and the job. Here's how they run on our reference build."
-          aside={<Illustrative>Illustrative — fictional contractor</Illustrative>}
+          lede="Foundation repair, crawl space and siding contractors on their new sites, in their own words."
         />
       </div>
       <div className="mt-14 lg:mt-16">
-        <ReviewMarquee reviews={reviews} />
+        <ReviewMarquee reviews={reviews} square />
       </div>
     </section>
   );
