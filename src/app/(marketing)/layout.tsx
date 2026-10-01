@@ -7,12 +7,11 @@ const nav = [
   { label: "Our work", href: "/#work" },
   { label: "Try the crack checker", href: "/#tools" },
   { label: "How it works", href: "/#system" },
-  { label: "Value calculator", href: "/#calculator" },
   { label: "FAQ", href: "/#faq" },
 ];
 
-const primary = { label: "Free homepage design", href: daybreak.offerHref };
-const secondary = { label: "See a site we built", href: daybreak.workHref };
+const primary = { label: "Free homepage concept", href: daybreak.offerHref };
+const secondary = { label: "See our work", href: "/#work" };
 
 /**
  * The agency's own chrome, in the same design language as the contractor
@@ -38,7 +37,7 @@ export default function MarketingLayout({
         {children}
       </main>
       <DaybreakFooter
-        brand={daybreak}
+        brand={{ ...daybreak, name: "Daybreak" }}
         email={daybreak.email}
         entity={legal.entity}
         columns={[
@@ -47,24 +46,8 @@ export default function MarketingLayout({
             links: [
               { label: "Our work", href: "/#work" },
               { label: "How it works", href: "/#system" },
-              { label: "Value calculator", href: "/#calculator" },
               { label: "Who you'll work with", href: "/#about" },
-              { label: "Free homepage design", href: daybreak.offerHref },
-            ],
-          },
-          {
-            title: "See it working",
-            links: [
-              { label: "Contractor site we built", href: daybreak.workHref },
-              { label: "Crack & symptom checker", href: daybreak.toolHref },
-              {
-                label: "Service page example",
-                href: `${daybreak.workHref}/services/foundation-repair`,
-              },
-              {
-                label: "Case study example",
-                href: `${daybreak.workHref}/projects/arlington-brick-ranch-piers`,
-              },
+              { label: "Free homepage concept", href: daybreak.offerHref },
             ],
           },
           {
@@ -79,7 +62,7 @@ export default function MarketingLayout({
       />
       {/* <StickyCta
         primary={primary}
-        secondary={{ label: "Our work", href: daybreak.workHref }}
+        secondary={secondary}
         hideOn={[]}
         spacerClassName="bg-black"
       /> */}

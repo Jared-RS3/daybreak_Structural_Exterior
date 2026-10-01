@@ -23,9 +23,10 @@
  */
 
 export const agency = {
-  name: "Daybreak",
+  name: "Daybreak Structure-Works",
   descriptor: "Foundation & Exterior Growth",
-  positioning: "We build websites and lead systems for foundation repair, crawl space and siding companies.",
+  positioning:
+    "We build websites and lead systems for foundation repair, crawl space and siding companies.",
   // TODO(daybreak): replace with real contact details before launch. These are
   // placeholders and are not wired to anything.
   email: "contact@daybreaktechinnovations.com",
@@ -89,16 +90,16 @@ export type Founder = {
  */
 export const founders: Founder[] = [
   {
-    name: "Jason",
-    role: "Co-founder",
-    portrait: "/images/team/jason.jpg",
-    headshot: "/images/team/jason-sq.jpg",
-  },
-  {
     name: "Jared",
     role: "Co-founder",
     portrait: "/images/team/jake.jpg",
     headshot: "/images/team/jake-sq.jpg",
+  },
+  {
+    name: "Yaaseen",
+    role: "Co-founder",
+    portrait: "/images/team/yaaseen.jpg",
+    headshot: "/images/team/yaaseen-sq.jpg",
   },
 ];
 

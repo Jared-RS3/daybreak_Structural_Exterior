@@ -1,3 +1,4 @@
+import { openGraphDefaults } from "@/lib/seo";
 import type { Metadata } from "next";
 import {
   LegalCallout,
@@ -9,10 +10,11 @@ import {
 import { agency, legal } from "@/lib/agency";
 
 export const metadata: Metadata = {
-  title: "Accessibility — Daybreak",
+  title: "Accessibility",
   description:
-    "Daybreak's accessibility commitment, the standard this site is built to, the parts of it that fall short today, and how to tell us about a barrier.",
+    "Daybreak Structure-Works' accessibility commitment, the standard this site is built to, the parts of it that fall short today, and how to tell us about a barrier.",
   alternates: { canonical: "/accessibility" },
+  openGraph: { ...openGraphDefaults, url: "/accessibility", title: "Accessibility | Daybreak Structure-Works" },
 };
 
 /**

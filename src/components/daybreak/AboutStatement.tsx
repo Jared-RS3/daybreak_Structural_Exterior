@@ -15,11 +15,13 @@ export function AboutStatement({
   statement,
   stats,
   people,
+  offerHref,
 }: {
   label?: string;
   statement: string;
   stats: { value: string; label: string }[];
   people: { name: string; role: string; src: string }[];
+  offerHref: string;
 }) {
   return (
     <section id="about" aria-labelledby="about-title" className="flex min-h-svh scroll-mt-20 flex-col bg-panel py-16 sm:py-20">
@@ -28,7 +30,7 @@ export function AboutStatement({
           <AxLabel>{label}</AxLabel>
         </div>
         <h2 id="about-title" className="sr-only">
-          About Daybreak
+          About Daybreak Structure-Works
         </h2>
 
         <div className="grid flex-1 gap-10 py-14 lg:grid-cols-12 lg:items-center lg:gap-10 lg:py-20">
@@ -37,7 +39,7 @@ export function AboutStatement({
               <li key={p.name} className={i === 1 ? "lg:mt-16" : ""}>
                 <ZoomIn className="relative aspect-[4/5] bg-panel-2">
                   <div className="relative size-full">
-                    <Img src={p.src} alt={`${p.name}, ${p.role.toLowerCase()} of Daybreak`} sizes="(min-width:1024px) 16vw, 45vw" className="object-[50%_20%]" />
+                    <Img src={p.src} alt={`${p.name}, ${p.role.toLowerCase()} of Daybreak Structure-Works`} sizes="(min-width:1024px) 16vw, 45vw" className="object-[50%_20%]" />
                   </div>
                 </ZoomIn>
                 <p className="mt-3 flex items-baseline justify-between gap-2">
@@ -54,7 +56,7 @@ export function AboutStatement({
               className="font-home text-[clamp(1.7rem,2.9vw,2.75rem)] font-normal leading-[1.32] tracking-[-0.02em] text-fg"
             />
             <div className="mt-10 flex flex-wrap gap-2">
-              <AxButton href="#free-design">Get a free homepage design</AxButton>
+              <AxButton href={offerHref}>Get a free homepage concept</AxButton>
               <AxButton href="#work" variant="line">
                 See our work
               </AxButton>

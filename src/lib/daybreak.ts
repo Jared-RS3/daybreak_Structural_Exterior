@@ -8,13 +8,19 @@
    Same rule as lib/agency.ts: nothing here asserts a result Daybreak has not
    produced, and nothing is attributed to someone who did not say it. There
    are no client logos, testimonials or percentages because there are no
-   published client results yet. The proof on this page is work a visitor can
-   open and use: the live contractor site at /work/daybreak-foundation.
+   published client results yet. The proof on this page is the concept work
+   and the crack checker a visitor can try for themselves.
    ========================================================================== */
 
 import type { IconKey } from "@/components/ui/Icon";
 import { agency } from "./agency";
-import type { Comparison, Faq, Guarantee, ProcessStep, Review } from "./template/types";
+import type {
+  Comparison,
+  Faq,
+  Guarantee,
+  ProcessStep,
+  Review,
+} from "./template/types";
 
 /**
  * Cal.com booking for the hero's consultation button.
@@ -35,11 +41,26 @@ export const bookingHref =
 
 export const daybreak = {
   name: agency.name,
+  wordmark: agency.name,
   descriptor: "",
   email: agency.email,
-  offerHref: "/#free-design",
-  workHref: "/work/daybreak-foundation",
-  toolHref: "/work/daybreak-foundation/crack-checker",
+  /** The free concept is shown on the first call, so asking for it books one.
+      (The on-page form it used to scroll to, #free-design, is switched off.) */
+  offerHref: bookingHref,
+};
+
+/**
+ * The short film above "How it works". Read by the page, the video sitemap and
+ * the VideoObject structured data, so they always describe the same file.
+ */
+export const automationFilm = {
+  title: "Does your business run without you? Why automation matters",
+  description:
+    "Thirty seconds on why the contractors who grow are the ones whose leads get answered, booked and followed up without them lifting a finger.",
+  src: "/videos/why-automation.mp4",
+  poster: "/videos/why-automation-poster.jpg",
+  seconds: 28,
+  uploaded: "2026-10-01",
 };
 
 /**
@@ -50,10 +71,10 @@ export const daybreak = {
  */
 export const about = {
   statement:
-    "We're Jason and Jared. We build websites for foundation repair, crawl space and siding contractors, and we judge our work by how many inspections it books.",
+    "We're Jared and Yaaseen. We build websites for foundation repair, crawl space and siding contractors, and we judge our work by how many inspections it books.",
   stats: [
     { value: "2", label: "Founders on every project" },
-    { value: "0", label: "Account managers" },
+    { value: "100%", label: "Of our clients are still with us" },
     { value: "3", label: "Trades we specialise in" },
     { value: "100%", label: "You own your site and data" },
   ],
@@ -61,25 +82,28 @@ export const about = {
 
 /**
  * The founders' statement for the "From the founders" band. Daybreak's own
- * words on its own site — TODO(daybreak): Jason and Jared to approve or
+ * words on its own site — TODO(daybreak): Jared and Yaaseen to approve or
  * rewrite before launch.
  */
 export const founderNote =
   "Our names go on every site we build. You work with the two of us from your first design to launch day, and every month we show you exactly what your site brought in.";
 
 /**
- * The free offer: we design the contractor's homepage before they pay
- * anything, so they see their own company on a better site first. It replaces
- * the old free audit (the notes on their current site are now part of it).
+ * The free offer: on the first call we show the contractor a concept of their
+ * homepage, so they see their own company on a better site before they pay
+ * anything. It is a first look at the direction, not the finished design: the
+ * final design starts once they've agreed a price and paid the deposit, and
+ * the concept stays Daybreak's work until then (terms page, "Intellectual
+ * property"). It replaces the old free audit.
  *
- * TODO(daybreak): Jason and Jared to confirm `reply` — it's a promise the
+ * TODO(daybreak): Jared and Yaaseen to confirm `reply` — it's a promise the
  * form makes the moment someone submits.
  */
 export const offer = {
-  label: "Free contractor homepage design",
-  cta: "Get my free contractor homepage",
+  label: "Free contractor homepage concept",
+  cta: "Get my free website concept",
   includes: [
-    "Your homepage, designed",
+    "A concept of your homepage",
     "Your service area & towns",
     "Your repairs & services",
     "Notes on your current site",
@@ -88,13 +112,13 @@ export const offer = {
 };
 
 /**
- * The promise, shown just before the form. Each line is a commitment to keep.
- * TODO(daybreak): Jason and Jared to confirm the headline promise (revisions
- * until they're happy, nothing owed if they walk away) before launch.
+ * The promise. Each line is a commitment to keep. The free part is the
+ * concept and the call; refining it into the final design is paid work, so
+ * the page never promises free revisions.
  */
 export const promise: { title: string; lede: string; items: Guarantee[] } = {
-  title: "You don't pay until you love the design.",
-  lede: "We’ll refine your homepage with your feedback before you commit. If the direction still isn’t right after the initial design process, you’re free to walk away.",
+  title: "See your new homepage before you pay a cent.",
+  lede: "On your first call we show you a concept of your homepage, with your logo, services and towns. It's free, and you owe nothing if it's not for you. It's a first look at the direction, not the finished design: if you like it, you get a fixed price in writing, and the final design starts once you've signed off and paid the deposit.",
   items: [
     {
       title: "Our names on every site",
@@ -116,7 +140,7 @@ export const promise: { title: string; lede: string; items: Guarantee[] } = {
 
 /** Ticked under the hero buttons (the first button is the free design). Each one is true today. */
 export const heroPromises = [
-  "Free homepage design before you pay",
+  "Free homepage concept on your first call",
   "Built to book more inspections",
 ];
 
@@ -130,7 +154,7 @@ export const heroPromises = [
 export const heroTrust = [
   { value: "Custom", label: "contractor sites" },
   { value: "Foundation", label: "crawl space & siding specialists" },
-  { value: "Free design", label: "before any commitment" },
+  { value: "Free concept", label: "before any commitment" },
   { value: "You own it", label: "site, domain & data" },
 ];
 
@@ -292,18 +316,18 @@ export const comparison: Comparison = {
 
 export const process: ProcessStep[] = [
   {
-    title: "Free design",
-    body: "Tell us about your company. We design your new homepage and change it until you're happy with it.",
-    detail: "Free",
+    title: "Free concept",
+    body: "Book a call and tell us about your company. On the call we show you a concept of your new homepage, so you can see the direction before you spend anything.",
+    detail: "Free, no obligation",
   },
   {
-    title: "Build",
-    body: "Like it? We build the rest of your site. You approve it before it goes live.",
-    detail: "You approve it",
+    title: "Final design",
+    body: "Like the direction? You get a fixed price in writing. Once you sign off and pay the deposit, we turn the concept into your final design, with your feedback.",
+    detail: "Starts with the deposit",
   },
   {
-    title: "Launch & report",
-    body: "Your site goes live. Every month we show you the jobs it brought in.",
+    title: "Build & launch",
+    body: "We build the rest of your site and you approve it before it goes live. Every month after, we show you the jobs it brought in.",
     detail: "Monthly reporting",
   },
 ];
@@ -344,15 +368,83 @@ export const terms: Guarantee[] = [
 
 /**
  * Client reviews for the homepage carousel: real ones only, in the client's
- * own words and with their permission. While this is empty the section is
- * hidden in production and shows `placeholderReviews` in development, so the
- * layout can be seen without a made-up review ever going live.
- *
- * TODO(daybreak): add real reviews here. `role` is shown under the name
- * ("Owner, Company"), `city` is where their business is, and `headline` and
- * `source` aren't shown in the carousel but are required by the type.
+ * own words and with their permission. These are from Daybreak's website
+ * clients before the move to contractors, so the section doesn't call them
+ * contractors. `role` is shown under the name, `city` (with a pin) only when
+ * set, and `headline` and `source` aren't shown in the carousel.
  */
-export const reviews: Review[] = [];
+const review = (
+  id: string,
+  name: string,
+  role: string,
+  quote: string,
+  headline: string,
+): Review => ({
+  id,
+  headline,
+  quote,
+  name,
+  role,
+  city: "",
+  service: "Website",
+  rating: 5,
+  source: "Client",
+});
+
+export const reviews: Review[] = [
+  review(
+    "nj-tfm",
+    "NJ",
+    "TFM",
+    "It's inspiring to see how Daybreak has brought my vision to reality.",
+    "My vision to reality",
+  ),
+  review(
+    "naughty-berry",
+    "Naughty Berry",
+    "Naughty Berry team",
+    "Nothing short of amazing working with the Daybreak team, we wish them the best.",
+    "Nothing short of amazing",
+  ),
+  review(
+    "lumi-branding",
+    "Lumi Branding",
+    "Lumi Branding team",
+    "You guys are amazing, super happy that you were recommended. Keep up the amazing work!",
+    "Super happy",
+  ),
+  review(
+    "natania-eon",
+    "Natania",
+    "EON General team",
+    "We are so happy with the website, it's exactly what we wanted!",
+    "Exactly what we wanted",
+  ),
+  review(
+    "forge-lab",
+    "Forge Lab Studios",
+    "Website client",
+    "Finally, an agency that delivers what it promises.",
+    "Delivers what it promises",
+  ),
+];
+
+/**
+ * Reviews written for a client to approve, shown in development only. Move one
+ * into `reviews` once the client has read it and said yes, in writing: a
+ * review in someone's name that they didn't give is a fake review.
+ *
+ * TODO(daybreak): send Glynn this wording (or ask for his own) before launch.
+ */
+export const draftReviews: Review[] = [
+  review(
+    "glynn-wessels",
+    "Glynn",
+    "Wessels Plumbing",
+    "Daybreak built our new website and it's exactly what we needed. It looks professional, customers can find us and get in touch easily, and the team was great to deal with from start to finish.",
+    "Exactly what we needed",
+  ),
+];
 
 /** Layout stand-ins for `reviews`, development only. Obviously not real. */
 export const placeholderReviews: Review[] = [
@@ -380,12 +472,16 @@ export const faqs: Faq[] = [
     a: "Foundation repair, crawl space and siding companies. Many of them also sell basement waterproofing, drainage, concrete lifting, windows or gutters, and your site covers those too.",
   },
   {
-    q: "What do I get with the free homepage design?",
-    a: "A homepage designed for your company, with your logo, colours, services and the towns you work in. If you already have a website, we'll also tell you what's worth keeping. It's free, and you don't have to buy anything.",
+    q: "What do I get with the free homepage concept?",
+    a: "On your first call we show you a concept of your homepage, with your logo, colours, services and the towns you work in. If you already have a website, we'll also tell you what's worth keeping. It's free, and you don't have to buy anything.",
+  },
+  {
+    q: "Is the concept my finished design?",
+    a: "No. It's a first look at the direction, so you can judge us on real work before you commit. If you go ahead, the final design starts once you've agreed the price and paid the deposit, and we refine it with your feedback from there. The design files and the finished site are handed over to you as part of the paid project.",
   },
   {
     q: "What does a website cost?",
-    a: "It depends on the size of your business. Once you've seen your free homepage design you get a fixed price in writing, so there are no surprises.",
+    a: "It depends on the size of your business. Once you've seen your free homepage concept you get a fixed price in writing, so there are no surprises.",
   },
   {
     q: "I already have a website. Do I have to start over?",

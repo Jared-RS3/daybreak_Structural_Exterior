@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow_Semi_Condensed, Inter, Schibsted_Grotesk } from "next/font/google";
 import "./globals.css";
+import { founders } from "@/lib/agency";
 import { homeFont, monoFont } from "@/lib/fonts";
+import { openGraphDefaults, shareImage, site, siteUrl } from "@/lib/seo";
 
 /* Three type roles, one per job. The brand spec calls for Founders Grotesk (or
    Söhne Breit) on headlines, Söhne for body, and DIN for anything numeric.
@@ -46,14 +48,48 @@ export const viewport: Viewport = {
 // Only the pieces every route shares. Header, footer and <main> belong to the
 // route groups, because the agency site and the contractor demo it hosts are two
 // different products with two different navigations.
+//
+// The icons come from app/favicon.ico, app/icon.svg and app/apple-icon.png,
+// which Next adds to every page; the share image is in lib/seo.ts.
 export const metadata: Metadata = {
-  metadataBase: new URL("https://daybreak.example.com"),
+  metadataBase: new URL(siteUrl),
+  title: { default: site.title, template: `%s | ${site.name}` },
+  description: site.description,
+  applicationName: site.name,
+  keywords: [...site.keywords],
+  authors: founders.map((f) => ({ name: f.name })),
+  creator: site.name,
+  publisher: site.name,
+  category: "business",
+  openGraph: {
+    ...openGraphDefaults,
+    title: site.title,
+    description: site.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.title,
+    description: site.description,
+    images: [shareImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  formatDetection: { telephone: false, email: false, address: false },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="en-US"
       // Next 16 no longer overrides scroll-behavior during navigation. Without
       // this the `scroll-behavior: smooth` in globals.css (there for the anchor
       // nav) makes every route change smooth-scroll the page instead of jumping.

@@ -10,6 +10,17 @@ import { AxHead, AxLabel } from "./ax";
  */
 export function AxReviews({ reviews, placeholder = false }: { reviews: Review[]; placeholder?: boolean }) {
   if (!reviews.length) return null;
+  // A short list leaves each marquee row narrower than a wide screen, so it
+  // gaps as it loops. Repeat the same reviews, the second pass rotated so the
+  // two rows don't scroll the same cards side by side.
+  const shift = Math.ceil(reviews.length / 2);
+  const cards =
+    reviews.length < 8
+      ? [
+          ...reviews,
+          ...[...reviews.slice(shift), ...reviews.slice(0, shift)].map((r) => ({ ...r, id: `${r.id}-again` })),
+        ]
+      : reviews;
   return (
     <section id="reviews" aria-labelledby="reviews-title" className="scroll-mt-20 overflow-hidden bg-white py-20 sm:py-24 lg:py-28">
       <div className="container-wide">
@@ -25,15 +36,15 @@ export function AxReviews({ reviews, placeholder = false }: { reviews: Review[];
           }
           title={
             <>
-              What contractors say
+              What our clients say
               <br className="hidden sm:block" /> about working with us.
             </>
           }
-          lede="Foundation repair, crawl space and siding contractors on their new sites, in their own words."
+          lede="Business owners on their new websites, in their own words."
         />
       </div>
-      <div className="mt-14 lg:mt-16">
-        <ReviewMarquee reviews={reviews} square />
+      <div className="mt-10 sm:mt-14 lg:mt-16">
+        <ReviewMarquee reviews={cards} square />
       </div>
     </section>
   );

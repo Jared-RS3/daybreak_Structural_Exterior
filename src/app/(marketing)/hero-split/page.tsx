@@ -5,7 +5,14 @@ import { PillLink } from "@/components/template/primitives";
 import { CrackChip } from "@/components/tools/CrackChip";
 import { Icon } from "@/components/ui/Icon";
 import { founders } from "@/lib/agency";
-import { about, bookingHref, daybreak, heroPromises, heroTrust, offer } from "@/lib/daybreak";
+import {
+  about,
+  bookingHref,
+  daybreak,
+  heroPromises,
+  heroTrust,
+  offer,
+} from "@/lib/daybreak";
 import { houseImage } from "@/lib/demo-site";
 import type { Metadata } from "next";
 
@@ -53,7 +60,7 @@ export default function HeroSplitPreview() {
           <HeroProof
             people={founders.map((f) => ({ name: f.name, src: f.headshot }))}
             claim="Every client we've worked with is still with us."
-            byline="Jason & Jared, founders"
+            byline="Jared & Yaaseen, founders"
           />
         }
         house={houseImage}
@@ -65,6 +72,7 @@ export default function HeroSplitPreview() {
 
       <AboutStatement
         statement={about.statement}
+        offerHref={daybreak.offerHref}
         stats={about.stats}
         people={founders.map((f) => ({
           name: f.name,

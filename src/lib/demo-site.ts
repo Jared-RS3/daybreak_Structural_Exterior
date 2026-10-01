@@ -61,11 +61,12 @@ export const siteTheme: SiteTheme = {};
 /**
  * The house that stands in the sky on the hero and the closing section — a
  * transparent cut-out, so it sits in the gradient with no rectangle. Made
- * from /images/project-modern.jpg by removing its sky.
+ * from /images/project-modern.jpg by removing its sky, with the garage door
+ * re-clad in horizontal cedar (see public/images/CREDITS.md).
  */
 export const houseImage = {
-  src: "/images/home-modern-cutout.webp",
-  alt: "A two-storey rendered home with a slab foundation, standing against the sky",
+  src: "/images/home-modern-cedar-garage.webp",
+  alt: "A modern two-storey rendered home with a horizontal cedar garage door, standing against the sky",
   width: 1470,
   height: 1030,
 };

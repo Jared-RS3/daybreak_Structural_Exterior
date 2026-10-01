@@ -23,7 +23,9 @@ function Mark({ className }: { className?: string }) {
   );
 }
 
-export type Brand = { name: string; descriptor: string };
+
+/** `wordmark` is the logo text; without it the logo shows the name's first word. */
+export type Brand = { name: string; descriptor: string; wordmark?: string };
 export type Phone = { display: string; href: string; note?: string };
 
 export function Wordmark({
@@ -40,9 +42,10 @@ export function Wordmark({
         tone === "light" ? "text-white" : "text-fg",
       )}
     >
-      <Mark />
-      <span className="font-home text-[23px] font-medium leading-none tracking-[-0.03em]">
-        {brand.name.split(" ")[0]}
+      <Mark className="max-sm:size-5" />
+      {/* Smaller on phones, so the full name sits on one line beside the menu button. */}
+      <span className="whitespace-nowrap font-home text-[19px] font-medium leading-none tracking-[-0.03em] max-[400px]:text-[17px] sm:text-[23px]">
+        {brand.wordmark ?? brand.name.split(" ")[0]}
       </span>
       <span
         className={cn(
@@ -106,6 +109,21 @@ export function SiteHeader({
     return () => io.disconnect();
   }, [pathname]);
 
+  // On phones the hero runs long, so a clear header would sit over the
+  // headline and buttons as they scroll under it. Go solid on first scroll.
+  const [scrolledPhone, setScrolledPhone] = useState(false);
+  useEffect(() => {
+    const phone = window.matchMedia("(max-width: 767px)");
+    const update = () => setScrolledPhone(phone.matches && window.scrollY > 8);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    phone.addEventListener("change", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      phone.removeEventListener("change", update);
+    };
+  }, []);
+
   useEffect(() => {
     if (!open) return;
     document.body.style.overflow = "hidden";
@@ -117,7 +135,7 @@ export function SiteHeader({
     };
   }, [open]);
 
-  const clear = overlayPage && !pastSky && !open;
+  const clear = overlayPage && !pastSky && !scrolledPhone && !open;
   const close = () => setOpen(false);
 
   return (
@@ -147,8 +165,10 @@ export function SiteHeader({
           <nav
             aria-label="Main"
             className={cn(
-              "ml-6 hidden items-center gap-7 lg:flex",
-              wide && "xl:absolute xl:left-1/2 xl:ml-0 xl:-translate-x-1/2",
+              // The wide (agency) header has a full-name wordmark, so its nav
+              // waits for xl; below that it lives in the menu.
+              "ml-6 hidden items-center gap-7",
+              wide ? "xl:absolute xl:left-1/2 xl:ml-0 xl:flex xl:-translate-x-1/2" : "lg:flex",
             )}
           >
             {nav.map((item) => (
@@ -193,7 +213,8 @@ export function SiteHeader({
               aria-expanded={open}
               aria-controls="site-menu"
               className={cn(
-                "-mr-2 flex size-11 items-center justify-center rounded-full transition-colors lg:hidden",
+                "-mr-2 flex size-11 items-center justify-center rounded-full transition-colors",
+                wide ? "xl:hidden" : "lg:hidden",
                 clear
                   ? "text-white hover:bg-white/15"
                   : "text-fg hover:bg-accent-soft",
@@ -216,7 +237,10 @@ export function SiteHeader({
       <div
         id="site-menu"
         hidden={!open}
-        className="fixed inset-x-0 bottom-0 top-[72px] z-40 overflow-y-auto bg-white lg:hidden"
+        className={cn(
+          "fixed inset-x-0 bottom-0 top-[72px] z-40 overflow-y-auto bg-white",
+          wide ? "xl:hidden" : "lg:hidden",
+        )}
       >
         <nav
           aria-label="Mobile"

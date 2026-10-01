@@ -27,12 +27,12 @@ export function ReviewMarquee({
   const rows = [reviews.slice(0, half), reviews.slice(half)].filter((r) => r.length);
 
   return (
-    <div className="space-y-5 [mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)]">
+    <div className="space-y-3 sm:space-y-5 [mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)]">
       {rows.map((row, i) => (
         <div key={i} className="group overflow-hidden motion-reduce:overflow-x-auto">
           <ul
             className={cn(
-              "flex w-max gap-5 pr-5 group-hover:[animation-play-state:paused] motion-reduce:animate-none",
+              "flex w-max gap-3 pr-3 max-sm:items-start sm:gap-5 sm:pr-5 group-hover:[animation-play-state:paused] motion-reduce:animate-none",
               i % 2
                 ? "animate-[marquee-reverse_var(--dur)_linear_infinite]"
                 : "animate-[marquee_var(--dur)_linear_infinite]",
@@ -62,22 +62,26 @@ function ReviewCard({ review: r, hidden, square }: { review: Review; hidden: boo
           key={k}
           name="star"
           filled
-          className={cn("size-4.5", k < r.rating ? "text-[#f2b53a]" : square ? "text-panel-2" : "text-[#e7e4dd]")}
+          className={cn("size-4 sm:size-4.5", k < r.rating ? "text-[#f2b53a]" : square ? "text-panel-2" : "text-[#e7e4dd]")}
         />
       ))}
     </span>
   );
   return (
-    <li aria-hidden={hidden || undefined} className="w-[82vw] max-w-[31rem] shrink-0">
-      <figure className={cn("flex h-full flex-col p-7 sm:p-8", square ? "bg-panel" : "rounded-[14px] bg-[#f7f6f3]")}>
-        {stars("mb-5 sm:hidden")}
-        <blockquote className="text-[17px] leading-[1.6] text-fg/85 sm:text-[18px]">&ldquo;{r.quote}&rdquo;</blockquote>
-        <div className="mt-auto pt-8">
-          <p className="flex items-center justify-between gap-4 text-[15px] text-muted">
-            <span className="flex items-center gap-2">
-              <Icon name="pin" className="size-4.5 text-[#e0a33b]" />
-              {r.city}
-            </span>
+    // Phones get a compact card, so a whole review and the next one's edge fit on screen.
+    <li aria-hidden={hidden || undefined} className="w-[68vw] max-w-[31rem] shrink-0 sm:w-[82vw]">
+      <figure className={cn("flex h-full flex-col p-5 sm:p-8", square ? "bg-panel" : "rounded-[14px] bg-[#f7f6f3]")}>
+        {stars("mb-3 sm:hidden")}
+        <blockquote className="text-[15px] leading-[1.5] text-fg/85 sm:text-[18px] sm:leading-[1.6]">&ldquo;{r.quote}&rdquo;</blockquote>
+        <div className="mt-auto pt-5 sm:pt-8">
+          {(r.city || r.date) && (
+          <p className="mb-4 flex items-center justify-between gap-4 text-[13px] text-muted sm:mb-6 sm:text-[15px]">
+            {r.city && (
+              <span className="flex items-center gap-2">
+                <Icon name="pin" className="size-4.5 text-[#e0a33b]" />
+                {r.city}
+              </span>
+            )}
             {r.date && (
               <span className="flex items-center gap-2 tabular-nums">
                 <CalendarIcon />
@@ -85,19 +89,20 @@ function ReviewCard({ review: r, hidden, square }: { review: Review; hidden: boo
               </span>
             )}
           </p>
-          <div className={cn("mt-6 flex items-center gap-4 border-t pt-6", square ? "border-rule" : "border-[#e7e4dd]")}>
+          )}
+          <div className={cn("flex items-center gap-3 border-t pt-4 sm:gap-4 sm:pt-6", square ? "border-rule" : "border-[#e7e4dd]")}>
             <span
               aria-hidden
               className={cn(
-                "flex size-12 shrink-0 items-center justify-center rounded-full text-[15px] font-semibold text-fg",
+                "flex size-10 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold text-fg sm:size-12 sm:text-[15px]",
                 square ? "bg-panel-2" : "bg-[#e9e5dc]",
               )}
             >
               {initials}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="font-home block truncate text-[19px] font-medium tracking-[-0.01em] text-fg">{r.name}</span>
-              <span className="block truncate text-[15px] text-muted">{r.role ?? r.service}</span>
+              <span className="font-home block truncate text-[16px] font-medium tracking-[-0.01em] text-fg sm:text-[19px]">{r.name}</span>
+              <span className="block truncate text-[13px] text-muted sm:text-[15px]">{r.role ?? r.service}</span>
             </span>
             {stars("shrink-0 max-sm:hidden")}
           </div>

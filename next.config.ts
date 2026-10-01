@@ -1,6 +1,55 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV === "development";
+
+/**
+ * Content Security Policy: the browser only runs scripts, loads styles and
+ * fonts, and sends requests to this site. Everything the site uses is
+ * self-hosted (fonts via next/font, images, video), so nothing else is
+ * needed. If you add analytics, a chat widget or an embed, add its domain to
+ * the matching line or the browser will block it.
+ *
+ * 'unsafe-inline' on scripts is what Next needs without per-request nonces
+ * (see node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md);
+ * the rest of the policy still stops scripts from other sites, framing,
+ * plugins and form posts elsewhere. Development adds what hot reload needs.
+ */
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' blob: data:",
+  "font-src 'self'",
+  "media-src 'self'",
+  `connect-src 'self'${isDev ? " ws:" : ""}`,
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  ...(isDev ? [] : ["upgrade-insecure-requests"]),
+].join("; ");
+
+const securityHeaders = [
+  { key: "Content-Security-Policy", value: csp },
+  // HTTPS only, for two years, including subdomains.
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  // Older browsers' version of frame-ancestors: no one can frame the site.
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
+];
+
 const nextConfig: NextConfig = {
+  // Don't advertise the framework in every response.
+  poweredByHeader: false,
+  async headers() {
+    return [
+      { source: "/(.*)", headers: securityHeaders },
+      // Form submissions and their answers are never cached anywhere.
+      { source: "/api/growth-audit", headers: [{ key: "Cache-Control", value: "no-store" }] },
+    ];
+  },
   images: {
     // Next 16 made `images.qualities` an allowlist that defaults to [75], and
     // silently coerces anything else to the nearest allowed value. `Img`

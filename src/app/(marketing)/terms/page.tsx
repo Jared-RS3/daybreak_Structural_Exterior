@@ -1,3 +1,4 @@
+import { openGraphDefaults } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -10,10 +11,11 @@ import {
 import { agency, legal } from "@/lib/agency";
 
 export const metadata: Metadata = {
-  title: "Terms of Use — Daybreak",
+  title: "Terms of Use",
   description:
     "The terms that govern use of this website, including what the crack checker is and is not, and how the demonstration and concept material on it should be read.",
   alternates: { canonical: "/terms" },
+  openGraph: { ...openGraphDefaults, url: "/terms", title: "Terms of Use | Daybreak Structure-Works" },
 };
 
 /**
@@ -56,7 +58,7 @@ export default function TermsPage() {
     <LegalDoc
       eyebrow="Terms"
       title="Terms of Use"
-      lede="The rules for using this website. The two that matter most are that the crack checker is not an inspection or a quote, and that the contractor in the reference build does not exist."
+      lede="The rules for using this website. The two that matter most are that the crack checker is not an inspection or a quote, and that the companies in our design concepts do not exist."
       sections={sections}
     >
       <LegalSection id="acceptance" index={1} title="Accepting these terms">
@@ -76,8 +78,8 @@ export default function TermsPage() {
         <p>
           This is the marketing website of a company that builds websites, local search
           and sales automation for foundation repair, crawl space and siding contractors. It contains a description of that
-          service, a working demonstration build, unbuilt design concepts, and a form for
-          requesting a free homepage design for your own business.
+          service, unbuilt design concepts, a demonstration crack checker, and a way to ask for
+          requesting a free homepage concept for your own business.
         </p>
         <p>
           Nothing on this site is an offer capable of acceptance, and submitting the design
@@ -110,28 +112,15 @@ export default function TermsPage() {
 
       <LegalSection id="demo" index={4} title="Demonstration and concept material">
         <p>
-          Two parts of this site show designs for contractors that do not exist. We
-          would rather state that here as well as on the pages themselves.
+          The design concepts on this site show websites for contractors that do not
+          exist. We would rather state that here as well as on the page itself.
         </p>
-        <LegalList
-          items={[
-            <>
-              <strong className="text-ink-900">The reference build</strong> published under{" "}
-              <code>/work</code> is a complete working foundation, crawl space and siding website built by Daybreak
-              as a demonstration. The contractor in it is fictional. Its reviews,
-              ratings, credentials, licence numbers, project history, staff, financing
-              terms and prices are illustrative and describe no real business. It is not
-              a client engagement and no repair work can be purchased through it.
-            </>,
-            <>
-              <strong className="text-ink-900">The concepts</strong> are unbuilt designs.
-              The companies shown in them are invented, and the review scores, star
-              ratings, platform badges, testimonials, phone numbers, addresses and price
-              ranges rendered inside the mockups are drawn as part of the design. They are
-              not reviews, not endorsements, and not measurements of anything.
-            </>,
-          ]}
-        />
+        <p>
+          The concepts are unbuilt designs. The companies shown in them are invented, and
+          the review scores, star ratings, platform badges, testimonials, phone numbers,
+          addresses and price ranges rendered inside the mockups are drawn as part of the
+          design. They are not reviews, not endorsements, and not measurements of anything.
+        </p>
         <p>
           Third-party names and logos that appear inside those mockups — including those of
           review platforms, accreditation bodies and manufacturers — are the property of
@@ -165,6 +154,13 @@ export default function TermsPage() {
           law. You may view the site, and quote short extracts with attribution. You may
           not copy the site wholesale, reproduce the concept artwork as your own work, or
           present any of it as the portfolio of another business.
+        </p>
+        <p>
+          The same applies to a free homepage concept we prepare for your business. It is
+          shown to you so you can judge the direction of our work, and it remains
+          Daybreak&rsquo;s work. You may not use it, publish it, or have anyone else build
+          from it unless you engage Daybreak. Rights in the final design and the finished
+          site pass to you under your engagement agreement, once the work is paid for.
         </p>
         <p>
           Some photographs are used under the Unsplash licence, and one under a public

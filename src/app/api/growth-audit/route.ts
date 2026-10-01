@@ -1,78 +1,91 @@
 import { NextResponse } from "next/server";
-import { isEmail, jobVolumes, normalizeDomain, type LeadRequest } from "@/lib/lead";
+import { normalizeDomain, readLead, validateLead } from "@/lib/lead";
+import { airtableConfigured, createAirtableRecord, noFormula } from "@/lib/server/airtable";
+import { clientIp, isSameOrigin, rateLimit } from "@/lib/server/rate-limit";
 
 /**
- * Receives free homepage design requests from the site. (The path still says
- * growth-audit, from the offer this replaced, so existing webhook set-ups
- * keep working.)
+ * Receives free homepage concept requests from the site and writes each one
+ * to Airtable (lib/server/airtable.ts). (The path still says growth-audit,
+ * from the offer this replaced.)
  *
- * PROTOTYPE — this validates and normalizes the request, then forwards it to
- * whatever URL is in DAYBREAK_LEAD_WEBHOOK (a CRM inbound hook, Zapier, an
- * email relay). With no webhook configured it writes the lead to the server
- * log and still reports success, because the submission is genuinely captured
- * there. Before this site handles real traffic, set DAYBREAK_LEAD_WEBHOOK or
- * replace the forward below with a direct CRM client — a lead that only exists
- * in a log line is a lead nobody is going to call.
+ * In order, before anything is stored: the request must come from this site,
+ * stay under the rate limit, be small JSON, pass the bot checks, and pass the
+ * same validation the form runs (lib/lead.ts). Errors the visitor sees never
+ * include what went wrong on our side.
+ *
+ * With Airtable not configured (local development), the lead is written to
+ * the server log instead and the visitor still sees success.
  */
+const MAX_BODY_BYTES = 8_000;
+/** Faster than this from page load to submit is a script, not a person. */
+const MIN_FILL_MS = 2_500;
+
+const fail = (status: number, error: string) => NextResponse.json({ ok: false, error }, { status });
+
 export async function POST(request: Request) {
-  let body: Partial<LeadRequest>;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ ok: false, error: "Malformed request." }, { status: 400 });
+  if (!isSameOrigin(request)) return fail(403, "Forbidden.");
+
+  if (!rateLimit(`lead:${clientIp(request)}`, 5, 10 * 60_000)) {
+    return fail(429, "Too many requests. Please wait a few minutes, or email us directly.");
   }
 
-  const rawDomain = (body.domain ?? "").trim();
-  const domain = rawDomain ? normalizeDomain(rawDomain) : null;
-  const name = (body.name ?? "").trim();
-  const email = (body.email ?? "").trim();
-  const phone = (body.phone ?? "").trim();
-  const company = (body.company ?? "").trim();
-  const jobs = (jobVolumes as readonly string[]).includes(body.jobs ?? "") ? body.jobs! : null;
+  if (!request.headers.get("content-type")?.startsWith("application/json")) {
+    return fail(415, "Unsupported request.");
+  }
+  const raw = await request.text();
+  if (raw.length > MAX_BODY_BYTES) return fail(413, "Request too large.");
 
-  const errors: Record<string, string> = {};
-  if (company.length < 2) errors.company = "Enter your company name.";
-  if (rawDomain && !domain) errors.domain = "Enter a website address, like yourfoundationcompany.com";
-  if (name.length < 2) errors.name = "Enter your name.";
-  if (!isEmail(email)) errors.email = "Enter an email address we can send your design to.";
+  let body: Record<string, unknown>;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error();
+    body = parsed as Record<string, unknown>;
+  } catch {
+    return fail(400, "Malformed request.");
+  }
 
+  // Bots: the hidden field only they fill in, or a form sent faster than a
+  // person could fill it. Report success so they don't learn to adapt.
+  const elapsed = Number(body.elapsed);
+  if (String(body.fax ?? "").trim() || !Number.isFinite(elapsed) || elapsed < MIN_FILL_MS) {
+    return NextResponse.json({ ok: true });
+  }
+
+  const l = readLead((k) => body[k]);
+  const errors = validateLead(l);
   if (Object.keys(errors).length) {
     return NextResponse.json({ ok: false, errors }, { status: 422 });
   }
 
-  const lead = {
-    offer: "free-homepage-design",
-    company,
-    domain,
-    name,
-    email,
-    phone: phone || null,
-    jobsPerMonth: jobs,
-    receivedAt: new Date().toISOString(),
-    source: request.headers.get("referer") ?? null,
+  // Column names in the Airtable table. Typed answers are guarded against
+  // spreadsheet formulas; the one-tap answers come from fixed lists.
+  const fields = {
+    Company: noFormula(l.company),
+    Name: noFormula(l.name),
+    Email: l.email,
+    Phone: l.phone,
+    Area: noFormula(l.area),
+    Website: l.domain ? normalizeDomain(l.domain) : null,
+    Trade: l.trade,
+    "Jobs per month": l.jobs,
+    "Average job size": l.jobValue,
+    Timeline: l.timeline,
+    Offer: "Free homepage concept",
+    Page: request.headers.get("referer")?.slice(0, 500) ?? null,
+    "Received at": new Date().toISOString(),
   };
 
-  const webhook = process.env.DAYBREAK_LEAD_WEBHOOK;
-  if (webhook) {
-    try {
-      const res = await fetch(webhook, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(lead),
-      });
-      if (!res.ok) throw new Error(`Webhook responded ${res.status}`);
-    } catch (err) {
-      console.error("[lead] webhook delivery failed", err, lead);
-      return NextResponse.json(
-        { ok: false, error: "We could not record that. Please email us directly." },
-        { status: 502 },
-      );
-    }
-  } else {
-    console.warn(
-      "[lead] DAYBREAK_LEAD_WEBHOOK is not set — lead captured to log only:",
-      lead,
-    );
+  if (!airtableConfigured()) {
+    console.warn("[lead] Airtable is not configured — lead captured to log only:", fields);
+    return NextResponse.json({ ok: true });
+  }
+
+  try {
+    await createAirtableRecord(fields);
+  } catch (err) {
+    // Logged in full so the lead can be recovered by hand.
+    console.error("[lead] Airtable write failed", err, fields);
+    return fail(502, "We couldn't save that. Please try again, or email us directly.");
   }
 
   return NextResponse.json({ ok: true });

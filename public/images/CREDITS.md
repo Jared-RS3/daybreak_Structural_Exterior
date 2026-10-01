@@ -27,7 +27,10 @@ the client's own project photography before launch.
 | siding-trim.jpg | https://images.unsplash.com/photo-1675671509845-a5184ef9c4c6 | Vi Si |
 | siding-white-colonial.jpg | https://images.unsplash.com/photo-1768067437750-f18d26d3397b | Lumin Osity |
 | crawl-space-before.jpg | https://commons.wikimedia.org/wiki/File:Crawl-space-inside.jpg | Newell Post (public domain) |
+| home-modern-cedar-garage.webp (cedar planks only) | https://unsplash.com/photos/4KXEQrDUizs | Meri Vasilevski |
 
 The house photographs (project-*.jpg, concrete-driveway-modern.jpg) and
 home-modern-cutout.webp (derived from project-modern.jpg, sky removed) carry
-over from the original Daybreak build.
+over from the original Daybreak build. home-modern-cedar-garage.webp is that
+same cut-out with its garage door re-clad in cedar planks taken from the
+Unsplash photo above.

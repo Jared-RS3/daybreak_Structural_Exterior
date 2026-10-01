@@ -1,3 +1,4 @@
+import { openGraphDefaults } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -10,10 +11,11 @@ import {
 import { legal } from "@/lib/agency";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Daybreak",
+  title: "Privacy Policy",
   description:
-    "What Daybreak collects, what it does not collect, who it is shared with, and the rights US state privacy laws give you over it.",
+    "What Daybreak Structure-Works collects, what it does not collect, who it is shared with, and the rights US state privacy laws give you over it.",
   alternates: { canonical: "/privacy" },
+  openGraph: { ...openGraphDefaults, url: "/privacy", title: "Privacy Policy | Daybreak Structure-Works" },
 };
 
 /**
@@ -54,8 +56,7 @@ export default function PrivacyPage() {
         <p>
           This policy describes how {legal.entity} (&ldquo;Daybreak&rdquo;,
           &ldquo;we&rdquo;) handles personal information collected through this website,
-          including the reference build published under <code>/work</code> and the crack
-          checker tool. It does not cover the separate websites we build and operate
+          including the crack checker tool. It does not cover the separate websites we build and operate
           for clients — those are governed by each client&rsquo;s own privacy policy.
         </p>
       </LegalSection>
@@ -63,16 +64,14 @@ export default function PrivacyPage() {
       <LegalSection id="collect" index={2} title="What we collect">
         <p>There are exactly two ways information reaches us through this site.</p>
         <p className="pt-1 text-ink-900">
-          <strong>1. The free homepage design form.</strong> When you ask for a free
-          design we collect what you type into it:
+          <strong>1. The free homepage concept form.</strong> When you ask for a free
+          concept we collect what you enter into it:
         </p>
         <LegalList
           items={[
-            "Your name",
-            "Your email address",
-            "Your phone number, if you choose to give one — the field is optional and the form works without it",
-            "Your company name, and your website address if you give one",
-            "Roughly how many jobs you do a month, if you choose to say",
+            "Your name, email address and phone number",
+            "Your company name, the main town or city you serve, and your website address if you give one",
+            "What you mainly sell, roughly how many jobs you sign a month, your average job size, and when you want a new site",
             "The page you submitted from, and the date and time",
           ]}
         />
@@ -85,8 +84,7 @@ export default function PrivacyPage() {
         <p>
           The crack checker is not one of them. It runs entirely in your browser: the
           answers you tap are never sent to us, never stored, and are gone when you leave
-          the page. The booking form on the reference build is a demonstration and sends
-          nothing anywhere.
+          the page.
         </p>
       </LegalSection>
 
@@ -117,9 +115,9 @@ export default function PrivacyPage() {
 
       <LegalSection id="use" index={4} title="How we use it">
         <p>
-          Form submissions are used to prepare and send the free homepage design you
-          asked for, and to reply to you about it. If you gave a phone number, we may call or
-          text you about that request.
+          Form submissions are used to prepare the free homepage concept you asked for,
+          to arrange the call where we show it to you, and to reply to you about it. We may
+          call or text the number you gave us about that request.
         </p>
         <LegalCallout>
           We do not add you to a marketing list because you asked for a design, and we do
@@ -145,9 +143,9 @@ export default function PrivacyPage() {
             <>
               <strong className="text-ink-900">
                 Our customer relationship management system
-              </strong>
-              , which receives form submissions so that a person actually follows
-              up on them.
+              </strong>{" "}
+              (Airtable), which receives form submissions so that a person actually
+              follows up on them.
             </>,
           ]}
         />

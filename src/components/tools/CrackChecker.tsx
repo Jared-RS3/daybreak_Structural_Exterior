@@ -121,7 +121,8 @@ export function CrackChecker({
   className,
 }: {
   /** Where "book an inspection" goes. The severity is added as a query. */
-  bookHref: string;
+  /** Where "Book a free inspection" goes. Without it the button isn't shown. */
+  bookHref?: string;
   phone?: { display: string; href: string };
   /** "square" for the agency site's Axion panels; "round" for the Crest template. */
   shape?: "round" | "square";
@@ -253,16 +254,18 @@ export function CrackChecker({
         </dl>
 
         <div className="mt-6 flex flex-col gap-2 pt-1 sm:flex-row lg:mt-auto">
-          <Link
-            href={`${bookHref}${bookHref.includes("?") ? "&" : "?"}problem=cracks`}
-            className={cn(
-              "inline-flex h-12 flex-1 items-center justify-center gap-2 bg-fg px-5 text-[15px] font-medium text-white transition-colors hover:bg-accent-strong",
-              !sq && "rounded-full",
-            )}
-          >
-            Book a free inspection
-            <Icon name="arrowRight" className="size-4" />
-          </Link>
+          {bookHref && (
+            <Link
+              href={`${bookHref}${bookHref.includes("?") ? "&" : "?"}problem=cracks`}
+              className={cn(
+                "inline-flex h-12 flex-1 items-center justify-center gap-2 bg-fg px-5 text-[15px] font-medium text-white transition-colors hover:bg-accent-strong",
+                !sq && "rounded-full",
+              )}
+            >
+              Book a free inspection
+              <Icon name="arrowRight" className="size-4" />
+            </Link>
+          )}
           {phone && (
             <a
               href={phone.href}
