@@ -14,6 +14,7 @@ export function DaybreakFooter({
   entity,
   company,
   columns,
+  legalExtra,
 }: {
   brand: { name: string; descriptor: string };
   email: string;
@@ -21,6 +22,8 @@ export function DaybreakFooter({
   /** The parent company: its logo and site close the footer. */
   company: { name: string; legalName: string; href: string };
   columns: { title: string; links: { label: string; href: string }[] }[];
+  /** Beside the copyright line, e.g. "Cookie settings". */
+  legalExtra?: React.ReactNode;
 }) {
   const year = new Date().getFullYear();
   // A multi-word name stacks: the first word on its own line, the rest below,
@@ -114,6 +117,7 @@ export function DaybreakFooter({
           <AxLabel tone="light" className="text-white/60">
             © {year} {entity}
           </AxLabel>
+          {legalExtra}
         </div>
 
         {/* Whose site this is, as a centred sign-off: "A division of", a

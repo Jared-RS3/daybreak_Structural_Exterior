@@ -9,6 +9,7 @@ import {
   LegalSection,
 } from "@/components/agency/LegalDoc";
 import { legal } from "@/lib/agency";
+import { analyticsOn } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "PAIA Manual",
@@ -198,7 +199,12 @@ export default function PaiaPage() {
             ["Prospective clients (contractor businesses and the people who contact us for them)", "Name, email address, phone number, company name, town or city served, website, the trade, job volume, average job size and timeline they tell us, their agreement to our privacy policy and when it was given, and call recordings, transcripts and summaries where they agreed to them."],
             ["Clients", "The same, plus the agreement, billing details, the content of their websites and the access to their accounts needed to do the work."],
             ["Clients' customers", "Where we run a website or lead system for a client, the details homeowners send through it, such as their name, contact details and the job or property concerned. We process these on the client's instructions, as an operator under POPIA."],
-            ["Website visitors", "IP address, timestamp, the address requested and browser user-agent, in server logs."],
+            [
+              "Website visitors",
+              analyticsOn
+                ? "IP address, timestamp, the address requested and browser user-agent, in server logs; their cookie choice; and, only if they accept analytics cookies, the pages they visit, how they arrived, approximate location and device, through Google Analytics."
+                : "IP address, timestamp, the address requested and browser user-agent, in server logs.",
+            ],
             ["Suppliers and service providers", "Names, contact details, registration and VAT numbers, and banking details for payment."],
             ["Directors and any staff", "What company and employment law require us to keep."],
           ]}
@@ -213,7 +219,7 @@ export default function PaiaPage() {
         </p>
         <LegalList
           items={[
-            "Service providers that handle it on our behalf, under written terms: our website host, our customer relationship management system (Airtable), our booking calendar (Cal.com) and the calendar and video-call services connected to it, our AI note-taking service, and our email provider.",
+            `Service providers that handle it on our behalf, under written terms: our website host, our customer relationship management system (Airtable), our booking calendar (Cal.com) and the calendar and video-call services connected to it, our AI note-taking service, and our email provider${analyticsOn ? ", and, for visitors who accept analytics cookies, Google (Google Analytics)" : ""}.`,
             "Our professional advisers, such as accountants and lawyers, where they need it.",
             "The South African Revenue Service, the Companies and Intellectual Property Commission and other authorities, where the law requires it.",
           ]}

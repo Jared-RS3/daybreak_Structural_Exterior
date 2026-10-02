@@ -1,6 +1,8 @@
+import { CookieSettingsButton } from "@/components/consent/CookieConsent";
 import { DaybreakFooter } from "@/components/daybreak/DaybreakFooter";
 import { SiteHeader } from "@/components/template/SiteHeader";
 import { legal } from "@/lib/agency";
+import { analyticsOn } from "@/lib/analytics";
 import { daybreak } from "@/lib/daybreak";
 
 const nav = [
@@ -48,6 +50,11 @@ export default function MarketingLayout({
           .filter(Boolean)
           .join(" · ")}
         company={{ name: legal.company, legalName: legal.entity, href: legal.companyUrl }}
+        legalExtra={
+          analyticsOn && (
+            <CookieSettingsButton className="mono-label text-[12.5px] text-white/60 underline underline-offset-4 transition-colors hover:text-white" />
+          )
+        }
         columns={[
           {
             title: "Daybreak",

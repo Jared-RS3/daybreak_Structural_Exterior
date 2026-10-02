@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Barlow_Semi_Condensed, Inter, Schibsted_Grotesk } from "next/font/google";
 import "./globals.css";
+import { CookieConsent } from "@/components/consent/CookieConsent";
 import { founders } from "@/lib/agency";
+import { analyticsOn, gaId } from "@/lib/analytics";
 import { homeFont, monoFont } from "@/lib/fonts";
 import { openGraphDefaults, shareImage, site, siteUrl } from "@/lib/seo";
 
@@ -107,6 +109,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         {children}
+        {/* Only when NEXT_PUBLIC_GA_ID is set: without analytics there is nothing to ask about. */}
+        {analyticsOn && <CookieConsent gaId={gaId} />}
       </body>
     </html>
   );

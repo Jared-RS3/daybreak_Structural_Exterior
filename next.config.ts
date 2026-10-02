@@ -2,12 +2,18 @@ import type { NextConfig } from "next";
 
 const isDev = process.env.NODE_ENV === "development";
 
+/** Google Analytics' domains, allowed only when it's switched on (lib/analytics.ts). */
+const ga = /^G-[A-Z0-9]{4,}$/.test((process.env.NEXT_PUBLIC_GA_ID ?? "").trim());
+const gaScript = ga ? " https://www.googletagmanager.com" : "";
+const gaData = ga ? " https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com" : "";
+
 /**
  * Content Security Policy: the browser only runs scripts, loads styles and
  * fonts, and sends requests to this site. Everything the site uses is
  * self-hosted (fonts via next/font, images, video), so nothing else is
- * needed. If you add analytics, a chat widget or an embed, add its domain to
- * the matching line or the browser will block it.
+ * needed — except Google Analytics when NEXT_PUBLIC_GA_ID is set, whose
+ * domains are added below. If you add a chat widget or an embed, add its
+ * domain to the matching line or the browser will block it.
  *
  * 'unsafe-inline' on scripts is what Next needs without per-request nonces
  * (see node_modules/next/dist/docs/01-app/02-guides/content-security-policy.md);
@@ -16,12 +22,12 @@ const isDev = process.env.NODE_ENV === "development";
  */
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${gaScript}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' blob: data:",
+  `img-src 'self' blob: data:${gaData}`,
   "font-src 'self'",
   "media-src 'self'",
-  `connect-src 'self'${isDev ? " ws:" : ""}`,
+  `connect-src 'self'${isDev ? " ws:" : ""}${gaData}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

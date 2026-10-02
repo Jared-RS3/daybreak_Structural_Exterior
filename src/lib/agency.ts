@@ -42,8 +42,8 @@ export const agency = {
  * Every value marked TODO is a placeholder and has to be replaced with the
  * registered entity's real details before this site handles live traffic. The
  * policies themselves are accurate descriptions of what the code actually does
- * — no cookies, no analytics, no advertising pixels, no sale of personal
- * information — but a privacy policy that names a fictional company at a
+ * — analytics only with consent (and none at all while NEXT_PUBLIC_GA_ID is
+ * unset), no advertising pixels, no sale of personal information — but a privacy policy that names a fictional company at a
  * fictional address is not a privacy policy, it is a liability.
  *
  * Daybreak Structure-Works is a trading name. The company behind it is

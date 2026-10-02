@@ -10,6 +10,7 @@ import {
   LegalSection,
 } from "@/components/agency/LegalDoc";
 import { legal } from "@/lib/agency";
+import { analyticsOn } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -22,13 +23,16 @@ export const metadata: Metadata = {
 /**
  * Written from what the code actually does, not from a template.
  *
- * Before editing this page, check the claim against the source. The three
- * facts that make this policy unusually short are all verifiable and all worth
- * keeping true: there is no analytics, no advertising pixel and no cookie
- * anywhere in this application. If any of those change, this page changes in
- * the same commit — a stale "we do not use cookies" is materially worse than
- * never having claimed it, because it is a misrepresentation rather than an
- * omission.
+ * Before editing this page, check the claim against the source. The facts
+ * that keep this policy short are all verifiable and all worth keeping true:
+ * no advertising pixel anywhere, and analytics only with consent. Google
+ * Analytics runs only when NEXT_PUBLIC_GA_ID is set (lib/analytics.ts) AND
+ * the visitor accepts it on the cookie banner (components/consent); the
+ * wording below switches on `analyticsOn`, so with the ID unset the page
+ * still says "no cookies, no analytics" and that is still true. If any of
+ * this changes, this page changes in the same commit — a stale "we do not use
+ * cookies" is materially worse than never having claimed it, because it is a
+ * misrepresentation rather than an omission.
  *
  * Where the data goes, as of this version: the concept form posts to
  * /api/growth-audit, which writes to Airtable; "Pick a time" opens Cal.com
@@ -111,7 +115,7 @@ export default function PrivacyPage() {
       </LegalSection>
 
       <LegalSection id="collect" index={2} title="What we collect">
-        <p>There are four ways information reaches us.</p>
+        <p>There are {analyticsOn ? "five" : "four"} ways information reaches us.</p>
         <p className="pt-1 text-ink-900">
           <strong>1. The free homepage concept form.</strong> When you ask for a free
           concept we collect what you enter into it:
@@ -150,6 +154,16 @@ export default function PrivacyPage() {
           submission is written to the server log so that a person can recover it rather
           than lose it.
         </p>
+        {analyticsOn && (
+          <p className="pt-1 text-ink-900">
+            <strong>5. Google Analytics, only if you accept it.</strong> If you accept
+            analytics cookies on the cookie banner, Google Analytics records the pages you
+            visit here, how you arrived (a search, a link or an ad), your approximate
+            location (city and country, worked out from your IP address; Google Analytics
+            does not log or store the address itself), and your device, browser and screen
+            size. If you decline, or never choose, none of this is collected.
+          </p>
+        )}
         <p>
           The crack checker is not one of them. It runs entirely in your browser: the
           answers you tap are never sent to us, never stored, and are gone when you leave
@@ -177,21 +191,41 @@ export default function PrivacyPage() {
         </p>
         <LegalList
           items={[
-            "This site sets no cookies. Not analytics cookies, not preference cookies, none.",
-            "This site keeps nothing in your browser's storage. No local storage, no session storage.",
-            "There is no analytics package. No Google Analytics, no alternative, no first-party event pipeline.",
+            ...(analyticsOn
+              ? [
+                  "Cookies only with your agreement. Until you choose on the cookie banner, and if you decline, the one cookie this site sets is daybreak_consent, which remembers your choice for 12 months. If you accept analytics, Google Analytics also sets its own cookies (_ga, and _ga_ followed by our ID), which last up to two years.",
+                  "This site keeps nothing else in your browser's storage. No local storage, no session storage.",
+                  "One analytics package, Google Analytics 4, and only if you accept it. Google signals and ad personalisation are switched off, so your visits are not linked to your Google account or used for advertising.",
+                ]
+              : [
+                  "This site sets no cookies. Not analytics cookies, not preference cookies, none.",
+                  "This site keeps nothing in your browser's storage. No local storage, no session storage.",
+                  "There is no analytics package. No Google Analytics, no alternative, no first-party event pipeline.",
+                ]),
             "There are no advertising or social pixels. No Meta pixel, no Google Ads tag, no LinkedIn Insight tag, no TikTok pixel.",
-            "We do not build advertising profiles, run cross-site tracking, or use session recording or heatmap tools, and no third party collects information about your activity over time or across other websites through this site.",
+            analyticsOn
+              ? "We do not build advertising profiles, run cross-site tracking, or use session recording or heatmap tools. If you accept analytics, Google collects information about your use of this site over time on our behalf; it is not used to follow you across other websites."
+              : "We do not build advertising profiles, run cross-site tracking, or use session recording or heatmap tools, and no third party collects information about your activity over time or across other websites through this site.",
             "We have never sold personal information and we do not share it for cross-context behavioural advertising, as those terms are defined under California law.",
             "Web fonts are served from this domain. They are downloaded at build time rather than requested from Google when you load the page, so loading this site does not tell Google you did.",
           ]}
         />
-        <p>
-          Because no cookies or trackers are set, there is nothing here for a cookie
-          banner to ask you about, and a Global Privacy Control or Do Not Track signal
-          has nothing to switch off. We honour both regardless: if we ever add anything
-          that responds to them, this section changes first.
-        </p>
+        {analyticsOn ? (
+          <p>
+            You can change your choice at any time with &ldquo;Cookie settings&rdquo; at
+            the bottom of every page; withdrawing it stops Google Analytics and deletes its
+            cookies. If your browser sends a Global Privacy Control or Do Not Track signal,
+            we treat it as a decline: Google Analytics is never loaded and the banner does
+            not ask.
+          </p>
+        ) : (
+          <p>
+            Because no cookies or trackers are set, there is nothing here for a cookie
+            banner to ask you about, and a Global Privacy Control or Do Not Track signal
+            has nothing to switch off. We honour both regardless: if we ever add anything
+            that responds to them, this section changes first.
+          </p>
+        )}
         <p>
           The one exception is off this site. When you follow a link to book a call you
           are on Cal.com&rsquo;s website, and its own cookies and privacy policy apply
@@ -226,6 +260,17 @@ export default function PrivacyPage() {
               legitimate interest in running a site that works and is not abused (section
               11(1)(f)).
             </>,
+            ...(analyticsOn
+              ? [
+                  <>
+                    <strong className="text-ink-900">To understand how the site is used</strong>{" "}
+                    — which pages are visited and how people arrive — through Google
+                    Analytics, only if you accept analytics cookies. This rests on your
+                    consent (section 11(1)(a)), which you can withdraw at any time from
+                    &ldquo;Cookie settings&rdquo;.
+                  </>,
+                ]
+              : []),
             <>
               <strong className="text-ink-900">To do the work, if you become a client</strong>,
               under the agreement we sign with you.
@@ -292,6 +337,15 @@ export default function PrivacyPage() {
               <strong className="text-ink-900">Our email provider</strong>, which carries
               our emails to you and yours to us.
             </>,
+            ...(analyticsOn
+              ? [
+                  <>
+                    <strong className="text-ink-900">Google (Google Analytics)</strong>, only
+                    if you accept analytics cookies, which measures visits to this site for
+                    us. Google signals and ad personalisation are switched off.
+                  </>,
+                ]
+              : []),
           ]}
         />
         <LegalCallout>
@@ -332,6 +386,8 @@ export default function PrivacyPage() {
           of our work together are kept for as long as South African company and tax law
           requires business records to be kept. Server logs are kept on a short
           operational rotation.
+          {analyticsOn &&
+            " Google Analytics data is deleted automatically after the retention period set in our Google Analytics account, which is no more than 14 months."}
         </p>
         <p>
           You can ask us to delete your enquiry at any point, whether or not a law gives
