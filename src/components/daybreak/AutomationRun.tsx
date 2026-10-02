@@ -74,34 +74,70 @@ export function AutomationRun({ steps }: { steps: string[] }) {
 
   return (
     <div ref={ref}>
-      {/* The section heading above carries the story; this row is just the control. */}
-      <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={toggle}
-          className="mono-label inline-flex h-11 shrink-0 items-center gap-2 border border-fg/25 px-4 text-[12.5px] text-fg transition-colors hover:border-fg"
-        >
-          {playing ? (
-            <>
-              <span aria-hidden className="flex gap-[3px]">
-                <span className="h-3 w-[3px] bg-fg" />
-                <span className="h-3 w-[3px] bg-fg" />
-              </span>
-              Pause
-            </>
-          ) : (
-            <>
-              <Icon name="play" filled className="size-3.5" />
-              {step === last ? "Replay" : "Play"}
-            </>
-          )}
-        </button>
+      {/* Desktop: the section heading carries the story; this row is just the control. */}
+      <div className="hidden justify-end lg:flex">
+        <PlayButton playing={playing} ended={step === last} onClick={toggle} />
+      </div>
+
+      {/* Phones: which step you're on sits directly above the phone, so it's in
+          view while the messages arrive, with back / pause / next to step
+          through at your own pace. */}
+      <div className="mt-4 bg-fg p-4 text-white lg:hidden">
+        <div className="flex items-center justify-between gap-3">
+          <span className="mono-label bg-sun px-2 py-1 text-[11.5px] text-fg tabular-nums">
+            Step {pad(step)} / {pad(last)}
+          </span>
+          <div className="flex gap-1.5">
+            <button
+              type="button"
+              onClick={() => jump(Math.max(0, step - 1))}
+              disabled={step === 0}
+              aria-label="Previous step"
+              className="flex size-10 items-center justify-center border border-white/25 disabled:opacity-35"
+            >
+              <Icon name="arrowRight" className="size-4 rotate-180" />
+            </button>
+            <PlayButton playing={playing} ended={step === last} onClick={toggle} compact />
+            <button
+              type="button"
+              onClick={() => jump(Math.min(last, step + 1))}
+              disabled={step === last}
+              aria-label="Next step"
+              className="flex size-10 items-center justify-center bg-white text-fg disabled:opacity-35"
+            >
+              <Icon name="arrowRight" className="size-4" />
+            </button>
+          </div>
+        </div>
+        <p key={step} aria-hidden className={cn("font-home mt-3 text-[1.5rem] leading-tight tracking-[-0.02em]", enter)}>
+          {steps[step]}
+        </p>
+        <ol aria-label="What happens, step by step" className="mt-3 flex gap-1">
+          {steps.map((s, i) => (
+            <li key={s} className="flex-1">
+              <button
+                type="button"
+                onClick={() => jump(i)}
+                aria-label={`Step ${i + 1}: ${s}`}
+                aria-current={i === step ? "step" : undefined}
+                className="block w-full py-2"
+              >
+                <span
+                  className={cn(
+                    "block h-1.5 transition-colors duration-300",
+                    i < step ? "bg-white" : i === step ? "bg-sun" : "bg-white/20",
+                  )}
+                />
+              </button>
+            </li>
+          ))}
+        </ol>
       </div>
 
       {/* ---- the stage ---- */}
       <div
         aria-hidden
-        className="mt-4 flex flex-col items-center gap-4 bg-panel-2 px-4 py-6 sm:px-8 sm:py-8 lg:flex-row lg:justify-center lg:gap-12 lg:py-10"
+        className="flex flex-col items-center gap-4 bg-panel-2 px-4 py-6 sm:px-8 sm:py-8 lg:mt-4 lg:flex-row lg:justify-center lg:gap-12 lg:py-10"
       >
         <Phone step={step} />
         <Crm step={step} done={step === last} />
@@ -145,45 +181,61 @@ export function AutomationRun({ steps }: { steps: string[] }) {
         ))}
       </ol>
 
-      {/* ---- steps: segmented bar on smaller screens ---- */}
-      <div className="mt-5 lg:hidden">
-        <ol aria-label="What happens, step by step" className="flex gap-1">
-          {steps.map((s, i) => (
-            <li key={s} className="flex-1">
-              <button
-                type="button"
-                onClick={() => jump(i)}
-                aria-label={`Step ${i + 1}: ${s}`}
-                aria-current={i === step ? "step" : undefined}
-                className="block w-full py-2.5"
-              >
-                <span className={cn("block h-1 transition-colors duration-300", i <= step ? "bg-fg" : "bg-rule")} />
-              </button>
-            </li>
-          ))}
-        </ol>
-        <p aria-hidden className="mt-2 flex items-baseline gap-3">
-          <span className="mono-label text-[12px] text-muted tabular-nums">
-            {pad(step)} / {pad(last)}
-          </span>
-          <span className="font-home text-[1.35rem] leading-tight tracking-[-0.02em] text-fg">{steps[step]}</span>
-        </p>
-      </div>
     </div>
+  );
+}
+
+function PlayButton({
+  playing,
+  ended,
+  onClick,
+  compact = false,
+}: {
+  playing: boolean;
+  ended: boolean;
+  onClick: () => void;
+  /** Icon-only, for the dark caption on phones. */
+  compact?: boolean;
+}) {
+  const label = playing ? "Pause" : ended ? "Replay" : "Play";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={compact ? label : undefined}
+      className={cn(
+        "inline-flex shrink-0 items-center justify-center gap-2",
+        compact
+          ? "size-10 border border-white/25 text-white"
+          : "mono-label h-11 border border-fg/25 px-4 text-[12.5px] text-fg transition-colors hover:border-fg",
+      )}
+    >
+      {playing ? (
+        <span aria-hidden className="flex gap-[3px]">
+          <span className={cn("h-3 w-[3px]", compact ? "bg-white" : "bg-fg")} />
+          <span className={cn("h-3 w-[3px]", compact ? "bg-white" : "bg-fg")} />
+        </span>
+      ) : (
+        <Icon name="play" filled className="size-3.5" />
+      )}
+      {!compact && label}
+    </button>
   );
 }
 
 /** The homeowner's phone. Messages arrive at the bottom and push older ones up. */
 function Phone({ step }: { step: number }) {
+  /** Outlines whatever arrived at this step, so the eye goes straight to it. */
+  const now = (n: number) => step === n && "ring-2 ring-sun ring-offset-2 ring-offset-panel";
   return (
-    <div className="flex h-[27rem] w-full max-w-[19rem] flex-col overflow-hidden rounded-[2.4rem] border-[7px] border-fg bg-white shadow-[0_30px_70px_-30px_rgb(0_0_0/0.55)] sm:h-[30rem]">
+    <div className="flex h-[24rem] w-full max-w-[19rem] flex-col overflow-hidden rounded-[2.4rem] border-[7px] border-fg bg-white shadow-[0_30px_70px_-30px_rgb(0_0_0/0.55)] sm:h-[30rem]">
       <div className="shrink-0 border-b border-rule px-4 pb-3 pt-3.5 text-center">
         <span className="mx-auto mb-2.5 block h-1.5 w-16 rounded-full bg-fg/80" />
         <span className="text-[14px] font-semibold text-fg">Your Foundation Co.</span>
       </div>
       <div className="flex flex-1 flex-col justify-end gap-2 overflow-hidden bg-panel px-3 py-4 [mask-image:linear-gradient(to_bottom,transparent,#000_3rem)]">
         {step === 0 ? (
-          <p className={cn("mx-auto flex items-center gap-2 bg-white px-3 py-2 text-[13px] text-fg", enter)}>
+          <p className={cn("mx-auto flex items-center gap-2 bg-white px-3 py-2 text-[13px] text-fg", enter, now(0))}>
             <span className="relative flex size-6 items-center justify-center">
               <span className="absolute inset-0 animate-pulse-ring rounded-full bg-[#1d6b3f]/30" />
               <Icon name="phone" className={cn("relative size-4", GREEN)} />
@@ -191,7 +243,7 @@ function Phone({ step }: { step: number }) {
             Calling… 4:52 PM
           </p>
         ) : (
-          <p className="mx-auto flex items-center gap-2 bg-white px-3 py-2 text-[13px] text-fg">
+          <p className={cn("mx-auto flex items-center gap-2 bg-white px-3 py-2 text-[13px] text-fg", now(1))}>
             <Icon name="phone" className={cn("size-4", RED)} />
             <span className={RED}>Missed call</span> · 4:52 PM
           </p>
@@ -199,15 +251,15 @@ function Phone({ step }: { step: number }) {
         {step >= 2 && (
           <div className={enter}>
             <p className="mono-label mb-1.5 text-center text-[9px] text-muted">Text · 4 sec after the call</p>
-            <Us>Sorry we missed your call! This is Your Foundation Co.</Us>
+            <Us className={cn(now(2))}>Sorry we missed your call! This is Your Foundation Co.</Us>
           </div>
         )}
-        {step >= 3 && <Us className={enter}>What issue are you seeing? Cracks, moisture, sagging floors or bowing walls?</Us>}
-        {step >= 4 && <Them className={enter}>Foundation cracks</Them>}
+        {step >= 3 && <Us className={cn(enter, now(3))}>What issue are you seeing? Cracks, moisture, sagging floors or bowing walls?</Us>}
+        {step >= 4 && <Them className={cn(enter, now(4))}>Foundation cracks</Them>}
         {step >= 5 && (
           <div className={cn("space-y-2", enter)}>
             <Us>What&rsquo;s your ZIP code?</Us>
-            <Them>76248</Them>
+            <Them className={cn(now(5))}>76248</Them>
             <p className={cn("mono-label flex items-center justify-center gap-1 whitespace-nowrap text-[9.5px]", GREEN)}>
               <Icon name="check" className="size-3" /> In your service area
             </p>
@@ -216,14 +268,14 @@ function Phone({ step }: { step: number }) {
         {step >= 6 && (
           <div className={cn("space-y-2", enter)}>
             <Us>Can you send a photo or two of the crack?</Us>
-            <div className="ml-auto flex w-fit gap-1.5">
+            <div className={cn("ml-auto flex w-fit gap-1.5 rounded-lg", now(6))}>
               <CrackPhoto d="M8 4 L20 18 L15 28 L30 40 L26 50 L38 60" />
               <CrackPhoto d="M56 6 L44 16 L48 26 L36 36 L40 46 L28 58" />
             </div>
           </div>
         )}
         {step >= 7 && (
-          <Us className={cn("border-l-[3px] border-sun", HIGHLIGHT, enter)}>
+          <Us className={cn("border-l-[3px] border-sun", HIGHLIGHT, enter, now(7))}>
             You&rsquo;re booked: free inspection, Tue 9:00 AM. Mike will see you then.
           </Us>
         )}
