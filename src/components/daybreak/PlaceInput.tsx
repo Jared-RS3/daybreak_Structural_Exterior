@@ -41,7 +41,8 @@ export function PlaceInput({
     const ctrl = new AbortController();
     const t = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/places?q=${encodeURIComponent(q)}`, { signal: ctrl.signal });
+        // `v` changes whenever the search does, so day-old cached answers aren't reused.
+        const res = await fetch(`/api/places?v=2&q=${encodeURIComponent(q)}`, { signal: ctrl.signal });
         const json = (await res.json()) as { places?: string[] };
         setOptions(json.places ?? []);
         setActive(-1);
