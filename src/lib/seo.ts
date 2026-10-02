@@ -6,13 +6,14 @@ import { agency } from "./agency";
  * sitemap, robots.txt, the share image and the structured data all read from
  * here, so the domain and the pitch are changed in one place.
  *
- * TODO(daybreak): confirm the production domain. The default is the domain
- * the contact email uses, which already points at Netlify. Set
- * NEXT_PUBLIC_SITE_URL in the host's environment to override it (no trailing
- * slash), e.g. for a staging deploy.
+ * The production domain is daybreakstructureworks.com. Not the parent
+ * company's daybreaktech.agency (that is `legal.companyUrl`, linked from the
+ * footer): a canonical pointing there tells Google this site is a copy of
+ * that one. Set NEXT_PUBLIC_SITE_URL in the host's environment only to
+ * override it (no trailing slash), e.g. for a staging deploy.
  */
 export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://daybreaktech.agency"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://daybreakstructureworks.com"
 ).replace(/\/$/, "");
 
 export const site = {
