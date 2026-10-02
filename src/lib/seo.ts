@@ -12,7 +12,7 @@ import { agency } from "./agency";
  * slash), e.g. for a staging deploy.
  */
 export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://daybreaktechinnovations.com"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://daybreaktech.agency"
 ).replace(/\/$/, "");
 
 export const site = {
@@ -37,7 +37,8 @@ export const site = {
 } as const;
 
 /** An absolute URL on this site, for places that can't resolve a relative one. */
-export const absoluteUrl = (path = "/") => new URL(path, `${siteUrl}/`).toString();
+export const absoluteUrl = (path = "/") =>
+  new URL(path, `${siteUrl}/`).toString();
 
 /**
  * The link preview (1200×630). Set explicitly rather than as an

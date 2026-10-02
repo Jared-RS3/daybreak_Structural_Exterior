@@ -36,9 +36,18 @@ export type LeadRequest = {
   /** Optional: plenty of contractors don't have a site yet. */
   domain?: string;
   trade: string;
+  /** What they sell, in their words: asked only when the trade is "Other". */
+  services?: string;
   jobs: string;
   jobValue: string;
   timeline: string;
+  /**
+   * "yes" when they ticked the box agreeing to the privacy policy and to being
+   * contacted about the request. A string like every other field, so it goes
+   * through the same reading and validation; saved as the "POPIA Agreement"
+   * checkbox in Airtable.
+   */
+  consent: string;
 };
 
 export type LeadField = keyof LeadRequest;
@@ -52,9 +61,11 @@ export const leadFields: LeadField[] = [
   "area",
   "domain",
   "trade",
+  "services",
   "jobs",
   "jobValue",
   "timeline",
+  "consent",
 ];
 
 const pick = (options: readonly string[], v: string) =>
@@ -68,11 +79,14 @@ const maxLength: Partial<Record<LeadField, number>> = {
   phone: 30,
   area: 100,
   domain: 253,
+  services: 200,
 };
 
 /**
  * Reads the form's fields out of untrusted input (FormData or a JSON body):
- * strings only, control characters removed, whitespace collapsed, trimmed.
+ * strings only, control characters removed, invisible and text-direction
+ * characters removed (they can disguise what a value says), whitespace
+ * collapsed, trimmed.
  */
 export function readLead(get: (k: LeadField) => unknown): LeadRequest {
   return Object.fromEntries(
@@ -82,7 +96,8 @@ export function readLead(get: (k: LeadField) => unknown): LeadRequest {
       return [
         k,
         text
-          .replace(/[\u0000-\u001f\u007f]/g, " ")
+          .replace(/[\u0000-\u001f\u007f-\u009f]/g, " ")
+          .replace(/[\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2069\ufeff]/g, "")
           .replace(/\s+/g, " ")
           .trim(),
       ];
@@ -110,9 +125,7 @@ export function validateLead(
   );
   set(
     "phone",
-    l.phone.replace(/\D/g, "").length < 10
-      ? "Enter a phone number, area code first."
-      : null,
+    isPhone(l.phone) ? null : "Enter a phone number, area code first.",
   );
   set(
     "area",
@@ -125,9 +138,20 @@ export function validateLead(
       : null,
   );
   set("trade", pick(trades, l.trade));
-  set("jobs", pick(jobVolumes, l.jobs));
-  set("jobValue", pick(jobValues, l.jobValue));
-  set("timeline", pick(timelines, l.timeline));
+  set(
+    "services",
+    l.trade === "Other" && (l.services ?? "").length < 3
+      ? "Tell us what services you offer."
+      : null,
+  );
+  // Optional: they can skip these, but an answer must be one of the options.
+  set("jobs", l.jobs && pick(jobVolumes, l.jobs));
+  set("jobValue", l.jobValue && pick(jobValues, l.jobValue));
+  set("timeline", l.timeline && pick(timelines, l.timeline));
+  set(
+    "consent",
+    l.consent === "yes" ? null : "Tick the box to agree before sending.",
+  );
   return errors;
 }
 
@@ -149,6 +173,25 @@ export function normalizeDomain(input: string): string | null {
   return v;
 }
 
+/**
+ * Letters (any language), digits and the punctuation real addresses use.
+ * Starting with a letter, digit or underscore also means a typed address can
+ * never begin with = + - or @ and run as a spreadsheet formula.
+ */
 export function isEmail(v: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+  const t = v.trim();
+  return (
+    /^[\p{L}\p{N}_][\p{L}\p{N}._%+'-]*@[\p{L}\p{N}][\p{L}\p{N}.-]*\.\p{L}[\p{L}\p{N}-]+$/u.test(t) &&
+    !t.includes("..")
+  );
+}
+
+/** Digits with the usual separators, an optional leading + and extension. */
+export function isPhone(v: string): boolean {
+  const digits = v.replace(/\D/g, "").length;
+  return (
+    digits >= 10 &&
+    digits <= 20 &&
+    /^\+?[\d\s().-]+(\s?(x|ext\.?)\s?\d{1,6})?$/i.test(v.trim())
+  );
 }

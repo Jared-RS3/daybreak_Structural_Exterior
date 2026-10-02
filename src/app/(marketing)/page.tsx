@@ -1,6 +1,8 @@
 import { AboutStatement } from "@/components/daybreak/AboutStatement";
 import { AutomationFilm } from "@/components/daybreak/AutomationFilm";
+import { AutomationRun } from "@/components/daybreak/AutomationRun";
 import { AxButton } from "@/components/daybreak/ax";
+import { AxComparison } from "@/components/daybreak/AxComparison";
 import { AxContact } from "@/components/daybreak/AxContact";
 import { AxFaq } from "@/components/daybreak/AxFaq";
 import { AxProcess } from "@/components/daybreak/AxProcess";
@@ -8,15 +10,7 @@ import { AxReviews } from "@/components/daybreak/AxReviews";
 import { AxTerms } from "@/components/daybreak/AxTerms";
 import { AxToolBand } from "@/components/daybreak/AxTools";
 import { HeroProof } from "@/components/daybreak/HeroProof";
-import { SystemJourney } from "@/components/daybreak/SystemJourney";
-import {
-  SceneCapture,
-  SceneEstimate,
-  SceneFollowUp,
-  SceneRespond,
-  SceneRevenue,
-  SceneSearch,
-} from "@/components/daybreak/SystemScenes";
+import { LeakBand, LostRevenue } from "@/components/daybreak/LostRevenue";
 import { WorkShowcase } from "@/components/daybreak/WorkShowcase";
 import { Hero } from "@/components/template/Hero";
 import { PillLink } from "@/components/template/primitives";
@@ -27,18 +21,22 @@ import { founders } from "@/lib/agency";
 import {
   about,
   automationFilm,
+  beforeAfter,
   bookingHref,
+  callSteps,
   daybreak,
   draftReviews,
   faqs,
   heroPromises,
   heroTrust,
+  leakBand,
+  liveRun,
+  liveRunCopy,
+  lostLeadStats,
   offer,
   placeholderReviews,
   promise,
   reviews,
-  process as startSteps,
-  system,
 } from "@/lib/daybreak";
 import { houseImage, tool } from "@/lib/demo-site";
 import { openGraphDefaults, site } from "@/lib/seo";
@@ -63,13 +61,29 @@ export const metadata: Metadata = {
  * Axion's business-professional language — hairlines, mono labels, square
  * grey panels, black rectangular buttons, a black footer.
  *
- * Order follows a skimming contractor's questions, proof and money before
- * anything about us: is this for my trade (hero) → show me one (work, ending
- * on the live crack checker) → why should it run without me (a 30-second
- * film) → how does it get me jobs → what's it worth to
- * me → what do I have to do (the free concept) → what if I don't like it →
- * who's accountable → questions → the ask. Kept short: each section makes
- * one point, and nothing repeats an earlier one.
+ * One job: get a busy contractor onto a call. Each section answers the next
+ * question they'd ask, in order. NN/g's eyetracking puts 57% of viewing time
+ * on the first screen and 74% on the first two, so the founder on camera and
+ * the money problem sit straight under the hero, ahead of everything else.
+ *
+ *   1. Is this for my trade?             hero
+ *   2. Are these people real?            the founder's 30-second film
+ *      Am I losing money right now?      lost-revenue band, two sourced stats
+ *   3. Can you actually build it?        our work, ending on the crack checker
+ *   4. How would it stop the leak?       one missed call, saved live
+ *   5. What changes for me?              before & after
+ *   6. What happens if I book a call?    the call in three steps → book
+ *   7. What if it's not for me?          the promise: free concept, you own it
+ *   8. Do other clients trust you?       reviews
+ *      Who would I be dealing with?      the founders
+ *   9. Anything else?                    FAQ
+ *  10. Book the call.
+ *
+ * /how-it-works holds the extra detail (the 6-step journey, the three leaks
+ * card by card, outcomes, how we start) for the visitor who wants more. Every
+ * point that sells the call is here as well. The lost-revenue calculator is
+ * at /calculator, unlisted, to work through with a contractor on the call
+ * (step two above).
  */
 export default function AgencyHome() {
   return (
@@ -122,11 +136,73 @@ export default function AgencyHome() {
         trustNote={null}
       />
 
+      <LeakBand
+        {...leakBand}
+        stats={lostLeadStats}
+        href="/how-it-works#leaks"
+        before={
+          <AutomationFilm
+            label="From the founders"
+            title={
+              <>
+                A business that stops
+                <br className="hidden sm:block" /> when you do is a job.
+              </>
+            }
+            lede="Thirty seconds from us on why the contractors who grow are the ones whose leads get answered, booked and followed up while they're on a roof, in a crawl space, or off for the day."
+            src={automationFilm.src}
+            poster={automationFilm.poster}
+            duration={`0:${automationFilm.seconds}`}
+          />
+        }
+      />
+
       <WorkShowcase
         offerHref={daybreak.offerHref}
         tool={
           <AxToolBand tool={tool} checker={<CrackChecker shape="square" />} />
         }
+      />
+
+      <LostRevenue
+        label={liveRunCopy.label}
+        title={
+          <>
+            {liveRunCopy.title[0]}
+            <br /> {liveRunCopy.title[1]}
+          </>
+        }
+        lede={liveRunCopy.lede}
+        run={<AutomationRun steps={liveRun} />}
+        action={
+          <AxButton href="/how-it-works" variant="line">
+            See the full system
+            <Icon name="arrowRight" className="size-4" />
+          </AxButton>
+        }
+      />
+
+      <AxComparison
+        label="Before & after"
+        title="The same lead, before and after Daybreak."
+        lede="Homeowners find you the same way they do now. What changes is what happens in the first minute, and in the month after the quote."
+        data={beforeAfter}
+      />
+
+      <AxProcess
+        id="call"
+        label="Your first call"
+        title="What happens when you book a call."
+        lede="One call with the two of us. You see your new homepage, we work out what your missed calls and unsold estimates are costing you, and you leave with a fixed price if it's a fit."
+        steps={callSteps}
+        action={<AxButton href={bookingHref}>Book a discovery call</AxButton>}
+      />
+
+      <AxTerms
+        label="Our promise"
+        title={promise.title}
+        lede={promise.lede}
+        items={promise.items}
       />
 
       {/* Real reviews go in lib/daybreak.ts. Drafts awaiting a client's
@@ -144,68 +220,6 @@ export default function AgencyHome() {
           <AxReviews reviews={placeholderReviews} placeholder />
         )
       )}
-
-      <section
-        id="system"
-        aria-labelledby="system-title"
-        className="scroll-mt-20 overflow-clip bg-panel py-20 sm:py-24 lg:py-28"
-      >
-        <div className="container-wide">
-          <AutomationFilm
-            label="Why it matters"
-            title={
-              <>
-                A business that stops
-                <br className="hidden sm:block" /> when you do is a job.
-              </>
-            }
-            lede="The contractors who grow are the ones whose leads get answered, booked and followed up while they're on a roof, in a crawl space, or off for the day. Thirty seconds on why."
-            src={automationFilm.src}
-            poster={automationFilm.poster}
-            duration={`0:${automationFilm.seconds}`}
-          />
-          <SystemJourney
-            label="How it works"
-            titleId="system-title"
-            title={
-              <>
-                How your new website
-                <br className="hidden sm:block" /> wins you jobs.
-              </>
-            }
-            lede="Here's what happens when a homeowner finds you on Google."
-            steps={system}
-            scenes={[
-              <SceneSearch key="search" />,
-              <SceneEstimate key="estimate" />,
-              <SceneCapture key="capture" />,
-              <SceneRespond key="respond" />,
-              <SceneFollowUp key="follow" />,
-              <SceneRevenue key="revenue" />,
-            ]}
-            end={{
-              href: daybreak.offerHref,
-              label: "Get a free homepage concept",
-            }}
-          />
-        </div>
-      </section>
-
-      {/* <AxCalculator trades={calculatorTrades} offerHref={daybreak.offerHref} /> */}
-
-      <AxProcess
-        steps={startSteps}
-        title="Start with a free homepage concept."
-        lede="See your company on a better website before you spend anything. The concept is free; the final design and build are paid work, at a fixed price you agree first."
-        action={<AxButton href={daybreak.offerHref}>{offer.cta}</AxButton>}
-      />
-
-      <AxTerms
-        label="Our promise"
-        title={promise.title}
-        lede={promise.lede}
-        items={promise.items}
-      />
 
       <AboutStatement
         label="Who you'll work with"

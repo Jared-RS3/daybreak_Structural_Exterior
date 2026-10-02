@@ -5,7 +5,7 @@ import { absoluteUrl, site, siteUrl } from "./seo";
 
 /**
  * Schema.org JSON-LD for the homepage, as one connected graph: the business,
- * the website, the page, the service it sells, the FAQ and the film.
+ * the website, the page, the service it sells, the FAQ and the founder's film.
  *
  * Same rule as the rest of the content: it states only what is true today.
  * There is no street address (none is published yet), no legal name (the
@@ -17,6 +17,7 @@ import { absoluteUrl, site, siteUrl } from "./seo";
 const org = `${siteUrl}/#organization`;
 const website = `${siteUrl}/#website`;
 const home = `${siteUrl}/#webpage`;
+const howItWorks = `${siteUrl}/how-it-works#webpage`;
 const film = `${siteUrl}/#automation-film`;
 
 export function homeStructuredData() {
@@ -122,6 +123,25 @@ export function homeStructuredData() {
         uploadDate: `${automationFilm.uploaded}T00:00:00Z`,
         duration: `PT${automationFilm.seconds}S`,
         publisher: { "@id": org },
+      },
+    ],
+  };
+}
+
+/** The how-it-works page, tied to the homepage graph by @id. */
+export function howItWorksStructuredData({ title, description }: { title: string; description: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": howItWorks,
+        url: absoluteUrl("/how-it-works"),
+        name: title,
+        description,
+        inLanguage: "en-US",
+        isPartOf: { "@id": website },
+        about: { "@id": org },
       },
     ],
   };

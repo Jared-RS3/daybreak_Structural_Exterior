@@ -3,17 +3,32 @@ import { Icon } from "@/components/ui/Icon";
 import { AxHead, AxLabel } from "./ax";
 
 /**
- * The brochure site against a Daybreak site, as two square panels. The usual
- * way is grey and mostly waiting; the Daybreak way is black, and the first
- * three steps are marked as happening in the first minute.
+ * The usual way against the Daybreak way, as two square panels. The usual
+ * way is grey and mostly waiting; the Daybreak way is black, and its first
+ * steps are marked as happening in the first minute. `children` run on under
+ * the panels, inside the same section.
  */
-export function AxComparison({ data, title, lede }: { data: Comparison; title: React.ReactNode; lede: React.ReactNode }) {
+export function AxComparison({
+  data,
+  title,
+  lede,
+  label = "Why it's different",
+  id,
+  children,
+}: {
+  data: Comparison;
+  title: React.ReactNode;
+  lede: React.ReactNode;
+  label?: string;
+  id?: string;
+  children?: React.ReactNode;
+}) {
   const fast = data.ours.steps.slice(0, data.ours.fastSteps);
   const rest = data.ours.steps.slice(data.ours.fastSteps);
   return (
-    <section aria-labelledby="compare-title" className="bg-panel py-20 sm:py-24 lg:py-28">
+    <section id={id} aria-labelledby="compare-title" className="scroll-mt-20 bg-panel py-20 sm:py-24 lg:py-28">
       <div className="container-wide">
-        <AxHead id="compare-title" label="Why it's different" title={title} lede={lede} />
+        <AxHead id="compare-title" label={label} title={title} lede={lede} />
         <div className="mt-14 grid gap-2.5 lg:mt-16 lg:grid-cols-2">
           <div className="bg-panel-2 p-7 sm:p-10">
             <AxLabel>{data.usual.label}</AxLabel>
@@ -61,6 +76,7 @@ export function AxComparison({ data, title, lede }: { data: Comparison; title: R
             </p>
           </div>
         </div>
+        {children}
       </div>
     </section>
   );

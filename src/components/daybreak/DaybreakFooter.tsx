@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { AxLabel } from "./ax";
 
@@ -11,11 +12,14 @@ export function DaybreakFooter({
   brand,
   email,
   entity,
+  company,
   columns,
 }: {
   brand: { name: string; descriptor: string };
   email: string;
   entity: string;
+  /** The parent company: its logo and site close the footer. */
+  company: { name: string; legalName: string; href: string };
   columns: { title: string; links: { label: string; href: string }[] }[];
 }) {
   const year = new Date().getFullYear();
@@ -110,6 +114,40 @@ export function DaybreakFooter({
           <AxLabel tone="light" className="text-white/60">
             © {year} {entity}
           </AxLabel>
+        </div>
+
+        {/* Whose site this is, as a centred sign-off: "A division of", a
+            hairline, then the parent company's logo linking to its site. */}
+        <div className="flex flex-col items-center gap-4 border-t border-white/15 py-10">
+          <div className="flex items-center justify-center gap-5 sm:gap-7">
+            <span className="mono-label text-[12.5px] tracking-[0.18em] text-white/60">
+              A division of
+            </span>
+            <span aria-hidden className="h-8 w-px bg-white/20" />
+            <a
+              href={company.href}
+              target="_blank"
+              rel="noopener"
+              title={`${company.name} — ${company.legalName}`}
+              className="opacity-80 transition-opacity hover:opacity-100"
+            >
+              <Image
+                src="/images/daybreak-logo-white.png"
+                alt={`${company.name} website`}
+                width={1531}
+                height={240}
+                className="h-5 w-auto sm:h-6"
+              />
+            </a>
+          </div>
+          <a
+            href={company.href}
+            target="_blank"
+            rel="noopener"
+            className="text-[14.5px] text-white/60 underline decoration-white/25 underline-offset-4 transition-colors hover:text-white hover:decoration-white"
+          >
+            {company.href.replace(/^https?:\/\//, "")}
+          </a>
         </div>
       </div>
     </footer>

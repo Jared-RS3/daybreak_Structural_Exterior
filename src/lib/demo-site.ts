@@ -74,7 +74,7 @@ export const houseImage = {
 export const company: Business = {
   name: "Daybreak Foundation & Exteriors",
   descriptor: "Foundation & Exteriors",
-  legal: "Daybreak Foundation & Exteriors, LLC",
+  legal: "DayBreak Tech-Innovations (Pty) Ltd",
   phoneDisplay: "(817) 555-0142",
   phoneHref: "tel:+18175550142",
   // A reserved .example domain: the company is fictional, and a plausible
@@ -110,7 +110,8 @@ export const tool: ToolConfig = {
   href: `${demoBase}/crack-checker`,
   inputLabel: "Your crack",
   placeholder: "",
-  reassurance: "Free. Nothing is sent anywhere, and nobody calls unless you ask them to.",
+  reassurance:
+    "Free. Nothing is sent anywhere, and nobody calls unless you ask them to.",
   steps: [
     {
       title: "Tell us what you see",
@@ -128,9 +129,16 @@ export const tool: ToolConfig = {
 };
 
 /** The site's main call to action. */
-export const quoteCta = { label: "Get a free inspection", href: `${demoBase}/book` };
+export const quoteCta = {
+  label: "Get a free inspection",
+  href: `${demoBase}/book`,
+};
 
-export const rating: RatingSummary = { score: "4.9", count: 868, source: "Google" };
+export const rating: RatingSummary = {
+  score: "4.9",
+  count: 868,
+  source: "Google",
+};
 
 export const trust: TrustItem[] = [
   { value: "4.9", label: "868 Google reviews", rating: true },
@@ -145,7 +153,8 @@ export const services: Service[] = [
     slug: "foundation-repair",
     group: "specialty",
     title: "Foundation Repair",
-    short: "Steel piers driven to load-bearing soil, with a lifetime transferable warranty.",
+    short:
+      "Steel piers driven to load-bearing soil, with a lifetime transferable warranty.",
     blurb:
       "North Texas clay swells when it's wet and shrinks when it's dry, and your slab rides it. We measure how far each part of the house has moved, then drive steel piers under the settling beams until they stop on soil that doesn't move, and lift the house back as far as it will safely go.",
     image: "/images/foundation-underpin.jpg",
@@ -247,7 +256,8 @@ export const services: Service[] = [
     slug: "crawl-space-encapsulation",
     group: "specialty",
     title: "Crawl Space Encapsulation",
-    short: "A 20-mil liner, sealed vents and a dehumidifier sized to the space.",
+    short:
+      "A 20-mil liner, sealed vents and a dehumidifier sized to the space.",
     blurb:
       "An open, vented crawl space pulls humid Texas air under the house, where it condenses on cool ducts and joists. That's where the musty smell, the cupping floors and the mold come from. Encapsulation closes the space off and dries it out, so the air under your floor is as dry as the air above it.",
     image: "/images/crawl-foam.jpg",
@@ -300,7 +310,8 @@ export const services: Service[] = [
     slug: "crawl-space-repair",
     group: "specialty",
     title: "Crawl Space Repair",
-    short: "Sagging floors, rotted joists and failed supports, fixed from below.",
+    short:
+      "Sagging floors, rotted joists and failed supports, fixed from below.",
     blurb:
       "A bouncy kitchen floor or a sloping hallway usually starts in the crawl space: a support that's sunk, a joist that's cracked, or wood that's been damp for years. We find the cause, fix the structure and deal with the moisture, so it doesn't happen again.",
     image: "/images/crawl-inspection.jpg",
@@ -349,7 +360,8 @@ export const services: Service[] = [
     slug: "drainage",
     group: "specialty",
     title: "Drainage & Moisture Control",
-    short: "French drains, root barriers and downspouts that keep the soil stable.",
+    short:
+      "French drains, root barriers and downspouts that keep the soil stable.",
     blurb:
       "Most North Texas foundations move because the soil under them gets wet on one side and dry on the other. Water off the roof, a low spot by the patio or a thirsty oak tree can all do it. Fixing the water is often cheaper than fixing the foundation, and it protects the piers if you've already got them.",
     image: "/images/foundation-pour.jpg",
@@ -398,7 +410,8 @@ export const services: Service[] = [
     slug: "foundation-inspection",
     group: "specialty",
     title: "Foundation Inspections",
-    short: "A free elevation survey, and an engineer's report when you need one.",
+    short:
+      "A free elevation survey, and an engineer's report when you need one.",
     blurb:
       "Buying, selling or just worried? We measure the whole floor, check the crawl space or the slab edges, and give you a written answer: what's moving, what isn't, and what (if anything) we'd do about it. When a lender or buyer needs it, a licensed engineer writes the report.",
     image: "/images/inspectors-tablet.jpg",
@@ -447,7 +460,8 @@ export const services: Service[] = [
     slug: "siding-replacement",
     group: "more",
     title: "Siding Replacement",
-    short: "James Hardie® fiber cement, engineered wood or vinyl, installed to spec.",
+    short:
+      "James Hardie® fiber cement, engineered wood or vinyl, installed to spec.",
     blurb:
       "New siding is only as good as what's behind it. We strip to the sheathing, fix any rot we find, wrap and flash every window, then install fiber cement, engineered wood or vinyl exactly as the manufacturer specifies, so the warranty actually holds.",
     image: "/images/siding-crew.jpg",
@@ -496,7 +510,8 @@ export const services: Service[] = [
     slug: "siding-repair",
     group: "more",
     title: "Siding Repair",
-    short: "Rot, hail and woodpecker damage matched and replaced board by board.",
+    short:
+      "Rot, hail and woodpecker damage matched and replaced board by board.",
     blurb:
       "Not every wall needs new siding. Rotted boards behind a gutter, hail-cracked panels on one side or a woodpecker's work can be cut out and replaced with matched material, and the cause fixed so it doesn't come back.",
     image: "/images/siding-drill.jpg",
@@ -614,7 +629,10 @@ export const reviews: Review[] = [
     service: "Foundation repair, 14 piers",
     rating: 5,
     source: "Google",
-    photo: { src: "/images/project-brick-ranch.jpg", alt: "Brick ranch home in Arlington after foundation repair" },
+    photo: {
+      src: "/images/project-brick-ranch.jpg",
+      alt: "Brick ranch home in Arlington after foundation repair",
+    },
   },
   {
     id: "angela",
@@ -654,7 +672,10 @@ export const reviews: Review[] = [
     service: "Crawl space encapsulation",
     rating: 5,
     source: "Google",
-    photo: { src: "/images/project-farmhouse.jpg", alt: "Farmhouse in Aledo with a wraparound porch" },
+    photo: {
+      src: "/images/project-farmhouse.jpg",
+      alt: "Farmhouse in Aledo with a wraparound porch",
+    },
   },
   {
     id: "tamika",
@@ -764,17 +785,30 @@ export const projects: Project[] = [
     ],
     days: 2,
     insurance: false,
-    image: { src: "/images/project-brick-ranch.jpg", alt: "Single-story brick ranch home after foundation repair" },
+    image: {
+      src: "/images/project-brick-ranch.jpg",
+      alt: "Single-story brick ranch home after foundation repair",
+    },
     beforeAfter: {
-      before: { src: "/images/foundation-crack-brick.jpg", alt: "Crack running through the mortar of a brick wall", label: "Before" },
-      after: { src: "/images/project-brick-ranch.jpg", alt: "Brick ranch home with repointed brick after the lift", label: "After" },
-      placeholderNote: "Placeholder pair — different properties. The live build uses the client's matched photos.",
+      before: {
+        src: "/images/foundation-crack-brick.jpg",
+        alt: "Crack running through the mortar of a brick wall",
+        label: "Before",
+      },
+      after: {
+        src: "/images/project-brick-ranch.jpg",
+        alt: "Brick ranch home with repointed brick after the lift",
+        label: "After",
+      },
+      placeholderNote:
+        "Placeholder pair — different properties. The live build uses the client's matched photos.",
     },
     problem:
       "A stair-step crack through the brick on the back corner, and a bedroom door that wouldn't latch. The survey showed 1.8 inches of drop over 30 feet.",
     solution:
       "Fourteen steel push piers along the back and side beams, driven to refusal at an average of 19 feet, then lifted in stages with the doors checked at each step.",
-    result: "1.6 inches recovered. Every door latches, and the brick was repointed to match.",
+    result:
+      "1.6 inches recovered. Every door latches, and the brick was repointed to match.",
     reviewId: "priya",
   },
   {
@@ -791,11 +825,23 @@ export const projects: Project[] = [
     ],
     days: 3,
     insurance: false,
-    image: { src: "/images/project-farmhouse.jpg", alt: "Blue farmhouse with a wraparound porch" },
+    image: {
+      src: "/images/project-farmhouse.jpg",
+      alt: "Blue farmhouse with a wraparound porch",
+    },
     beforeAfter: {
-      before: { src: "/images/crawl-space-before.jpg", alt: "Dusty open crawl space with bare ground and exposed pipes", label: "Before" },
-      after: { src: "/images/crawl-foam.jpg", alt: "Sealed, insulated space under a house", label: "After" },
-      placeholderNote: "Placeholder pair — different properties. The live build uses the client's matched photos.",
+      before: {
+        src: "/images/crawl-space-before.jpg",
+        alt: "Dusty open crawl space with bare ground and exposed pipes",
+        label: "Before",
+      },
+      after: {
+        src: "/images/crawl-foam.jpg",
+        alt: "Sealed, insulated space under a house",
+        label: "After",
+      },
+      placeholderNote:
+        "Placeholder pair — different properties. The live build uses the client's matched photos.",
     },
     problem:
       "A musty smell upstairs, 78% humidity under the floor and standing water after every heavy rain.",
@@ -818,12 +864,16 @@ export const projects: Project[] = [
     ],
     days: 8,
     insurance: false,
-    image: { src: "/images/project-colonial.jpg", alt: "White shingle-style home with a dark roof and hydrangeas" },
+    image: {
+      src: "/images/project-colonial.jpg",
+      alt: "White shingle-style home with a dark roof and hydrangeas",
+    },
     problem:
       "Original wood siding with paint failing on every wall, and soft spots under the windows, in a neighborhood where any change needs design review.",
     solution:
       "Stripped to the sheathing, replaced eleven rotted sheets at our flat per-sheet price, flashed every window, and installed Artisan lap in a profile chosen for the review board.",
-    result: "Approved on the first submission. Eight days on site, and the final invoice matched the proposal.",
+    result:
+      "Approved on the first submission. Eight days on site, and the final invoice matched the proposal.",
     reviewId: "tamika",
   },
   {
@@ -840,11 +890,16 @@ export const projects: Project[] = [
     ],
     days: 2,
     insurance: false,
-    image: { src: "/images/project-craftsman.jpg", alt: "Yellow craftsman bungalow with a front porch" },
-    problem: "Rotted cedar stumps and crushed shims left the living room floor 2.5 inches out across its width.",
+    image: {
+      src: "/images/project-craftsman.jpg",
+      alt: "Yellow craftsman bungalow with a front porch",
+    },
+    problem:
+      "Rotted cedar stumps and crushed shims left the living room floor 2.5 inches out across its width.",
     solution:
       "Replaced 22 cedar stumps with poured concrete piers, reset the beams on steel shims, and sistered six cracked joists.",
-    result: "Floors within ⅜ inch across the whole house, with the original oak floors kept.",
+    result:
+      "Floors within ⅜ inch across the whole house, with the original oak floors kept.",
   },
   {
     slug: "keller-sagging-floor",
@@ -860,11 +915,16 @@ export const projects: Project[] = [
     ],
     days: 1,
     insurance: false,
-    image: { src: "/images/crawl-cellar.jpg", alt: "Low space under a house with wooden joists and work lights" },
-    problem: "A dip in the kitchen floor where the old block supports had sunk into wet soil.",
+    image: {
+      src: "/images/crawl-cellar.jpg",
+      alt: "Low space under a house with wooden joists and work lights",
+    },
+    problem:
+      "A dip in the kitchen floor where the old block supports had sunk into wet soil.",
     solution:
       "Six adjustable steel posts on new footings under the girder, raised in stages over a week, plus four sistered joists.",
-    result: "The floor is flat and firm, and the dishwasher door lines up again.",
+    result:
+      "The floor is flat and firm, and the dishwasher door lines up again.",
     reviewId: "owen",
   },
   {
@@ -881,11 +941,16 @@ export const projects: Project[] = [
     ],
     days: 6,
     insurance: false,
-    image: { src: "/images/concrete-driveway-modern.jpg", alt: "Modern white board-and-batten home with black windows" },
-    problem: "Engineered wood siding swelling at every bottom edge after only nine years.",
+    image: {
+      src: "/images/concrete-driveway-modern.jpg",
+      alt: "Modern white board-and-batten home with black windows",
+    },
+    problem:
+      "Engineered wood siding swelling at every bottom edge after only nine years.",
     solution:
       "Removed it, corrected the ground and roof-line clearances that caused the swelling, and installed fiber cement panel and batten.",
-    result: "HOA-approved in one round. Proper clearances on every wall this time.",
+    result:
+      "HOA-approved in one round. Proper clearances on every wall this time.",
     reviewId: "karen",
   },
   {
@@ -902,9 +967,14 @@ export const projects: Project[] = [
     ],
     days: 2,
     insurance: false,
-    image: { src: "/images/project-brick-oak.jpg", alt: "Two-story brick home under a mature oak tree" },
-    problem: "The oak's roots were drying the soil under one corner, and a downspout was soaking the other.",
-    solution: "A root barrier along the tree side, a French drain and piped downspouts, and three piers on the corner that had dropped.",
+    image: {
+      src: "/images/project-brick-oak.jpg",
+      alt: "Two-story brick home under a mature oak tree",
+    },
+    problem:
+      "The oak's roots were drying the soil under one corner, and a downspout was soaking the other.",
+    solution:
+      "A root barrier along the tree side, a French drain and piped downspouts, and three piers on the corner that had dropped.",
     result: "The house has held level through two summers of monitoring.",
     reviewId: "luis",
   },
@@ -922,9 +992,14 @@ export const projects: Project[] = [
     ],
     days: 1,
     insurance: false,
-    image: { src: "/images/siding-green-lap.jpg", alt: "Green lap siding and white windows" },
-    problem: "Soft, swollen siding on two walls where the roof meets the wall and water ran behind it.",
-    solution: "Cut out only the rotted boards, replaced the wet sheathing, added kick-out flashing and matched the paint.",
+    image: {
+      src: "/images/siding-green-lap.jpg",
+      alt: "Green lap siding and white windows",
+    },
+    problem:
+      "Soft, swollen siding on two walls where the roof meets the wall and water ran behind it.",
+    solution:
+      "Cut out only the rotted boards, replaced the wet sheathing, added kick-out flashing and matched the paint.",
     result: "A one-day repair instead of a re-side.",
     reviewId: "sam",
   },
@@ -942,10 +1017,16 @@ export const projects: Project[] = [
     ],
     days: 3,
     insurance: true,
-    image: { src: "/images/project-modern.jpg", alt: "Modern two-story home with white stucco" },
-    problem: "A leaking drain line under the slab had washed out the soil beneath the kitchen.",
-    solution: "A plumbing test found the leak; the plumber repaired it, then we set nine helical piers and lifted the settled section.",
-    result: "1.1 inches recovered, and the insurer covered the plumbing-related damage.",
+    image: {
+      src: "/images/project-modern.jpg",
+      alt: "Modern two-story home with white stucco",
+    },
+    problem:
+      "A leaking drain line under the slab had washed out the soil beneath the kitchen.",
+    solution:
+      "A plumbing test found the leak; the plumber repaired it, then we set nine helical piers and lifted the settled section.",
+    result:
+      "1.1 inches recovered, and the insurer covered the plumbing-related damage.",
   },
 ];
 
@@ -966,89 +1047,199 @@ export const problems: Problem[] = [
   {
     id: "cracks",
     label: "I see cracks in my walls or brick",
-    image: { src: "/images/foundation-crack-block.jpg", alt: "A wide crack running down through a block wall" },
+    image: {
+      src: "/images/foundation-crack-block.jpg",
+      alt: "A wide crack running down through a block wall",
+    },
     heading: "Not every crack means foundation trouble.",
     causes: [
-      { title: "Stair-step cracks in brick", body: "The classic sign of one corner settling as the clay under it dries out." },
-      { title: "Diagonal drywall cracks", body: "Running up from the corners of doors and windows as the frame racks." },
-      { title: "Doors and windows that stick", body: "Often the first thing people notice, before any crack." },
-      { title: "Gaps at trim and baseboards", body: "Where the wall has moved away from the floor or the ceiling." },
-      { title: "Hairline slab cracks", body: "Usually just shrinkage, and nothing to worry about on their own." },
+      {
+        title: "Stair-step cracks in brick",
+        body: "The classic sign of one corner settling as the clay under it dries out.",
+      },
+      {
+        title: "Diagonal drywall cracks",
+        body: "Running up from the corners of doors and windows as the frame racks.",
+      },
+      {
+        title: "Doors and windows that stick",
+        body: "Often the first thing people notice, before any crack.",
+      },
+      {
+        title: "Gaps at trim and baseboards",
+        body: "Where the wall has moved away from the floor or the ceiling.",
+      },
+      {
+        title: "Hairline slab cracks",
+        body: "Usually just shrinkage, and nothing to worry about on their own.",
+      },
     ],
     firstStep:
       "A free elevation survey: we measure how far each part of the floor has moved and show you the map. If it's cosmetic, you'll hear that in writing.",
     expectation: "Most pier jobs take two to three days, from $1,350 a pier.",
     primary: { label: "Check my crack", href: `${demoBase}/crack-checker` },
-    secondary: { label: "Book a free inspection", href: `${demoBase}/book?problem=cracks` },
+    secondary: {
+      label: "Book a free inspection",
+      href: `${demoBase}/book?problem=cracks`,
+    },
   },
   {
     id: "floors",
     label: "My floors sag or slope",
-    image: { src: "/images/crawl-cellar.jpg", alt: "Wooden joists and supports in the space under a house" },
+    image: {
+      src: "/images/crawl-cellar.jpg",
+      alt: "Wooden joists and supports in the space under a house",
+    },
     heading: "Sagging floors usually start underneath.",
     causes: [
-      { title: "Crushed or shifted shims", body: "Wood shims compress over the years and the beam drops with them." },
-      { title: "Sunken supports", body: "Piers and posts sitting on wet soil instead of real footings." },
-      { title: "Rotted sill or joists", body: "Wood that's been damp for years loses its strength." },
-      { title: "Overspanned joists", body: "Joists too small for the distance they cover, so the floor bounces." },
+      {
+        title: "Crushed or shifted shims",
+        body: "Wood shims compress over the years and the beam drops with them.",
+      },
+      {
+        title: "Sunken supports",
+        body: "Piers and posts sitting on wet soil instead of real footings.",
+      },
+      {
+        title: "Rotted sill or joists",
+        body: "Wood that's been damp for years loses its strength.",
+      },
+      {
+        title: "Overspanned joists",
+        body: "Joists too small for the distance they cover, so the floor bounces.",
+      },
     ],
     firstStep:
       "We crawl the whole space, photograph every support and measure the floor, then tell you exactly which parts are failing.",
-    expectation: "Most sagging-floor repairs are done in a day or two, from $1,950.",
-    primary: { label: "Book a crawl space inspection", href: `${demoBase}/book?problem=floors` },
-    secondary: { label: "See pier & beam repair", href: `${demoBase}/services/pier-and-beam` },
+    expectation:
+      "Most sagging-floor repairs are done in a day or two, from $1,950.",
+    primary: {
+      label: "Book a crawl space inspection",
+      href: `${demoBase}/book?problem=floors`,
+    },
+    secondary: {
+      label: "See pier & beam repair",
+      href: `${demoBase}/services/pier-and-beam`,
+    },
   },
   {
     id: "musty",
     label: "My crawl space is damp or smells musty",
-    image: { src: "/images/crawl-mold.jpg", alt: "Dark moisture streaks running down a surface" },
+    image: {
+      src: "/images/crawl-mold.jpg",
+      alt: "Dark moisture streaks running down a surface",
+    },
     heading: "The smell upstairs is coming from below.",
     causes: [
-      { title: "Open vents", body: "In summer, vents pull humid air under the house, where it condenses." },
-      { title: "Bare dirt or torn plastic", body: "The ground itself gives off moisture all year." },
-      { title: "Standing water", body: "Poor drainage outside lets water pool underneath after rain." },
-      { title: "Mold on joists", body: "Humidity above about 70% for long enough, and it grows." },
-      { title: "Sweating ductwork", body: "Cold ducts in humid air drip onto the insulation and the ground." },
+      {
+        title: "Open vents",
+        body: "In summer, vents pull humid air under the house, where it condenses.",
+      },
+      {
+        title: "Bare dirt or torn plastic",
+        body: "The ground itself gives off moisture all year.",
+      },
+      {
+        title: "Standing water",
+        body: "Poor drainage outside lets water pool underneath after rain.",
+      },
+      {
+        title: "Mold on joists",
+        body: "Humidity above about 70% for long enough, and it grows.",
+      },
+      {
+        title: "Sweating ductwork",
+        body: "Cold ducts in humid air drip onto the insulation and the ground.",
+      },
     ],
     firstStep:
       "We measure the humidity and wood moisture under your floor, photograph what we find, and tell you whether you need a vapor barrier or full encapsulation.",
     expectation: "Most encapsulations take two to three days, from $6,800.",
-    primary: { label: "Book a crawl space inspection", href: `${demoBase}/book?problem=musty` },
-    secondary: { label: "See encapsulation", href: `${demoBase}/services/crawl-space-encapsulation` },
+    primary: {
+      label: "Book a crawl space inspection",
+      href: `${demoBase}/book?problem=musty`,
+    },
+    secondary: {
+      label: "See encapsulation",
+      href: `${demoBase}/services/crawl-space-encapsulation`,
+    },
   },
   {
     id: "water",
     label: "Water pools around my foundation",
-    image: { src: "/images/foundation-excavation.jpg", alt: "A small excavator digging a drainage trench beside a house" },
+    image: {
+      src: "/images/foundation-excavation.jpg",
+      alt: "A small excavator digging a drainage trench beside a house",
+    },
     heading: "Water is what moves a North Texas slab.",
     causes: [
-      { title: "Short downspouts", body: "Dumping a whole roof's water right at the slab." },
-      { title: "Grading that falls toward the house", body: "Often from settled soil or a new bed or patio." },
-      { title: "Sprinklers", body: "Soaking one side of the house and not the others." },
-      { title: "Large trees nearby", body: "Drawing moisture out of the soil under one corner in summer." },
+      {
+        title: "Short downspouts",
+        body: "Dumping a whole roof's water right at the slab.",
+      },
+      {
+        title: "Grading that falls toward the house",
+        body: "Often from settled soil or a new bed or patio.",
+      },
+      {
+        title: "Sprinklers",
+        body: "Soaking one side of the house and not the others.",
+      },
+      {
+        title: "Large trees nearby",
+        body: "Drawing moisture out of the soil under one corner in summer.",
+      },
     ],
     firstStep:
       "We watch where the water actually goes, then design drains, downspouts and grading so the soil around the house stays evenly moist.",
     expectation: "Most drainage work takes a day or two, from $1,200.",
-    primary: { label: "Book a drainage assessment", href: `${demoBase}/book?problem=water` },
-    secondary: { label: "See drainage work", href: `${demoBase}/services/drainage` },
+    primary: {
+      label: "Book a drainage assessment",
+      href: `${demoBase}/book?problem=water`,
+    },
+    secondary: {
+      label: "See drainage work",
+      href: `${demoBase}/services/drainage`,
+    },
   },
   {
     id: "siding",
     label: "My siding is rotting or damaged",
-    image: { src: "/images/siding-porch-install.jpg", alt: "A worker fitting siding and flashing on a two-story home" },
+    image: {
+      src: "/images/siding-porch-install.jpg",
+      alt: "A worker fitting siding and flashing on a two-story home",
+    },
     heading: "Rot behind siding starts where water gets in.",
     causes: [
-      { title: "Missing kick-out flashing", body: "Where a roof edge meets a wall, water runs straight behind the siding." },
-      { title: "Too close to the ground or roof", body: "Siding without its required clearances wicks up water." },
-      { title: "Failed paint and caulk", body: "Wood and fiber cement need both to keep water out." },
-      { title: "Hail and impact damage", body: "Cracked or dented panels let water behind them." },
+      {
+        title: "Missing kick-out flashing",
+        body: "Where a roof edge meets a wall, water runs straight behind the siding.",
+      },
+      {
+        title: "Too close to the ground or roof",
+        body: "Siding without its required clearances wicks up water.",
+      },
+      {
+        title: "Failed paint and caulk",
+        body: "Wood and fiber cement need both to keep water out.",
+      },
+      {
+        title: "Hail and impact damage",
+        body: "Cracked or dented panels let water behind them.",
+      },
     ],
     firstStep:
       "We probe the damaged area, check the sheathing behind it and tell you whether a repair will do or the wall needs re-siding.",
-    expectation: "Most repairs are done in a day; a full re-side takes four to eight.",
-    primary: { label: "Get a siding quote", href: `${demoBase}/book?problem=siding` },
-    secondary: { label: "See siding replacement", href: `${demoBase}/services/siding-replacement` },
+    expectation:
+      "Most repairs are done in a day; a full re-side takes four to eight.",
+    primary: {
+      label: "Get a siding quote",
+      href: `${demoBase}/book?problem=siding`,
+    },
+    secondary: {
+      label: "See siding replacement",
+      href: `${demoBase}/services/siding-replacement`,
+    },
   },
 ];
 
@@ -1232,24 +1423,168 @@ export const areas: Area[] = [
     leadTime: "Within 3 days",
     note: "Out west in Parker County, more homes sit on acreage with crawl spaces, and more of our work is encapsulation and drainage that has to carry water a long way from the house.",
   },
-  { slug: "aledo", city: "Aledo", county: "Parker", lat: 32.696, lng: -97.6022, page: false, leadTime: "Within 3 days" },
-  { slug: "willow-park", city: "Willow Park", county: "Parker", lat: 32.7626, lng: -97.6506, page: false, leadTime: "Within 3 days" },
-  { slug: "grapevine", city: "Grapevine", county: "Tarrant", lat: 32.9343, lng: -97.0781, page: false, leadTime: "Within 2 days" },
-  { slug: "colleyville", city: "Colleyville", county: "Tarrant", lat: 32.881, lng: -97.155, page: false, leadTime: "Within 2 days" },
-  { slug: "mansfield", city: "Mansfield", county: "Tarrant", lat: 32.5632, lng: -97.1417, page: false, leadTime: "Within 2 days" },
-  { slug: "bedford", city: "Bedford", county: "Tarrant", lat: 32.844, lng: -97.1431, page: false, leadTime: "Within 2 days" },
-  { slug: "euless", city: "Euless", county: "Tarrant", lat: 32.8371, lng: -97.082, page: false, leadTime: "Within 2 days" },
-  { slug: "north-richland-hills", city: "North Richland Hills", county: "Tarrant", lat: 32.8343, lng: -97.2289, page: false, leadTime: "Next business day" },
-  { slug: "haslet", city: "Haslet", county: "Tarrant", lat: 32.9746, lng: -97.3478, page: false, leadTime: "Next business day" },
-  { slug: "saginaw", city: "Saginaw", county: "Tarrant", lat: 32.8601, lng: -97.3639, page: false, leadTime: "Next business day" },
-  { slug: "crowley", city: "Crowley", county: "Tarrant", lat: 32.579, lng: -97.3625, page: false, leadTime: "Within 2 days" },
-  { slug: "benbrook", city: "Benbrook", county: "Tarrant", lat: 32.6732, lng: -97.4606, page: false, leadTime: "Next business day" },
-  { slug: "flower-mound", city: "Flower Mound", county: "Denton", lat: 33.0146, lng: -97.097, page: false, leadTime: "Within 3 days" },
-  { slug: "lewisville", city: "Lewisville", county: "Denton", lat: 33.0462, lng: -96.9942, page: false, leadTime: "Within 3 days" },
-  { slug: "argyle", city: "Argyle", county: "Denton", lat: 33.1212, lng: -97.1834, page: false, leadTime: "Within 3 days" },
-  { slug: "burleson", city: "Burleson", county: "Johnson", lat: 32.5421, lng: -97.3208, page: false, leadTime: "Within 2 days" },
-  { slug: "cleburne", city: "Cleburne", county: "Johnson", lat: 32.3476, lng: -97.3867, page: false, leadTime: "Within 3 days" },
-  { slug: "grand-prairie", city: "Grand Prairie", county: "Dallas", lat: 32.746, lng: -96.9978, page: false, leadTime: "Within 2 days" },
+  {
+    slug: "aledo",
+    city: "Aledo",
+    county: "Parker",
+    lat: 32.696,
+    lng: -97.6022,
+    page: false,
+    leadTime: "Within 3 days",
+  },
+  {
+    slug: "willow-park",
+    city: "Willow Park",
+    county: "Parker",
+    lat: 32.7626,
+    lng: -97.6506,
+    page: false,
+    leadTime: "Within 3 days",
+  },
+  {
+    slug: "grapevine",
+    city: "Grapevine",
+    county: "Tarrant",
+    lat: 32.9343,
+    lng: -97.0781,
+    page: false,
+    leadTime: "Within 2 days",
+  },
+  {
+    slug: "colleyville",
+    city: "Colleyville",
+    county: "Tarrant",
+    lat: 32.881,
+    lng: -97.155,
+    page: false,
+    leadTime: "Within 2 days",
+  },
+  {
+    slug: "mansfield",
+    city: "Mansfield",
+    county: "Tarrant",
+    lat: 32.5632,
+    lng: -97.1417,
+    page: false,
+    leadTime: "Within 2 days",
+  },
+  {
+    slug: "bedford",
+    city: "Bedford",
+    county: "Tarrant",
+    lat: 32.844,
+    lng: -97.1431,
+    page: false,
+    leadTime: "Within 2 days",
+  },
+  {
+    slug: "euless",
+    city: "Euless",
+    county: "Tarrant",
+    lat: 32.8371,
+    lng: -97.082,
+    page: false,
+    leadTime: "Within 2 days",
+  },
+  {
+    slug: "north-richland-hills",
+    city: "North Richland Hills",
+    county: "Tarrant",
+    lat: 32.8343,
+    lng: -97.2289,
+    page: false,
+    leadTime: "Next business day",
+  },
+  {
+    slug: "haslet",
+    city: "Haslet",
+    county: "Tarrant",
+    lat: 32.9746,
+    lng: -97.3478,
+    page: false,
+    leadTime: "Next business day",
+  },
+  {
+    slug: "saginaw",
+    city: "Saginaw",
+    county: "Tarrant",
+    lat: 32.8601,
+    lng: -97.3639,
+    page: false,
+    leadTime: "Next business day",
+  },
+  {
+    slug: "crowley",
+    city: "Crowley",
+    county: "Tarrant",
+    lat: 32.579,
+    lng: -97.3625,
+    page: false,
+    leadTime: "Within 2 days",
+  },
+  {
+    slug: "benbrook",
+    city: "Benbrook",
+    county: "Tarrant",
+    lat: 32.6732,
+    lng: -97.4606,
+    page: false,
+    leadTime: "Next business day",
+  },
+  {
+    slug: "flower-mound",
+    city: "Flower Mound",
+    county: "Denton",
+    lat: 33.0146,
+    lng: -97.097,
+    page: false,
+    leadTime: "Within 3 days",
+  },
+  {
+    slug: "lewisville",
+    city: "Lewisville",
+    county: "Denton",
+    lat: 33.0462,
+    lng: -96.9942,
+    page: false,
+    leadTime: "Within 3 days",
+  },
+  {
+    slug: "argyle",
+    city: "Argyle",
+    county: "Denton",
+    lat: 33.1212,
+    lng: -97.1834,
+    page: false,
+    leadTime: "Within 3 days",
+  },
+  {
+    slug: "burleson",
+    city: "Burleson",
+    county: "Johnson",
+    lat: 32.5421,
+    lng: -97.3208,
+    page: false,
+    leadTime: "Within 2 days",
+  },
+  {
+    slug: "cleburne",
+    city: "Cleburne",
+    county: "Johnson",
+    lat: 32.3476,
+    lng: -97.3867,
+    page: false,
+    leadTime: "Within 3 days",
+  },
+  {
+    slug: "grand-prairie",
+    city: "Grand Prairie",
+    county: "Dallas",
+    lat: 32.746,
+    lng: -96.9978,
+    page: false,
+    leadTime: "Within 2 days",
+  },
 ];
 
 export const team = [
@@ -1286,6 +1621,8 @@ export const team = [
 /* ---------------------------------------------------------------- lookups -- */
 
 export const reviewById = (id: string) => reviews.find((r) => r.id === id);
-export const projectBySlug = (slug: string) => projects.find((p) => p.slug === slug);
+export const projectBySlug = (slug: string) =>
+  projects.find((p) => p.slug === slug);
 export const areaBySlug = (slug: string) => areas.find((a) => a.slug === slug);
-export const serviceBySlug = (slug: string) => services.find((s) => s.slug === slug);
+export const serviceBySlug = (slug: string) =>
+  services.find((s) => s.slug === slug);

@@ -28,9 +28,10 @@ const fieldClass =
  * design it and reach them; the four one-tap questions qualify the lead
  * (trade, volume, job size, timing) so the call starts with the numbers.
  * Validated here with the same rules the route handler uses (lib/lead.ts),
- * then posted to /api/growth-audit, which saves it to Airtable. The town field
- * suggests US places as they type (PlaceInput). On success it hands them
- * straight to the booking calendar, with their name and email filled in.
+ * then posted to /api/growth-audit with a token it signed when the form
+ * appeared, and saved to Airtable. The town field suggests places worldwide
+ * as they type (PlaceInput). On success it hands them straight to the
+ * booking calendar, with their name and email filled in.
  */
 export function DesignForm() {
   const [errors, setErrors] = useState<Errors>({});
@@ -38,11 +39,22 @@ export function DesignForm() {
     "idle",
   );
   const [sent, setSent] = useState<LeadRequest | null>(null);
+  const [failure, setFailure] = useState("");
+  // Picking "Other" opens a box for them to list their services.
+  const [trade, setTrade] = useState("");
   const uid = useId();
-  // When the form appeared: the route treats a near-instant submit as a bot.
-  const shownAt = useRef(0);
+  // A token the route signs when the form appears; it treats a submit that
+  // comes back near-instantly as a bot (lib/server/form-token.ts).
+  const token = useRef("");
+  const fetchToken = () =>
+    fetch("/api/growth-audit", { cache: "no-store" })
+      .then((r) => r.json() as Promise<{ token?: string }>)
+      .then((j) => {
+        token.current = j.token ?? "";
+      })
+      .catch(() => {});
   useEffect(() => {
-    shownAt.current = Date.now();
+    fetchToken();
   }, []);
 
   if (state === "sent" && sent) {
@@ -51,7 +63,11 @@ export function DesignForm() {
     book.searchParams.set("email", sent.email);
     book.searchParams.set(
       "notes",
-      `${sent.company} · ${sent.trade} · ${sent.area}`,
+      [
+        sent.company,
+        sent.trade === "Other" && sent.services ? sent.services : sent.trade,
+        sent.area,
+      ].join(" · "),
     );
     return (
       <div role="status" className="bg-white py-4 text-left">
@@ -77,7 +93,7 @@ export function DesignForm() {
           Pick a time
         </a>
         <p className="mt-4 text-[15px] text-muted">
-          Can&rsquo;t pick one now? We&rsquo;ll call you {offer.reply}.
+          Can&rsquo;t pick one now? We&rsquo;ll contact you {offer.reply}.
         </p>
       </div>
     );
@@ -96,6 +112,14 @@ export function DesignForm() {
       return;
     }
 
+    // Offline when the form appeared: get a token now, and the next try
+    // (a few seconds on) goes through.
+    if (!token.current) {
+      fetchToken();
+      setFailure("");
+      return setState("failed");
+    }
+
     setState("sending");
     try {
       const res = await fetch("/api/growth-audit", {
@@ -104,17 +128,23 @@ export function DesignForm() {
         body: JSON.stringify({
           ...body,
           fax: String(data.get("fax") ?? ""),
-          elapsed: Date.now() - shownAt.current,
+          token: token.current,
         }),
       });
-      const json = (await res.json()) as { ok: boolean; errors?: Errors };
+      const json = (await res.json()) as {
+        ok: boolean;
+        errors?: Errors;
+        error?: string;
+      };
       if (json.ok) {
         setSent(body);
         return setState("sent");
       }
       if (json.errors) setErrors(json.errors);
+      setFailure(json.error ?? "");
       setState(json.errors ? "idle" : "failed");
     } catch {
+      setFailure("");
       setState("failed");
     }
   };
@@ -156,6 +186,7 @@ export function DesignForm() {
     name: LeadField,
     legend: string,
     options: readonly string[],
+    onPick?: (value: string) => void,
   ) => {
     const err = errors[name];
     const id = `${uid}-${name}`;
@@ -177,7 +208,13 @@ export function DesignForm() {
                 err ? "border-[#c0392b]" : "border-rule",
               )}
             >
-              <input type="radio" name={name} value={o} className="sr-only" />
+              <input
+                type="radio"
+                name={name}
+                value={o}
+                onChange={onPick && (() => onPick(o))}
+                className="sr-only"
+              />
               {o}
             </label>
           ))}
@@ -239,10 +276,64 @@ export function DesignForm() {
         autoComplete: "url",
         placeholder: "yourcompany.com",
       })}
-      {choice("trade", "What do you mainly sell?", trades)}
-      {choice("jobs", "Jobs you sign in a typical month", jobVolumes)}
-      {choice("jobValue", "Your average job size", jobValues)}
-      {choice("timeline", "When do you want a new site?", timelines)}
+      {choice("trade", "What do you mainly sell?", trades, setTrade)}
+      {trade === "Other" && (
+        <div className="sm:col-span-2">
+          {input("services", "What services do you offer?", {
+            type: "text",
+            autoComplete: "off",
+            autoFocus: true,
+            maxLength: 200,
+            placeholder: "e.g. Gutters, decks, concrete driveways",
+          })}
+        </div>
+      )}
+      {choice("jobs", "Jobs you sign in a typical month (optional)", jobVolumes)}
+      {choice("jobValue", "Your average job size (optional)", jobValues)}
+      {choice("timeline", "When do you want a new site? (optional)", timelines)}
+      {/* The notice POPIA (s18) and California law want in front of someone
+          before their details are collected, and the agreement the route
+          saves as "POPIA Agreement". Never pre-ticked: agreement has to be
+          given, not assumed. The policy opens in a new tab so the form
+          keeps what they've typed. */}
+      <div className="text-left sm:col-span-2">
+        <label className="flex cursor-pointer items-start gap-3 text-[15.5px] leading-[1.55] text-fg">
+          <input
+            id={`${uid}-consent`}
+            type="checkbox"
+            name="consent"
+            value="yes"
+            aria-invalid={errors.consent ? true : undefined}
+            aria-describedby={`${uid}-consent-note${errors.consent ? ` ${uid}-consent-err` : ""}`}
+            className={cn(
+              "mt-1 size-4.5 shrink-0 cursor-pointer accent-fg",
+              errors.consent && "outline-2 outline-offset-2 outline-[#c0392b]",
+            )}
+          />
+          <span>
+            I agree that Daybreak can use these details to prepare my concept
+            and contact me about it by email, phone or text, as set out in the{" "}
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noopener"
+              className="underline decoration-fg/30 underline-offset-4 hover:decoration-fg"
+            >
+              Privacy Policy
+            </a>
+            .
+          </span>
+        </label>
+        <p
+          id={`${uid}-consent-note`}
+          className="mt-2 pl-7.5 text-[14px] leading-[1.55] text-muted"
+        >
+          No marketing lists. Message and data rates may apply; reply STOP to
+          stop texts. We use an AI note-taker on calls and will ask before it
+          starts.
+        </p>
+        {error("consent", `${uid}-consent`)}
+      </div>
       {/* Hidden from people; bots fill it in, and the route drops those. */}
       <div aria-hidden className="absolute -left-[9999px]">
         <label>
@@ -272,7 +363,8 @@ export function DesignForm() {
       </div>
       {state === "failed" && (
         <p role="alert" className="text-[15px] text-[#9b1c1c] sm:col-span-2">
-          That didn&rsquo;t go through. Try again, or email us directly.
+          {failure ||
+            "That didn’t go through. Try again, or email us directly."}
         </p>
       )}
     </form>

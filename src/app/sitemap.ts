@@ -16,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: absoluteUrl("/"),
-      lastModified: "2026-10-01",
+      lastModified: "2026-10-02",
       changeFrequency: "weekly",
       priority: 1,
       images: [houseImage.src, ...founders.map((f) => f.portrait)].map((src) => absoluteUrl(src)),
@@ -32,11 +32,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
       ],
     },
+    { url: absoluteUrl("/how-it-works"), lastModified: "2026-10-02", changeFrequency: "monthly", priority: 0.8 },
     /* Listed rather than hidden. These are the pages a visitor goes looking for
        when they want to know what happens to their data, and a policy that is
        hard to find reads as one that is trying not to be read. */
-    { url: absoluteUrl("/privacy"), lastModified: "2026-09-30", changeFrequency: "yearly", priority: 0.3 },
-    { url: absoluteUrl("/terms"), lastModified: "2026-09-30", changeFrequency: "yearly", priority: 0.3 },
+    { url: absoluteUrl("/privacy"), lastModified: "2026-10-02", changeFrequency: "yearly", priority: 0.3 },
+    { url: absoluteUrl("/terms"), lastModified: "2026-10-02", changeFrequency: "yearly", priority: 0.3 },
     { url: absoluteUrl("/accessibility"), lastModified: "2026-09-30", changeFrequency: "yearly", priority: 0.3 },
+    { url: absoluteUrl("/paia"), lastModified: "2026-10-02", changeFrequency: "yearly", priority: 0.3 },
   ];
 }

@@ -29,7 +29,7 @@ export const agency = {
     "We build websites and lead systems for foundation repair, crawl space and siding companies.",
   // TODO(daybreak): replace with real contact details before launch. These are
   // placeholders and are not wired to anything.
-  email: "contact@daybreaktechinnovations.com",
+  email: "contact@daybreakstructureworks.com",
   bookingUrl: "#free-design",
   social: {
     linkedin: "https://linkedin.com",
@@ -46,6 +46,19 @@ export const agency = {
  * information — but a privacy policy that names a fictional company at a
  * fictional address is not a privacy policy, it is a liability.
  *
+ * Daybreak Structure-Works is a trading name. The company behind it is
+ * registered in South Africa, so the policies answer to South African law
+ * (POPIA, PAIA, the Companies Act) as well as to the US laws that cover the
+ * contractors this site is for. POPIA applies to everything a South African
+ * company processes, including details sent in by a contractor in Texas.
+ *
+ * What is safe to publish here: the registered name, registration number,
+ * VAT number and registered address are already public on the CIPC register,
+ * and the Companies Act expects the first two on the company's website. Never
+ * add a director's ID number, a tax reference number or bank details, and
+ * never upload the CIPC registration certificate itself — it lists the
+ * directors' ID numbers.
+ *
  * `effective` must be bumped whenever a policy changes in substance. US state
  * privacy statutes require the date to reflect the current version, and CalOPPA
  * (Cal. Bus. & Prof. Code §22575) specifically requires the policy to identify
@@ -53,18 +66,44 @@ export const agency = {
  */
 export const legal = {
   /** TODO(daybreak): the registered legal entity, exactly as filed. */
-  entity: "Daybreak Growth Systems, LLC",
-  /** TODO(daybreak): the state of formation. Governs the terms and the venue. */
-  state: "Texas",
+  entity: "DayBreak Tech-Innovations (Pty) Ltd",
+  /** The name the site trades under. The privacy policy says whose it is. */
+  tradingName: agency.name,
+  /** The company's short name and its own website, linked from the footer.
+   *  TODO(daybreak): confirm the URL is the Daybreak company site. */
+  company: "Daybreak",
+  companyUrl: "https://daybreaktech.agency",
+  /** Where the company is registered. Also the Terms of Use governing law
+   *  and the courts disputes go to. */
+  country: "South Africa",
+  /** TODO(daybreak): the CIPC registration number, e.g. "2024/123456/07".
+   *  Companies Act 71 of 2008 s32(4) requires a company's name and
+   *  registration number on its official publications, electronic ones
+   *  included. Left empty, the line is not shown. */
+  registrationNumber: "",
+  /** Only if the company is registered for VAT. Left empty, not shown. */
+  vatNumber: "",
   /** TODO(daybreak): a real mailing address. US privacy statutes require a
-   *  contact route that is not only a web form. */
+   *  contact route that is not only a web form, and POPIA s18 requires the
+   *  responsible party's address. A business or postal address is enough;
+   *  it does not have to be anyone's home. */
   address: "Address to be published before launch",
+  /** TODO(daybreak): the Information Officer's name. Under POPIA that is the
+   *  head of the company (a director) unless someone else is formally
+   *  designated, and they must be registered with the Information Regulator
+   *  (eservices.inforegulator.org.za). Left empty, the policy names the role
+   *  only. */
+  informationOfficer: "",
   /** TODO(daybreak): a monitored inbox. Privacy requests have statutory
    *  response deadlines — 45 days in California, and this address is where the
    *  clock starts. */
-  privacyEmail: "privacy@daybreak.example.com",
+  privacyEmail: "contact@daybreaktech.agency",
+  /** TODO(daybreak): a phone number for the Information Officer, in
+   *  international form (+27 …) since most visitors dial from the US. PAIA
+   *  s51 lists it among the manual's contact details. Left empty, not shown. */
+  phone: "",
   /** Last substantive revision of the policies. Bump on every change. */
-  effective: "September 30, 2026",
+  effective: "2026",
 } as const;
 
 export type Founder = {

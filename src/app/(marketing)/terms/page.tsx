@@ -228,11 +228,15 @@ export default function TermsPage() {
 
       <LegalSection id="law" index={11} title="Governing law">
         <p>
-          These terms are governed by the laws of the State of {legal.state}, without
-          regard to its conflict-of-laws rules. Any dispute will be brought in the state or
-          federal courts located in {legal.state}, and you and Daybreak each consent to the
-          jurisdiction of those courts. If any provision of these terms is held
+          These terms are governed by the laws of {legal.country}, where Daybreak is
+          registered, without regard to their conflict-of-laws rules. Any dispute will be
+          brought in the courts of {legal.country}, and you and Daybreak each consent to
+          the jurisdiction of those courts. If any provision of these terms is held
           unenforceable, the rest remains in force.
+        </p>
+        <p>
+          Nothing in this section takes away a protection that the law of the place you
+          live gives you and does not allow to be removed by agreement.
         </p>
       </LegalSection>
 

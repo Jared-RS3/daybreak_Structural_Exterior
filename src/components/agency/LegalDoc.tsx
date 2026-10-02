@@ -3,7 +3,7 @@ import { Eyebrow } from "@/components/ui/Section";
 import { legal } from "@/lib/agency";
 
 /**
- * Shell for the three legal documents.
+ * Shell for the legal documents.
  *
  * Deliberately the plainest thing on the site. A policy is read by someone
  * checking whether they are about to be tracked, or by a lawyer checking
@@ -12,7 +12,7 @@ import { legal } from "@/lib/agency";
  * one column, real heading levels, and a section index at the top that links
  * to anchors, because "as described in Section 6" is useless without one.
  *
- * The three documents share this shell so they cannot drift apart in tone or
+ * The documents share this shell so they cannot drift apart in tone or
  * in effective date — the date comes from `legal` in lib/agency.ts, which is
  * the single place it is recorded.
  */
@@ -121,6 +121,29 @@ export function LegalList({ items }: { items: React.ReactNode[] }) {
 }
 
 /**
+ * Label–value rows for the company's registered details. A row whose value is
+ * empty is left out, so a detail not yet filled in in lib/agency.ts is absent
+ * from the page rather than shown as a placeholder.
+ */
+export function LegalDetails({ rows }: { rows: [label: string, value: React.ReactNode][] }) {
+  return (
+    <dl className="border-t border-ink-900/12">
+      {rows
+        .filter(([, value]) => value)
+        .map(([label, value]) => (
+          <div
+            key={label}
+            className="grid gap-1 border-b border-ink-900/12 py-3 sm:grid-cols-[11rem_minmax(0,1fr)] sm:gap-4"
+          >
+            <dt className="text-[14px] font-semibold text-ink-900">{label}</dt>
+            <dd className="text-[15px] leading-[1.6] text-ink-600">{value}</dd>
+          </div>
+        ))}
+    </dl>
+  );
+}
+
+/**
  * The one thing on these pages that should stop a skimming reader. Used for
  * the statements that carry actual legal weight — that the estimator is not a
  * binding quote, that the demonstration contractor is fictional.
@@ -133,12 +156,13 @@ export function LegalCallout({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Cross-document footer so each policy points at the other two. */
-export function LegalFooterNav({ current }: { current: "privacy" | "terms" | "accessibility" }) {
+/** Cross-document footer so each policy points at the others. */
+export function LegalFooterNav({ current }: { current: "privacy" | "terms" | "accessibility" | "paia" }) {
   const docs = [
     { key: "privacy", href: "/privacy", label: "Privacy Policy" },
     { key: "terms", href: "/terms", label: "Terms of Use" },
     { key: "accessibility", href: "/accessibility", label: "Accessibility" },
+    { key: "paia", href: "/paia", label: "PAIA Manual" },
   ] as const;
 
   return (

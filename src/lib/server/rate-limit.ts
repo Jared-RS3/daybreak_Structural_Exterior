@@ -39,11 +39,14 @@ export function clientIp(request: Request): string {
 
 /**
  * True when a browser request came from a page on this site. Browsers always
- * send Origin on a cross-site POST, so another site can't submit the form on
- * a visitor's behalf; tools that send no Origin at all still face the rate
- * limit and validation.
+ * send Origin on a cross-site POST, and modern ones say where a request came
+ * from in Sec-Fetch-Site, so another site can't submit the form on a
+ * visitor's behalf; tools that send neither still face the rate limit, the
+ * form token and validation.
  */
 export function isSameOrigin(request: Request): boolean {
+  const site = request.headers.get("sec-fetch-site");
+  if (site && site !== "same-origin" && site !== "none") return false;
   const origin = request.headers.get("origin");
   if (!origin) return true;
   const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");

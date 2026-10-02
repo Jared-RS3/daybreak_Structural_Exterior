@@ -5,7 +5,7 @@ import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
 
 /**
- * A text field that suggests US towns and cities as you type, from
+ * A text field that suggests towns and cities worldwide as you type, from
  * /api/places. It's a WAI-ARIA combobox: arrow keys move through the
  * suggestions, Enter picks one, Escape closes the list. Anything typed is
  * still accepted, so a town the list doesn't know never blocks the form.

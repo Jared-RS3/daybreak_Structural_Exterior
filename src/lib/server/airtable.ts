@@ -16,7 +16,9 @@ export function airtableConfigured(): boolean {
   return Boolean(process.env.AIRTABLE_TOKEN && process.env.AIRTABLE_BASE_ID);
 }
 
-export async function createAirtableRecord(fields: Record<string, string | null>): Promise<void> {
+export async function createAirtableRecord(
+  fields: Record<string, string | boolean | null>,
+): Promise<void> {
   const base = process.env.AIRTABLE_BASE_ID!;
   const table = encodeURIComponent(process.env.AIRTABLE_TABLE || "Leads");
   const res = await fetch(`https://api.airtable.com/v0/${base}/${table}`, {

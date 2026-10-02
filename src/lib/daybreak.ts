@@ -286,6 +286,197 @@ export const system: SystemStep[] = [
   },
 ];
 
+/* ==========================================================================
+   Lost revenue: the automations, sold as the money they stop leaking rather
+   than as software. Nothing here names a tool, a webhook or "AI".
+
+   The two industry figures are other people's research, quoted in their own
+   words with the source linked and dated. They describe the industry, not
+   Daybreak's results, and the page says whose they are. Check the wording
+   against the source before changing a number.
+   ========================================================================== */
+
+/** A third-party figure. `label` stays as close to the source's own words as one line allows. */
+export type IndustryStat = {
+  value: string;
+  label: string;
+  source: string;
+  href: string;
+};
+
+export const lostLeadStats: IndustryStat[] = [
+  {
+    value: "52%",
+    label: "of callers to home service businesses get to speak with a person.",
+    source: "Invoca, Home Services Lead Conversion Benchmarks, 2026",
+    href: "https://www.invoca.com/reports/the-invoca-home-services-lead-conversion-benchmarks-report-2026",
+  },
+  {
+    value: "47%",
+    label:
+      "of $10M+ contractors say following up on estimates brings in 11–15% of their income.",
+    source: "ServiceTitan, Residential Services Report, 2025",
+    href: "https://www.servicetitan.com/press/residential-industry-report-2025",
+  },
+];
+
+/** The band under the hero. The leak names match the three cards below. */
+export const leakBand = {
+  quiet: "You may not need more leads.",
+  loud: "You may need to stop losing the ones you already have.",
+  leaks: ["Missed calls", "Slow replies", "Unsold estimates"],
+  cta: "See where you're losing leads",
+};
+
+/**
+ * The three leaks. `scene` picks the drawing of the leak itself in
+ * components/daybreak/LeakScenes.tsx; `flow` is what Daybreak sets running
+ * instead, step by step. `stat` is either a sourced industry figure or, for
+ * slow replies, what the automation itself does (a spec, not a result).
+ */
+export type Leak = {
+  name: string;
+  scene: "missed" | "slow" | "unsold";
+  problem: string;
+  flow: string[];
+  stat: { value: string; label: string; source?: string; href?: string };
+};
+
+export const leaks: Leak[] = [
+  {
+    name: "Missed calls",
+    scene: "missed",
+    problem:
+      "Someone calls while your crew is on site. Nobody answers, so they call the next contractor.",
+    flow: ["Missed call", "Text in seconds", "Questions", "Inspection request"],
+    stat: lostLeadStats[0],
+  },
+  {
+    name: "Slow website leads",
+    scene: "slow",
+    problem:
+      "A homeowner fills in your form at 8:43 PM. Nobody replies until tomorrow.",
+    flow: [
+      "Form sent",
+      "Text in seconds",
+      "Questions",
+      "Photos",
+      "ZIP check",
+      "Inspection booked",
+    ],
+    stat: {
+      value: "30 sec",
+      label: "to the first reply on every web form, at any hour.",
+    },
+  },
+  {
+    name: "Unsold estimates",
+    scene: "unsold",
+    problem:
+      "You paid for the lead, drove out and wrote the quote. Then they go quiet.",
+    flow: [
+      "Estimate sent",
+      "Follow-ups",
+      "Payment options",
+      "Rep alerted when they reply",
+    ],
+    stat: lostLeadStats[1],
+  },
+];
+
+/**
+ * The live run: one missed call, followed until it's a booked inspection in
+ * the CRM. Each step is one change on the phone in the drawing.
+ */
+/** The live run's heading, shared by / and /how-it-works so they never drift. */
+export const liveRunCopy = {
+  label: "How it works",
+  /** Two lines, broken between them. */
+  title: ["A missed call at 4:52 PM.", "Booked by 4:57."],
+  lede: "Nobody in the office touched it. This runs behind your website while your crew is on site: the text back, the questions, the photos, the booking and the CRM.",
+};
+
+export const liveRun = [
+  "Homeowner calls",
+  "Call missed",
+  "Text sent in seconds",
+  "“What issue are you seeing?”",
+  "Foundation cracks",
+  "ZIP confirmed",
+  "Photos uploaded",
+  "Inspection booked",
+  "CRM updated",
+];
+
+export const beforeAfter: Comparison = {
+  usual: {
+    label: "Before Daybreak",
+    steps: [
+      { label: "Lead comes in" },
+      { label: "Goes to voicemail", wait: true },
+      { label: "Written into a spreadsheet", wait: true },
+      { label: "Someone remembers to call back", wait: true },
+      { label: "Quote sent" },
+      { label: "Homeowner disappears", wait: true },
+    ],
+  },
+  ours: {
+    label: "After Daybreak",
+    steps: [
+      "Lead comes in",
+      "Instant reply",
+      "Qualifying questions",
+      "Inspection booked",
+      "CRM tracks the job",
+      "Quote followed up",
+      "Review request after the job",
+    ],
+    fastSteps: 3,
+    fastLabel: "In the first minute",
+    note: "Every lead gets an answer, a booking and a follow-up, even when nobody's in the office.",
+  },
+};
+
+/**
+ * What the contractor gets, as outcomes. `how` names the automations behind
+ * each one, in plain words, so all of them appear without a feature list.
+ */
+export const outcomes: { title: string; how: string[] }[] = [
+  {
+    title: "Respond faster",
+    how: ["Instant reply to web forms", "Missed-call text-back"],
+  },
+  {
+    title: "Book more inspections",
+    how: ["Online booking", "Reminders 24 hrs and 2 hrs before"],
+  },
+  {
+    title: "Follow up with every estimate",
+    how: ["5 follow-ups over 30 days", "Payment options on large quotes"],
+  },
+  {
+    title: "Recover missed opportunities",
+    how: ["Old leads contacted again", "Rep alerted when they reply"],
+  },
+  {
+    title: "Get more 5-star reviews",
+    how: ["Google review request after every job"],
+  },
+  {
+    title: "Know where every lead stands",
+    how: ["Pipeline that updates itself"],
+  },
+];
+
+/**
+ * Tools the automations connect to, shown as "Works with the tools you
+ * already use". Hidden while empty.
+ *
+ * TODO(daybreak): list only tools you have actually connected for a client
+ * (e.g. "Airtable", "Google Calendar"). A name here is a promise.
+ */
+export const integrations: string[] = [];
+
 export const comparison: Comparison = {
   usual: {
     label: "A typical contractor website",
@@ -313,6 +504,29 @@ export const comparison: Comparison = {
     note: "The site does the part of the job nobody on your team has time for.",
   },
 };
+
+/**
+ * What happens on the first call, for the homepage. Step two is where the
+ * lost-revenue calculator (/calculator) gets used, on screen with the
+ * contractor's own numbers, rather than left on the page to fill in alone.
+ */
+export const callSteps: ProcessStep[] = [
+  {
+    title: "See your homepage",
+    body: "We show you a concept of your new homepage, with your logo, your services and the towns you work in.",
+    detail: "Free, no obligation",
+  },
+  {
+    title: "Find your leaks",
+    body: "Together we go through your missed calls, reply times and unsold estimates, and work out what they're costing you each month.",
+    detail: "Your numbers, worked out live",
+  },
+  {
+    title: "Get a fixed price",
+    body: "If it's a fit, you get a fixed price in writing for the site and the automations. Nothing starts until you've signed off.",
+    detail: "No surprises",
+  },
+];
 
 export const process: ProcessStep[] = [
   {
@@ -410,8 +624,8 @@ export const reviews: Review[] = [
     "lumi-branding",
     "Lumi Branding",
     "Lumi Branding team",
-    "You guys are amazing, super happy that you were recommended. Keep up the amazing work!",
-    "Super happy",
+    "The process was straightforward from our first call through launch, and the final site matched our brand perfectly. It feels polished, clear and easy for customers to navigate.",
+    "Matched our brand perfectly",
   ),
   review(
     "natania-eon",

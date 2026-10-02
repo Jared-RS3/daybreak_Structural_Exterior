@@ -6,7 +6,7 @@ import { daybreak } from "@/lib/daybreak";
 const nav = [
   { label: "Our work", href: "/#work" },
   { label: "Try the crack checker", href: "/#tools" },
-  { label: "How it works", href: "/#system" },
+  { label: "How it works", href: "/how-it-works" },
   { label: "FAQ", href: "/#faq" },
 ];
 
@@ -30,7 +30,7 @@ export default function MarketingLayout({
         nav={nav}
         primary={primary}
         secondary={secondary}
-        solidOn={["/privacy", "/terms", "/accessibility"]}
+        solidOn={["/privacy", "/terms", "/accessibility", "/paia", "/how-it-works", "/calculator"]}
         wide
       />
       <main id="main" className="flex-1">
@@ -39,13 +39,21 @@ export default function MarketingLayout({
       <DaybreakFooter
         brand={{ ...daybreak, name: "Daybreak" }}
         email={daybreak.email}
-        entity={legal.entity}
+        // The registered name and number on every page: the Companies Act
+        // (s32(4)) wants both on a company's publications, websites included.
+        entity={[
+          `${legal.entity}, trading as ${legal.tradingName}`,
+          legal.registrationNumber && `Reg. no. ${legal.registrationNumber}`,
+        ]
+          .filter(Boolean)
+          .join(" · ")}
+        company={{ name: legal.company, legalName: legal.entity, href: legal.companyUrl }}
         columns={[
           {
             title: "Daybreak",
             links: [
               { label: "Our work", href: "/#work" },
-              { label: "How it works", href: "/#system" },
+              { label: "How it works", href: "/how-it-works" },
               { label: "Who you'll work with", href: "/#about" },
               { label: "Free homepage concept", href: daybreak.offerHref },
             ],
@@ -56,6 +64,7 @@ export default function MarketingLayout({
               { label: "Privacy", href: "/privacy" },
               { label: "Terms", href: "/terms" },
               { label: "Accessibility", href: "/accessibility" },
+              { label: "PAIA Manual", href: "/paia" },
             ],
           },
         ]}

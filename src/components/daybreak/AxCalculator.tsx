@@ -164,7 +164,7 @@ const range = cn(
   "focus-visible:[&::-moz-range-thumb]:shadow-[0_0_0_4px_var(--color-sun)]",
 );
 
-function Slider({
+export function Slider({
   label,
   hint,
   value,

@@ -11,16 +11,20 @@ export function AxProcess({
   title,
   lede,
   action,
+  label = "How we start",
+  id,
 }: {
+  label?: string;
+  id?: string;
   steps: ProcessStep[];
   title: React.ReactNode;
   lede?: React.ReactNode;
   action?: React.ReactNode;
 }) {
   return (
-    <section aria-labelledby="process-title" className="bg-white py-20 sm:py-24 lg:py-28">
+    <section id={id} aria-labelledby="process-title" className="scroll-mt-20 bg-white py-20 sm:py-24 lg:py-28">
       <div className="container-wide">
-        <AxHead id="process-title" label="How we start" title={title} lede={lede} aside={action} />
+        <AxHead id="process-title" label={label} title={title} lede={lede} aside={action} />
         <ol className="mt-14 grid gap-10 sm:grid-cols-3 sm:gap-8 lg:mt-16">
           {steps.map((s, i) => (
             <li key={s.title} className="border-t border-fg pt-5">
