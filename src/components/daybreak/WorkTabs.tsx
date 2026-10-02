@@ -20,6 +20,8 @@ export type WorkItem = {
   domain: string;
   kind: "live" | "concept";
   blurb: string;
+  /** What runs behind the design, shown small under the blurb. */
+  behind?: string[];
   href?: string;
 };
 
@@ -255,6 +257,7 @@ export function WorkTabs({
             readers; this is what they show, in words. */}
         <p className="sr-only">
           {item.name}. {item.kind === "live" ? "Live site" : "Concept"} for {item.trade.toLowerCase()}. {item.blurb}
+          {item.behind && ` Behind the site: ${item.behind.join(", ")}.`}
         </p>
 
         {/* ---- Coverflow: the chosen site large in the middle, its
@@ -376,6 +379,11 @@ export function WorkTabs({
             {item.name}
           </h3>
           <p className="mt-3 text-[17px] leading-[1.6] text-muted">{item.blurb}</p>
+          {item.behind && (
+            <p aria-hidden className="mono-label mt-4 text-[11.5px] leading-[1.6] text-muted">
+              <span className="text-fg">Behind the site:</span> {item.behind.join(" · ")}
+            </p>
+          )}
           <div className="mt-7 flex justify-center">
             {item.href ? (
               <Link href={item.href} className={axButton("dark")}>

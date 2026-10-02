@@ -76,8 +76,8 @@ export function Hero({
             id="hero-title"
             className={cn(
               "home-display mx-auto mt-6 max-w-[17ch] animate-[rise-in_1.1s_var(--ease-out-expo)_0.08s_both] text-[clamp(2.6rem,6vw,5.25rem)] text-white",
-              // Sized to the screen so it always breaks "Websites that book /
-              // foundation, crawl / space & siding jobs."
+              // Sized to the screen so the headline (four lines on a phone)
+              // never breaks mid-word.
               pf && "max-sm:mt-5 max-sm:max-w-none max-sm:text-[8.9vw] max-sm:font-bold max-sm:leading-[1.04] max-sm:tracking-[-0.045em]",
             )}
           >

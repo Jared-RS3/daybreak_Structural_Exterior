@@ -32,11 +32,11 @@ function Source({ stat, className }: { stat: { source?: string; href?: string };
 /**
  * The band directly under the hero: the reframe in one line, two industry
  * figures with their sources, and the three leaks, with a jump to the section
- * that shows them. `before` runs first inside the same section (the
- * founder's film on the homepage).
+ * that shows them. `after` runs on inside the same section (the founders'
+ * film on the homepage), so nothing comes between the hero and the reframe.
  */
 export function LeakBand({
-  before,
+  after,
   quiet,
   loud,
   stats,
@@ -44,7 +44,7 @@ export function LeakBand({
   cta,
   href,
 }: {
-  before?: React.ReactNode;
+  after?: React.ReactNode;
   quiet: string;
   loud: string;
   stats: IndustryStat[];
@@ -55,7 +55,6 @@ export function LeakBand({
   return (
     <section aria-labelledby="leak-band-title" className="bg-white pb-20 pt-14 sm:pb-24 sm:pt-20">
       <div className="container-wide">
-        {before}
         <div className="flex justify-center border-t border-rule pt-6 lg:justify-start">
           <AxLabel>Lost revenue</AxLabel>
         </div>
@@ -97,6 +96,7 @@ export function LeakBand({
             </div>
           </li>
         </ul>
+        {after && <div className="mt-16 lg:mt-20">{after}</div>}
       </div>
     </section>
   );
@@ -116,6 +116,7 @@ export function LostRevenue({
   run,
   runHead,
   action,
+  children,
   id = "automations",
 }: {
   id?: string;
@@ -128,6 +129,8 @@ export function LostRevenue({
   runHead?: { label: string; title: React.ReactNode; lede: React.ReactNode };
   /** A link on from the section, under everything else. */
   action?: React.ReactNode;
+  /** More of the story after the run (the estimate follow-up on the homepage). */
+  children?: React.ReactNode;
 }) {
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-20 bg-white py-20 sm:py-24 lg:py-28">
@@ -146,6 +149,7 @@ export function LostRevenue({
           </div>
         )}
         {run && <div className={runHead ? "mt-10" : leaks ? "mt-20 lg:mt-28" : "mt-14 lg:mt-16"}>{run}</div>}
+        {children}
         {action && <div className="mt-10 lg:mt-12">{action}</div>}
       </div>
     </section>

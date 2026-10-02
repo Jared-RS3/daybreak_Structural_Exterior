@@ -2,18 +2,20 @@ import { AboutStatement } from "@/components/daybreak/AboutStatement";
 import { AutomationFilm } from "@/components/daybreak/AutomationFilm";
 import { AutomationRun } from "@/components/daybreak/AutomationRun";
 import { AxButton } from "@/components/daybreak/ax";
-import { AxComparison } from "@/components/daybreak/AxComparison";
 import { AxContact } from "@/components/daybreak/AxContact";
 import { AxFaq } from "@/components/daybreak/AxFaq";
 import { AxProcess } from "@/components/daybreak/AxProcess";
 import { AxReviews } from "@/components/daybreak/AxReviews";
 import { AxTerms } from "@/components/daybreak/AxTerms";
 import { AxToolBand } from "@/components/daybreak/AxTools";
+import { EstimateFollowUp } from "@/components/daybreak/EstimateFollowUp";
 import { HeroProof } from "@/components/daybreak/HeroProof";
+import { LeadJourneys } from "@/components/daybreak/LeadJourneys";
 import { LeakBand, LostRevenue } from "@/components/daybreak/LostRevenue";
+import { SystemStrip } from "@/components/daybreak/SystemStrip";
 import { WorkShowcase } from "@/components/daybreak/WorkShowcase";
 import { Hero } from "@/components/template/Hero";
-import { PillLink } from "@/components/template/primitives";
+import { ArrowLink, PillLink } from "@/components/template/primitives";
 import { CrackChecker } from "@/components/tools/CrackChecker";
 import { CrackChip } from "@/components/tools/CrackChip";
 import { Icon } from "@/components/ui/Icon";
@@ -21,14 +23,15 @@ import { founders } from "@/lib/agency";
 import {
   about,
   automationFilm,
-  beforeAfter,
   bookingHref,
   callSteps,
   daybreak,
   draftReviews,
+  estimateFollowUp,
   faqs,
   heroPromises,
   heroTrust,
+  leadJourneys,
   leakBand,
   liveRun,
   liveRunCopy,
@@ -37,6 +40,7 @@ import {
   placeholderReviews,
   promise,
   reviews,
+  systemStrip,
 } from "@/lib/daybreak";
 import { houseImage, tool } from "@/lib/demo-site";
 import { openGraphDefaults, site } from "@/lib/seo";
@@ -63,24 +67,30 @@ export const metadata: Metadata = {
  *
  * One job: get a busy contractor onto a call. Each section answers the next
  * question they'd ask, in order. NN/g's eyetracking puts 57% of viewing time
- * on the first screen and 74% on the first two, so the founder on camera and
- * the money problem sit straight under the hero, ahead of everything else.
+ * on the first screen and 74% on the first two, so the money problem sits
+ * straight under the hero, with the founders' film as a short note after it.
+ * The page sells the outcome (leads that don't leak) before the websites, and
+ * shows the system once: a strip, then each part of it working.
  *
- *   1. Is this for my trade?             hero
- *   2. Are these people real?            the founder's 30-second film
- *      Am I losing money right now?      lost-revenue band, two sourced stats
- *   3. Can you actually build it?        our work, ending on the crack checker
- *   4. How would it stop the leak?       one missed call, saved live
- *   5. What changes for me?              before & after
- *   6. What happens if I book a call?    the call in three steps → book
- *   7. What if it's not for me?          the promise: free concept, you own it
- *   8. Do other clients trust you?       reviews
+ *   1. Is this for my trade?             hero: the leak, in these three trades
+ *   2. Am I losing money right now?      lost-revenue band, two sourced stats
+ *      Are these people real?            the founders' 30-second film, compact
+ *   3. What do you actually build?       the system in one strip
+ *   4. Can you actually build it?        our work, ending on the crack checker
+ *   5. Do you know my trade?             a lead journey per trade
+ *   6. How would it stop the leak?       one missed call, saved live, then
+ *                                        one estimate, followed up for a month
+ *   7. What happens if I book a call?    the call in three steps → book
+ *   8. What if it's not for me?          the promise: free concept, you own it
+ *   9. Do other clients trust you?       reviews
  *      Who would I be dealing with?      the founders
- *   9. Anything else?                    FAQ
- *  10. Book the call.
+ *  10. Anything else?                    FAQ
+ *  11. Book the call.
  *
  * /how-it-works holds the extra detail (the 6-step journey, the three leaks
- * card by card, outcomes, how we start) for the visitor who wants more. Every
+ * card by card, outcomes, before & after, how we start) for the visitor who
+ * wants more. Before & after isn't on this page: the run and the follow-up
+ * already show the same steps. Every
  * point that sells the call is here as well. The lost-revenue calculator is
  * at /calculator, unlisted, to work through with a contractor on the call
  * (step two above).
@@ -94,8 +104,8 @@ export default function AgencyHome() {
       />
       <Hero
         kicker=""
-        title="Websites that book foundation, crawl space & siding jobs."
-        lede="Custom websites that turn a worried homeowner's search into a booked inspection and a signed job."
+        title="Turn More Foundation, Crawl Space & Siding Leads Into Booked Jobs"
+        lede="We build the website and lead system that captures, qualifies, follows up with and books the homeowners you're already paying to reach."
         action={
           <>
             <div className="flex justify-center">
@@ -107,6 +117,11 @@ export default function AgencyHome() {
               >
                 {offer.cta}
               </PillLink>
+            </div>
+            <div className="mt-4 flex justify-center">
+              <ArrowLink href="#system" tone="light">
+                See how it works
+              </ArrowLink>
             </div>
             <ul className="mx-auto mt-6 flex w-fit flex-col items-start gap-x-5 gap-y-2 text-[15px] text-white max-sm:gap-y-2.5 max-sm:text-[16px] sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:text-[16px]">
               {heroPromises.map((p) => (
@@ -140,7 +155,7 @@ export default function AgencyHome() {
         {...leakBand}
         stats={lostLeadStats}
         href="/how-it-works#leaks"
-        before={
+        after={
           <AutomationFilm
             label="From the founders"
             title={
@@ -157,11 +172,20 @@ export default function AgencyHome() {
         }
       />
 
+      <SystemStrip {...systemStrip} />
+
       <WorkShowcase
         offerHref={daybreak.offerHref}
         tool={
           <AxToolBand tool={tool} checker={<CrackChecker shape="square" />} />
         }
+      />
+
+      <LeadJourneys
+        label="Three trades"
+        title="A crawl space lead doesn't start where a foundation lead does."
+        lede="Each trade's homeowner starts with a different worry, so the site asks different questions and qualifies them the way that trade sells."
+        journeys={leadJourneys}
       />
 
       <LostRevenue
@@ -180,19 +204,14 @@ export default function AgencyHome() {
             <Icon name="arrowRight" className="size-4" />
           </AxButton>
         }
-      />
-
-      <AxComparison
-        label="Before & after"
-        title="The same lead, before and after Daybreak."
-        lede="Homeowners find you the same way they do now. What changes is what happens in the first minute, and in the month after the quote."
-        data={beforeAfter}
-      />
+      >
+        <EstimateFollowUp {...estimateFollowUp} />
+      </LostRevenue>
 
       <AxProcess
         id="call"
         label="Your first call"
-        title="What happens when you book a call."
+        title="Your first call is a working session."
         lede="One call with the two of us. You see your new homepage, we work out what your missed calls and unsold estimates are costing you, and you leave with a fixed price if it's a fit."
         steps={callSteps}
         action={<AxButton href={bookingHref}>Book a discovery call</AxButton>}

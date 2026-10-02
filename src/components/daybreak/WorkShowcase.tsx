@@ -17,6 +17,7 @@ export function WorkShowcase({ offerHref, tool }: { offerHref: string; tool?: Re
       domain: "cornerstonefoundation.example",
       kind: "concept",
       blurb: "For a high end foundation company. Calm and confident, and it shows homeowners where each pier goes before showing the price.",
+      behind: ["Lead qualification", "CRM", "SMS follow-up", "Inspection booking"],
     },
     {
       id: "bedrock",
@@ -25,6 +26,7 @@ export function WorkShowcase({ offerHref, tool }: { offerHref: string; tool?: Re
       domain: "bedrockfoundation.example",
       kind: "concept",
       blurb: "For a busy foundation repair company. Bold and easy to act on, with the crack checker right at the top.",
+      behind: ["Crack checker", "CRM", "SMS follow-up", "Inspection booking"],
     },
     {
       id: "dryline",
@@ -33,6 +35,7 @@ export function WorkShowcase({ offerHref, tool }: { offerHref: string; tool?: Re
       domain: "drylinecrawlspaces.example",
       kind: "concept",
       blurb: "For a crawl space company that wants to explain the problem clearly, with the numbers up front.",
+      behind: ["Moisture questions", "CRM", "SMS follow-up", "Inspection booking"],
     },
     {
       id: "clapboard",
@@ -41,6 +44,7 @@ export function WorkShowcase({ offerHref, tool }: { offerHref: string; tool?: Re
       domain: "clapboardandco.example",
       kind: "concept",
       blurb: "For a siding contractor. Big photos, plus a material and colour picker near the top of the page.",
+      behind: ["Project qualifier", "CRM", "SMS follow-up", "Estimate booking"],
     },
     {
       id: "keystone",
@@ -49,6 +53,7 @@ export function WorkShowcase({ offerHref, tool }: { offerHref: string; tool?: Re
       domain: "keystonebasements.example",
       kind: "concept",
       blurb: "For a waterproofing and foundation company. Lots of before & after photos, and a simple way to describe the problem.",
+      behind: ["Lead qualification", "CRM", "SMS follow-up", "Inspection booking"],
     },
   ];
 

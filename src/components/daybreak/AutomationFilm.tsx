@@ -6,8 +6,9 @@ import { cn } from "@/lib/utils";
 import { AxLabel } from "./ax";
 
 /**
- * The "why" before the "how": a short film on why a business has to run
- * without its owner on the phone, set directly above the system story.
+ * The founders' note: a short film on why a business has to run without its
+ * owner on the phone. Kept compact (a small frame beside a short heading) so
+ * it reads as a quick word from the founders rather than a chapter of its own.
  *
  * The film's captions are burned in, so it works silent. While it's on
  * screen it plays muted on a loop as a preview; it pauses once it scrolls
@@ -61,22 +62,11 @@ export function AutomationFilm({
   };
 
   return (
-    <div className="mb-20 lg:mb-28">
-      <div className="flex justify-center border-t border-rule pt-6 lg:justify-start">
-        <AxLabel>{label}</AxLabel>
-      </div>
-
-      <div className="mt-10 grid gap-10 lg:mt-14 lg:grid-cols-12 lg:items-center lg:gap-10">
-        <div className="text-center lg:col-span-5 lg:text-left">
-          <h2 className="font-home text-[clamp(2.2rem,4.2vw,3.6rem)] font-normal leading-[1.06] tracking-[-0.03em] text-fg lg:text-[clamp(2.2rem,3.75vw,3.4rem)]">
-            {title}
-          </h2>
-          <p className="mx-auto mt-5 max-w-md text-[17px] leading-[1.6] text-muted lg:mx-0">{lede}</p>
-        </div>
-
+    <div className="border-t border-rule pt-6">
+      <div className="grid gap-8 lg:grid-cols-12 lg:items-center lg:gap-10">
         {/* The button sits under the film, not on it, so it never covers
             the burned-in captions on a phone-sized frame. */}
-        <div className="lg:col-span-7">
+        <div className="mx-auto w-full max-w-md lg:col-span-5 lg:max-w-none">
           <div className="relative aspect-video overflow-hidden bg-fg">
             <video
               ref={video}
@@ -109,6 +99,16 @@ export function AutomationFilm({
             </span>
             <span className="text-white/60">{duration}</span>
           </button>
+        </div>
+
+        <div className="text-center lg:col-span-6 lg:col-start-7 lg:text-left">
+          <div className="flex justify-center lg:justify-start">
+            <AxLabel>{label}</AxLabel>
+          </div>
+          <h2 className="font-home mt-5 text-[clamp(1.75rem,2.8vw,2.5rem)] font-normal leading-[1.08] tracking-[-0.03em] text-fg">
+            {title}
+          </h2>
+          <p className="mx-auto mt-4 max-w-md text-[16.5px] leading-[1.6] text-muted lg:mx-0">{lede}</p>
         </div>
       </div>
     </div>

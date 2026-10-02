@@ -27,9 +27,8 @@ export function AxToolBand({
             Live tool · try it now
           </p>
           <h3 id="tools-title" className="font-home mt-6 text-[clamp(2rem,3.6vw,3.1rem)] font-normal leading-[1.05] tracking-[-0.03em]">
-            {tool.name}.
-            <br />
-            <span className="text-sun">Try it on any crack.</span>
+            Give them an answer before you ask for their number.
+            <span className="mt-3 block text-sun">Try our {tool.name.toLowerCase()}.</span>
           </h3>
         </div>
         <p className="mx-auto max-w-md text-center text-[17px] leading-[1.6] text-white/75 lg:col-span-5 lg:mx-0 lg:text-left">

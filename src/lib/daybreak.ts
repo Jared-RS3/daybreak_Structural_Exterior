@@ -71,7 +71,7 @@ export const automationFilm = {
  */
 export const about = {
   statement:
-    "We're Jared and Yaaseen. We build websites for foundation repair, crawl space and siding contractors, and we judge our work by how many inspections it books.",
+    "We're Jared and Yaaseen. We build the lead infrastructure behind foundation repair, crawl space and siding companies, from the first click to the booked inspection. The website is where it starts, and we judge our work by how many inspections it books.",
   stats: [
     { value: "2", label: "Founders on every project" },
     { value: "100%", label: "Of our clients are still with us" },
@@ -101,7 +101,7 @@ export const founderNote =
  */
 export const offer = {
   label: "Free contractor homepage concept",
-  cta: "Get my free website concept",
+  cta: "Get my free evaluation",
   includes: [
     "A concept of your homepage",
     "Your service area & towns",
@@ -131,9 +131,9 @@ export const promise: { title: string; lede: string; items: Guarantee[] } = {
       body: "Your site, domain and data are in your name. If you ever leave, you take it all with you.",
     },
     {
-      title: "Reported every month",
+      title: "Know where every lead came from",
       icon: "document",
-      body: "Every month we show you the calls, forms and jobs your site brought in, including the months it isn't working yet.",
+      body: "Calls, forms, booked inspections and lead sources are tracked, so you can see what the site is actually producing. We go through it with you every month, including the months it isn't working yet.",
     },
   ],
 };
@@ -141,7 +141,7 @@ export const promise: { title: string; lede: string; items: Guarantee[] } = {
 /** Ticked under the hero buttons (the first button is the free design). Each one is true today. */
 export const heroPromises = [
   "Free homepage concept on your first call",
-  "Built to book more inspections",
+  "A fixed price, not a percentage of your revenue",
 ];
 
 /**
@@ -323,7 +323,7 @@ export const lostLeadStats: IndustryStat[] = [
 /** The band under the hero. The leak names match the three cards below. */
 export const leakBand = {
   quiet: "You may not need more leads.",
-  loud: "You may need to stop losing the ones you already have.",
+  loud: "You may need to stop losing the ones you already paid for.",
   leaks: ["Missed calls", "Slow replies", "Unsold estimates"],
   cta: "See where you're losing leads",
 };
@@ -385,6 +385,113 @@ export const leaks: Leak[] = [
 ];
 
 /**
+ * The strip ahead of "Our work": the whole path in single words, so the
+ * visitor has the system in mind before they see the design work. `mark` is
+ * the step the path exists for.
+ */
+export const systemStrip = {
+  title:
+    "We build the full path from homeowner interest to booked inspection, and on to the review after the job.",
+  steps: [
+    "Traffic",
+    "Website",
+    "Qualify",
+    "Respond",
+    "Book",
+    "Track",
+    "Follow up",
+    "Get reviews",
+  ],
+  mark: "Book",
+};
+
+/**
+ * The three trades don't sell the same way, so the site doesn't ask the same
+ * questions. Each journey is what a Daybreak site for that trade is built to
+ * do, from the first thing the homeowner tells it to the hand-off. The
+ * foundation journey is the crack checker on this page.
+ */
+export const leadJourneys: {
+  trade: string;
+  opener: string;
+  steps: string[];
+}[] = [
+  {
+    trade: "Foundation repair",
+    opener: "Starts with a crack the homeowner just noticed.",
+    steps: [
+      "Crack & symptom checker",
+      "Severity",
+      "Photos",
+      "Inspection",
+      "CRM",
+    ],
+  },
+  {
+    trade: "Crawl space",
+    opener: "Starts with a smell, damp or a floor that's started to give.",
+    steps: [
+      "Moisture, smell or sagging-floor diagnosis",
+      "Property details",
+      "Photo upload",
+      "Inspection",
+    ],
+  },
+  {
+    trade: "Siding",
+    opener: "Starts with damage, or a house that's due for new siding.",
+    steps: [
+      "Damage, replacement or material preference",
+      "Project qualifier",
+      "Estimate request",
+      "Consultation",
+    ],
+  },
+];
+
+/**
+ * The second leak, shown: an estimate followed up five times over 30 days
+ * (the same cadence as `outcomes`). `day` counts from the estimate. Only the
+ * first step is done by a person; the rest run on their own and stop the
+ * moment the homeowner replies.
+ */
+export const estimateFollowUp = {
+  label: "The second leak",
+  title: "Estimate sent Monday.",
+  lede: "You paid for the lead, drove out and wrote the quote. From there, every estimate is followed up five times over 30 days, and your rep is alerted the moment the homeowner replies.",
+  steps: [
+    { when: "Monday", day: 0, text: "Estimate delivered", kind: "Your rep" },
+    {
+      when: "Wednesday",
+      day: 2,
+      text: "“Did the estimate come through OK?”",
+      kind: "Automatic",
+    },
+    {
+      when: "Friday",
+      day: 4,
+      text: "“Any questions about the repair options?”",
+      kind: "Automatic",
+    },
+    {
+      when: "Next week",
+      day: 9,
+      text: "“Would monthly payments make this easier?”",
+      kind: "Automatic",
+    },
+    {
+      when: "Week 3",
+      day: 16,
+      text: "“Still thinking it over? Here's what to watch for in the meantime.”",
+      kind: "Automatic",
+    },
+    { when: "A month on", day: 30, text: "Final follow-up", kind: "Automatic" },
+  ],
+  reply:
+    "They reply, the follow-ups stop, and your rep gets the estimate and the whole conversation.",
+};
+
+/**
  * The live run: one missed call, followed until it's a booked inspection in
  * the CRM. Each step is one change on the phone in the drawing.
  */
@@ -393,7 +500,7 @@ export const liveRunCopy = {
   label: "How it works",
   /** Two lines, broken between them. */
   title: ["A missed call at 4:52 PM.", "Booked by 4:57."],
-  lede: "Nobody in the office touched it. This runs behind your website while your crew is on site: the text back, the questions, the photos, the booking and the CRM.",
+  lede: "Nobody in the office touched it. This is what runs behind your website while your team is under a house, on site or off for the day: the text back, the questions, the photos, the booking and the CRM.",
 };
 
 export const liveRun = [
@@ -682,8 +789,8 @@ export const placeholderReviews: Review[] = [
 
 export const faqs: Faq[] = [
   {
-    q: "Which contractors do you build websites for?",
-    a: "Foundation repair, crawl space and siding companies. Many of them also sell basement waterproofing, drainage, concrete lifting, windows or gutters, and your site covers those too.",
+    q: "Who is Daybreak Structure-Works built for?",
+    a: "Foundation repair, crawl space and siding contractors. We build the website, qualification tools, follow-up and CRM workflow around how those businesses actually sell. Many of them also sell basement waterproofing, drainage, concrete lifting, windows or gutters, and your site covers those too.",
   },
   {
     q: "What do I get with the free homepage concept?",
