@@ -43,6 +43,13 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // Don't advertise the framework in every response.
   poweredByHeader: false,
+  experimental: {
+    // Turbopack's build cache (on by default since 16.3) records the env
+    // values the build read, and Netlify's secrets scan reads that cache and
+    // fails the deploy on AIRTABLE_TOKEN and LEAD_FORM_SECRET. The build is
+    // quick enough without it.
+    turbopackFileSystemCacheForBuild: false,
+  },
   async headers() {
     return [
       { source: "/(.*)", headers: securityHeaders },
