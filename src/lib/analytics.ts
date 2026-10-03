@@ -21,3 +21,14 @@ export const consentCookie = "daybreak_consent";
 
 /** How long that choice is remembered before we ask again. */
 export const consentDays = 365;
+
+/**
+ * Sends a Google Analytics event, only if the visitor has accepted analytics:
+ * gtag exists only once they have (CookieConsent.tsx), and withdrawing
+ * consent sets GA's own disable flag, so nothing is sent after that either.
+ */
+export function track(event: string, params: Record<string, string | number> = {}) {
+  if (typeof window === "undefined") return;
+  const gtag = (window as Window & { gtag?: (...args: unknown[]) => void }).gtag;
+  gtag?.("event", event, params);
+}

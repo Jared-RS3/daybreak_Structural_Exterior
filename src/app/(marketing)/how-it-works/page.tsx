@@ -1,7 +1,9 @@
+import { AutomationRun } from "@/components/daybreak/AutomationRun";
 import { AxButton, AxLabel } from "@/components/daybreak/ax";
 import { AxComparison } from "@/components/daybreak/AxComparison";
-import { AutomationRun } from "@/components/daybreak/AutomationRun";
+import { AxContact } from "@/components/daybreak/AxContact";
 import { AxProcess } from "@/components/daybreak/AxProcess";
+import { EstimateFollowUp } from "@/components/daybreak/EstimateFollowUp";
 import {
   Integrations,
   LostRevenue,
@@ -19,6 +21,7 @@ import {
 import {
   beforeAfter,
   daybreak,
+  estimateFollowUp,
   integrations,
   leaks,
   liveRun,
@@ -33,8 +36,10 @@ import { howItWorksStructuredData, jsonLd } from "@/lib/structured-data";
 import type { Metadata } from "next";
 
 const title = "How it works";
+/** Every ask on this page goes to the form at its foot. */
+const formHref = "#free-design";
 const description =
-  "How a Daybreak website and the automations behind it turn more of a foundation, crawl space or siding contractor's leads into booked inspections and signed jobs.";
+  "How a Daybreak website and the lead system behind it turn more of a foundation, crawl space or siding contractor's leads into booked inspections and signed jobs, from the first reply to the estimate follow-up.";
 
 export const metadata: Metadata = {
   title,
@@ -75,11 +80,11 @@ export default function HowItWorks() {
             How a Daybreak site turns more of your leads into jobs.
           </h1>
           <p className="mt-6 max-w-xl text-[17px] leading-[1.6] text-muted">
-            The website that gets you found, the automations that answer, book
-            and follow up, and what changes when they run.
+            The website that gets you found, the lead system that answers, books
+            and follows up, and what changes when it runs.
           </p>
           <div className="mt-8">
-            <AxButton href={daybreak.offerHref}>{offer.cta}</AxButton>
+            <AxButton href={formHref}>{offer.cta}</AxButton>
           </div>
         </div>
       </header>
@@ -101,7 +106,9 @@ export default function HowItWorks() {
           lede: liveRunCopy.lede,
         }}
         run={<AutomationRun steps={liveRun} />}
-      />
+      >
+        <EstimateFollowUp {...estimateFollowUp} />
+      </LostRevenue>
 
       <section
         id="system"
@@ -129,8 +136,8 @@ export default function HowItWorks() {
               <SceneRevenue key="revenue" />,
             ]}
             end={{
-              href: daybreak.offerHref,
-              label: "Get a free homepage concept",
+              href: formHref,
+              label: offer.cta,
             }}
           />
         </div>
@@ -140,7 +147,7 @@ export default function HowItWorks() {
         steps={startSteps}
         title="Start with a free homepage concept."
         lede="See your company on a better website before you spend anything. The concept is free; the final design and build are paid work, at a fixed price you agree first."
-        action={<AxButton href={daybreak.offerHref}>{offer.cta}</AxButton>}
+        action={<AxButton href={formHref}>{offer.cta}</AxButton>}
       />
 
       <AxComparison
@@ -152,10 +159,19 @@ export default function HowItWorks() {
         <Outcomes items={outcomes} />
         <Integrations tools={integrations} />
         <div className="mt-12">
-          <AxButton href={daybreak.offerHref}>{offer.cta}</AxButton>
+          <AxButton href={formHref}>{offer.cta}</AxButton>
         </div>
       </AxComparison>
 
+      <AxContact
+        label={offer.label}
+        title={offer.formTitle}
+        // note={`${founding.left} of ${founding.spots} founding spots open`}
+        lede={offer.formLede}
+        includes={offer.includes}
+        email={daybreak.email}
+        image="/images/aerial-neighborhood.jpg"
+      />
     </>
   );
 }

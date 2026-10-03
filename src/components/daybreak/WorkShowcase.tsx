@@ -7,9 +7,24 @@ import { WorkTabs, type WorkItem } from "./WorkTabs";
  * labelled as a concept for a fictional company, all drawn in code. `tool`
  * (the live crack checker) follows the tabs, so the proof ends with something
  * the contractor can try for themselves.
+ *
+ * The trade pages pass `only` (concept ids) to show that trade's concepts,
+ * with their own `title` and `lede`.
  */
-export function WorkShowcase({ offerHref, tool }: { offerHref: string; tool?: React.ReactNode }) {
-  const items: WorkItem[] = [
+export function WorkShowcase({
+  offerHref,
+  tool,
+  only,
+  title,
+  lede = "Sample homepages we designed for foundation, crawl space and siding contractors. Each one is built around how that business gets its jobs.",
+}: {
+  offerHref: string;
+  tool?: React.ReactNode;
+  only?: string[];
+  title?: React.ReactNode;
+  lede?: React.ReactNode;
+}) {
+  const all: WorkItem[] = [
     {
       id: "cornerstone",
       name: "Cornerstone Foundation",
@@ -56,6 +71,17 @@ export function WorkShowcase({ offerHref, tool }: { offerHref: string; tool?: Re
       behind: ["Lead qualification", "CRM", "SMS follow-up", "Inspection booking"],
     },
   ];
+  const previews: Record<string, React.ReactNode> = {
+    cornerstone: <CornerstoneMock key="c" />,
+    bedrock: <BedrockMock key="b" />,
+    dryline: <DryLineMock key="d" />,
+    clapboard: <ClapboardMock key="cl" />,
+    keystone: <KeystoneMock key="k" />,
+  };
+  const items = only ? all.filter((it) => only.includes(it.id)) : all;
+  const mobileOrder = ["bedrock", "dryline", "clapboard", "keystone", "cornerstone"].filter((id) =>
+    items.some((it) => it.id === id),
+  );
 
   return (
     <section id="work" aria-labelledby="work-title" className="scroll-mt-20 bg-panel py-20 sm:py-24 lg:py-28">
@@ -64,25 +90,21 @@ export function WorkShowcase({ offerHref, tool }: { offerHref: string; tool?: Re
           id="work-title"
           label="Our work"
           title={
-            <>
-              Sites built for
-              <br className="hidden sm:block" /> the trades.
-            </>
+            title ?? (
+              <>
+                Sites built for
+                <br className="hidden sm:block" /> the trades.
+              </>
+            )
           }
-          lede="Sample homepages we designed for foundation, crawl space and siding contractors. Each one is built around how that business gets its jobs."
+          lede={lede}
         />
         <div className="mt-14 lg:mt-16">
           <WorkTabs
             items={items}
             offerHref={offerHref}
-            mobileOrder={["bedrock", "dryline", "clapboard", "keystone", "cornerstone"]}
-            previews={[
-              <CornerstoneMock key="c" />,
-              <BedrockMock key="b" />,
-              <DryLineMock key="d" />,
-              <ClapboardMock key="cl" />,
-              <KeystoneMock key="k" />,
-            ]}
+            mobileOrder={mobileOrder}
+            previews={items.map((it) => previews[it.id])}
           />
         </div>
         {tool && <div className="mt-10 lg:mt-14">{tool}</div>}

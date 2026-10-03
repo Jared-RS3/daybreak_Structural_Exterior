@@ -1,7 +1,7 @@
 import { Icon } from "@/components/ui/Icon";
 import type { IndustryStat, Leak } from "@/lib/daybreak";
 import { cn } from "@/lib/utils";
-import { AxButton, AxHead, AxLabel, AxTag } from "./ax";
+import { AxButton, AxHead, AxLabel, AxTag, axCardTitle, axTitle } from "./ax";
 import { RED, leakScenes } from "./LeakScenes";
 
 /* ==========================================================================
@@ -60,7 +60,7 @@ export function LeakBand({
         </div>
         <h2
           id="leak-band-title"
-          className="font-home mx-auto mt-10 max-w-5xl text-center text-[clamp(2.2rem,4.6vw,4.2rem)] font-normal leading-[1.04] tracking-[-0.035em] lg:mx-0 lg:mt-14 lg:text-left"
+          className={`${axTitle} mx-auto mt-10 max-w-5xl text-center lg:mx-0 lg:mt-14 lg:text-left`}
         >
           <span className="text-muted">{quiet}</span> <span className="text-fg">{loud}</span>
         </h2>
@@ -142,7 +142,7 @@ export function LostRevenue({
         {runHead && (
           <div className="mt-20 border-t border-rule pt-6 lg:mt-28">
             <AxLabel>{runHead.label}</AxLabel>
-            <h3 className="font-home mt-10 text-[clamp(2rem,3.6vw,3.2rem)] font-normal leading-[1.06] tracking-[-0.03em] text-fg lg:mt-14">
+            <h3 className={`${axTitle} mt-10 text-fg lg:mt-14`}>
               {runHead.title}
             </h3>
             <p className="mt-4 max-w-xl text-[17px] leading-[1.6] text-muted">{runHead.lede}</p>
@@ -173,7 +173,7 @@ function LeakCards({ leaks }: { leaks: Leak[] }) {
                 <Icon name="drop" filled className="size-3.5" />
                 Leak {pad(i)}
               </p>
-              <h3 className="font-home mt-6 text-[clamp(1.9rem,2.6vw,2.4rem)] font-normal leading-none tracking-[-0.03em] text-fg">
+              <h3 className={`${axCardTitle} mt-6 text-fg`}>
                 {l.name}
               </h3>
               <p className="mt-3 text-[16.5px] leading-[1.55] text-muted">{l.problem}</p>
@@ -225,7 +225,7 @@ export function Outcomes({ items }: { items: { title: string; how: string[] }[] 
         {items.map((o, i) => (
           <li key={o.title} className="grid gap-3 border-b border-rule py-6 sm:grid-cols-12 sm:items-center sm:gap-8">
             <span className="mono-label hidden text-[12.5px] text-muted sm:col-span-1 sm:block">{pad(i)}</span>
-            <h3 className="font-home text-[clamp(1.75rem,3.2vw,2.75rem)] font-normal leading-[1.05] tracking-[-0.03em] text-fg sm:col-span-6">
+            <h3 className={`${axCardTitle} text-fg sm:col-span-6`}>
               {o.title}
             </h3>
             <ul className="flex flex-wrap gap-1.5 sm:col-span-5 sm:justify-end">

@@ -21,6 +21,15 @@ export function AxLabel({ children, tone = "dark", className }: { children: Reac
 }
 
 /**
+ * Every section title on the site, whether it sits in an AxHead or is laid
+ * out by hand next to a film or a form, so no two titles drift apart.
+ */
+export const axTitle = "font-home text-[clamp(2.2rem,4.2vw,3.6rem)] font-normal leading-[1.06] tracking-[-0.03em]";
+
+/** The title on a card or row inside a section: a leak, a step, a concept, an outcome. */
+export const axCardTitle = "font-home text-[clamp(1.8rem,2.6vw,2.3rem)] font-normal leading-[1.08] tracking-[-0.03em]";
+
+/**
  * Section opening: hairline, label, headline — centred on phones, left-set
  * from desktop up, with an optional lede and a right-hand slot (buttons, a
  * count) on the same row.
@@ -64,7 +73,7 @@ export function AxHead({
         <h2
           id={id}
           className={cn(
-            "font-home text-[clamp(2.2rem,4.2vw,3.6rem)] font-normal leading-[1.06] tracking-[-0.03em]",
+            axTitle,
             align === "center" ? "" : "lg:col-span-7",
             light ? "text-white" : "text-fg",
           )}

@@ -7,31 +7,28 @@ import { AxFaq } from "@/components/daybreak/AxFaq";
 import { AxProcess } from "@/components/daybreak/AxProcess";
 import { AxReviews } from "@/components/daybreak/AxReviews";
 import { AxTerms } from "@/components/daybreak/AxTerms";
-import { AxToolBand } from "@/components/daybreak/AxTools";
 import { EstimateFollowUp } from "@/components/daybreak/EstimateFollowUp";
 import { HeroProof } from "@/components/daybreak/HeroProof";
-import { LeadJourneys } from "@/components/daybreak/LeadJourneys";
 import { LeakBand, LostRevenue } from "@/components/daybreak/LostRevenue";
 import { SystemStrip } from "@/components/daybreak/SystemStrip";
+import { ToolPreview } from "@/components/daybreak/ToolPreview";
 import { WorkShowcase } from "@/components/daybreak/WorkShowcase";
 import { Hero } from "@/components/template/Hero";
 import { ArrowLink, PillLink } from "@/components/template/primitives";
-import { CrackChecker } from "@/components/tools/CrackChecker";
 import { CrackChip } from "@/components/tools/CrackChip";
 import { Icon } from "@/components/ui/Icon";
 import { founders } from "@/lib/agency";
 import {
   about,
   automationFilm,
-  bookingHref,
   callSteps,
   daybreak,
   draftReviews,
   estimateFollowUp,
   faqs,
+  founding,
   heroPromises,
   heroTrust,
-  leadJourneys,
   leakBand,
   liveRun,
   liveRunCopy,
@@ -42,7 +39,7 @@ import {
   reviews,
   systemStrip,
 } from "@/lib/daybreak";
-import { houseImage, tool } from "@/lib/demo-site";
+import { houseImage } from "@/lib/demo-site";
 import { openGraphDefaults, site } from "@/lib/seo";
 import { homeStructuredData, jsonLd } from "@/lib/structured-data";
 import type { Metadata } from "next";
@@ -76,24 +73,26 @@ export const metadata: Metadata = {
  *   2. Am I losing money right now?      lost-revenue band, two sourced stats
  *      Are these people real?            the founders' 30-second film, compact
  *   3. What do you actually build?       the system in one strip
- *   4. Can you actually build it?        our work, ending on the crack checker
- *   5. Do you know my trade?             a lead journey per trade
- *   6. How would it stop the leak?       one missed call, saved live, then
+ *   4. Can you actually build it?        our work, ending on a strip that opens
+ *                                        the live tools (the yellow button in
+ *                                        the corner, ToolLauncher, on every page)
+ *   5. How would it stop the leak?       one missed call, saved live, then
  *                                        one estimate, followed up for a month
- *   7. What happens if I book a call?    the call in three steps → book
- *   8. What if it's not for me?          the promise: free concept, you own it
- *   9. Do other clients trust you?       reviews
+ *   6. What happens if I book a call?    the call in three steps → book
+ *   7. What if it's not for me?          the promise: free concept, you own it
+ *   8. Do other clients trust you?       reviews
  *      Who would I be dealing with?      the founders
- *  10. Anything else?                    FAQ
- *  11. Book the call.
+ *   9. Anything else?                    FAQ
+ *  10. Book the call.
  *
  * /how-it-works holds the extra detail (the 6-step journey, the three leaks
  * card by card, outcomes, before & after, how we start) for the visitor who
  * wants more. Before & after isn't on this page: the run and the follow-up
- * already show the same steps. Every
- * point that sells the call is here as well. The lost-revenue calculator is
- * at /calculator, unlisted, to work through with a contractor on the call
- * (step two above).
+ * already show the same steps. Each trade's own detail (its leaks, lead
+ * journey and concepts) is on its trade page, linked from the footer, so this
+ * page stays short. Every point that sells the call is here as well. The
+ * lost-revenue calculator is at /calculator, unlisted, to work through with
+ * a contractor on the call (step two above).
  */
 export default function AgencyHome() {
   return (
@@ -110,7 +109,7 @@ export default function AgencyHome() {
           <>
             <div className="flex justify-center">
               <PillLink
-                href={bookingHref}
+                href={daybreak.offerHref}
                 variant="light"
                 size="lg"
                 className="max-sm:px-9"
@@ -123,13 +122,10 @@ export default function AgencyHome() {
                 See how it works
               </ArrowLink>
             </div>
-            <ul className="mx-auto mt-6 flex w-fit flex-col items-start gap-x-5 gap-y-2 text-[15px] text-white max-sm:gap-y-2.5 max-sm:text-[16px] sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:text-[16px]">
+            <ul className="mx-auto mt-6 flex max-w-[20rem] flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[14px] text-white/85 sm:max-w-none sm:gap-x-5 sm:gap-y-2 sm:text-[16px] sm:text-white">
               {heroPromises.map((p) => (
-                <li key={p} className="flex items-center gap-1.5 max-sm:gap-3">
-                  <Icon
-                    name="check"
-                    className="size-4.5 text-sun max-sm:size-5"
-                  />
+                <li key={p} className="flex items-center gap-1.5">
+                  <Icon name="check" className="size-4 text-sun sm:size-4.5" />
                   {p}
                 </li>
               ))}
@@ -176,16 +172,7 @@ export default function AgencyHome() {
 
       <WorkShowcase
         offerHref={daybreak.offerHref}
-        tool={
-          <AxToolBand tool={tool} checker={<CrackChecker shape="square" />} />
-        }
-      />
-
-      <LeadJourneys
-        label="Three trades"
-        title="A crawl space lead doesn't start where a foundation lead does."
-        lede="Each trade's homeowner starts with a different worry, so the site asks different questions and qualifies them the way that trade sells."
-        journeys={leadJourneys}
+        tool={<ToolPreview />}
       />
 
       <LostRevenue
@@ -214,7 +201,7 @@ export default function AgencyHome() {
         title="Your first call is a working session."
         lede="One call with the two of us. You see your new homepage, we work out what your missed calls and unsold estimates are costing you, and you leave with a fixed price if it's a fit."
         steps={callSteps}
-        action={<AxButton href={bookingHref}>Book a discovery call</AxButton>}
+        action={<AxButton href={daybreak.offerHref}>{offer.cta}</AxButton>}
       />
 
       <AxTerms
@@ -256,8 +243,9 @@ export default function AgencyHome() {
 
       <AxContact
         label={offer.label}
-        title="Get your free homepage concept."
-        lede="Answer a few quick questions about your business. We'll design a concept of your new homepage, with your logo, services and towns, and walk you through it on a call. No cost, no obligation."
+        title={offer.formTitle}
+        // note={`${founding.left} of ${founding.spots} founding spots open`}
+        lede={offer.formLede}
         includes={offer.includes}
         email={daybreak.email}
         image="/images/aerial-neighborhood.jpg"

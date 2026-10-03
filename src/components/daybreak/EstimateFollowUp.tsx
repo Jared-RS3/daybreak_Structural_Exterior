@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { AxLabel } from "./ax";
+import { AxLabel, axTitle } from "./ax";
 
 /**
  * The second leak, after the live run: one estimate followed up over a month.
@@ -13,20 +13,23 @@ export function EstimateFollowUp({
   lede,
   steps,
   reply,
+  className = "mt-20 lg:mt-28",
 }: {
   label: string;
   title: React.ReactNode;
   lede: React.ReactNode;
   steps: { when: string; day: number; text: string; kind: string }[];
   reply: string;
+  /** Space above; it follows the live run on the homepage. */
+  className?: string;
 }) {
   return (
-    <div className="mt-20 border-t border-rule pt-6 lg:mt-28">
+    <div className={cn("border-t border-rule pt-6", className)}>
       <div className="flex justify-center lg:justify-start">
         <AxLabel>{label}</AxLabel>
       </div>
       <div className="mt-10 grid gap-6 text-center lg:mt-14 lg:grid-cols-12 lg:items-end lg:gap-10 lg:text-left">
-        <h3 className="font-home text-[clamp(2rem,3.6vw,3.2rem)] font-normal leading-[1.06] tracking-[-0.03em] text-fg lg:col-span-7">
+        <h3 className={`${axTitle} text-fg lg:col-span-7`}>
           {title}
         </h3>
         <p className="mx-auto max-w-md text-[17px] leading-[1.6] text-muted lg:col-span-5 lg:mx-0 lg:pb-1.5">{lede}</p>

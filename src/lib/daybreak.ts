@@ -44,9 +44,12 @@ export const daybreak = {
   wordmark: agency.name,
   descriptor: "",
   email: agency.email,
-  /** The free concept is shown on the first call, so asking for it books one.
-      (The on-page form it used to scroll to, #free-design, is switched off.) */
-  offerHref: bookingHref,
+  /** The free concept is asked for on the short form (#free-design, at the
+      foot of every sales page), which then hands off to the booking calendar
+      with the visitor's details filled in. Asking on the form first means a
+      lead who never books still reaches the Airtable base. The header moves
+      to the form on the current page when there is one (SiteHeader). */
+  offerHref: "/#free-design",
 };
 
 /**
@@ -100,15 +103,38 @@ export const founderNote =
  * form makes the moment someone submits.
  */
 export const offer = {
-  label: "Free contractor homepage concept",
-  cta: "Get my free evaluation",
+  label: "Free call + homepage concept",
+  /** Every button that leads to the form. It says what happens (a call); the
+      free concept is the reason to book it, said beside the button. */
+  cta: "Book my free call",
+  /** The form's own button: the calendar comes next, so it says so. */
+  submit: "Next: pick a time",
   includes: [
+    "A call with both founders",
     "A concept of your homepage",
     "Your service area & towns",
     "Your repairs & services",
     "Notes on your current site",
   ],
   reply: "within one business day",
+  /** The form section at the foot of every sales page. */
+  formTitle: "Book your free call.",
+  formLede:
+    "Answer a few quick questions about your business, then pick a time. We'll design a concept of your new homepage, with your logo, services and towns, and show it to you on the call. No cost, no obligation.",
+};
+
+/**
+ * The founding-client offer: Daybreak has no contractor results yet, so the
+ * first contractor clients get a lower rate in exchange for being the proof.
+ * The rate itself is never published; it's given in writing on the call.
+ *
+ * Not shown on the site at the moment (the founding section and the
+ * mentions of it were taken out). If it goes back, lower `left` by hand each
+ * time a founding client signs, and never show more urgency than is true.
+ */
+export const founding = {
+  spots: 10,
+  left: 10,
 };
 
 /**
@@ -140,8 +166,9 @@ export const promise: { title: string; lede: string; items: Guarantee[] } = {
 
 /** Ticked under the hero buttons (the first button is the free design). Each one is true today. */
 export const heroPromises = [
-  "Free homepage concept on your first call",
-  "A fixed price, not a percentage of your revenue",
+  "Free homepage concept",
+  "Fixed price in writing",
+  "No obligation",
 ];
 
 /**
@@ -155,6 +182,10 @@ export const heroTrust = [
   { value: "Custom", label: "contractor sites" },
   { value: "Foundation", label: "crawl space & siding specialists" },
   { value: "Free concept", label: "before any commitment" },
+  // {
+  //   value: `${founding.left} founding spots`,
+  //   label: "left at a founding rate",
+  // },
   { value: "You own it", label: "site, domain & data" },
 ];
 
@@ -306,15 +337,15 @@ export type IndustryStat = {
 
 export const lostLeadStats: IndustryStat[] = [
   {
-    value: "52%",
-    label: "of callers to home service businesses get to speak with a person.",
+    value: "48%",
+    label: "of callers to home service businesses don't get to speak with a person.",
     source: "Invoca, Home Services Lead Conversion Benchmarks, 2026",
     href: "https://www.invoca.com/reports/the-invoca-home-services-lead-conversion-benchmarks-report-2026",
   },
   {
-    value: "47%",
+    value: "11–15%",
     label:
-      "of $10M+ contractors say following up on estimates brings in 11–15% of their income.",
+      "of income comes from following up on estimates, say nearly half of $10M+ contractors.",
     source: "ServiceTitan, Residential Services Report, 2025",
     href: "https://www.servicetitan.com/press/residential-industry-report-2025",
   },
@@ -391,15 +422,15 @@ export const leaks: Leak[] = [
  */
 export const systemStrip = {
   title:
-    "We build the full path from homeowner interest to booked inspection, and on to the review after the job.",
+    "We build the full path from a homeowner's Google search to a booked inspection, and on to the review after the job.",
   steps: [
-    "Traffic",
+    "Get found",
     "Website",
     "Qualify",
     "Respond",
     "Book",
-    "Track",
     "Follow up",
+    "Track",
     "Get reviews",
   ],
   mark: "Book",
@@ -415,9 +446,12 @@ export const leadJourneys: {
   trade: string;
   opener: string;
   steps: string[];
+  /** Its trade page. */
+  href: string;
 }[] = [
   {
     trade: "Foundation repair",
+    href: "/foundation-repair-websites",
     opener: "Starts with a crack the homeowner just noticed.",
     steps: [
       "Crack & symptom checker",
@@ -429,6 +463,7 @@ export const leadJourneys: {
   },
   {
     trade: "Crawl space",
+    href: "/crawl-space-websites",
     opener: "Starts with a smell, damp or a floor that's started to give.",
     steps: [
       "Moisture, smell or sagging-floor diagnosis",
@@ -439,6 +474,7 @@ export const leadJourneys: {
   },
   {
     trade: "Siding",
+    href: "/siding-websites",
     opener: "Starts with damage, or a house that's due for new siding.",
     steps: [
       "Damage, replacement or material preference",
@@ -653,40 +689,6 @@ export const process: ProcessStep[] = [
   },
 ];
 
-/** Terms and ownership, from lib/agency.ts. Every one is a commitment to keep. */
-export const terms: Guarantee[] = [
-  {
-    title: "Month to month",
-    icon: "clock",
-    body: "No twelve-month lock-in. If a month goes badly you can leave at the end of it, with everything you own.",
-  },
-  {
-    title: "The goal is agreed first",
-    icon: "target",
-    body: "We agree on the goal at the start and write it down, so we both know what we're aiming for.",
-  },
-  {
-    title: "Reported monthly",
-    icon: "document",
-    body: "The same attribution view, on your data, every month. Including the months where it isn't working yet.",
-  },
-  {
-    title: "Your website & domain",
-    icon: "shield",
-    body: "The site and the domain are registered in your name, and you can move them whenever you like.",
-  },
-  {
-    title: "Your data & leads",
-    icon: "users",
-    body: "Ad accounts, analytics and CRM data stay in your name. Leads reach you first, always.",
-  },
-  {
-    title: "Founding rate",
-    icon: "badge",
-    body: "Below what this will cost in a year, in exchange for permission to publish what happened, once there's something to publish.",
-  },
-];
-
 /**
  * Client reviews for the homepage carousel: real ones only, in the client's
  * own words and with their permission. These are from Daybreak's website
@@ -793,6 +795,10 @@ export const faqs: Faq[] = [
     a: "Foundation repair, crawl space and siding contractors. We build the website, qualification tools, follow-up and CRM workflow around how those businesses actually sell. Many of them also sell basement waterproofing, drainage, concrete lifting, windows or gutters, and your site covers those too.",
   },
   {
+    q: "Why work with two founders instead of a big agency?",
+    a: "You deal with the people doing the work, from the first call to launch day, with no account managers in between. You see a concept of your own homepage before you pay anything, the price is fixed in writing before anything starts, and your site, domain and data are in your name. Every client we've built for is still with us.",
+  },
+  {
     q: "What do I get with the free homepage concept?",
     a: "On your first call we show you a concept of your homepage, with your logo, colours, services and the towns you work in. If you already have a website, we'll also tell you what's worth keeping. It's free, and you don't have to buy anything.",
   },
@@ -809,11 +815,227 @@ export const faqs: Faq[] = [
     a: "Not always. When we design your homepage we'll tell you what's worth keeping and what needs fixing.",
   },
   {
+    q: "Does it work with my CRM, or do I have to switch?",
+    a: "You don't have to switch. If you already run your jobs in a CRM, we check on the first call whether new leads can go straight into it, and tell you before you pay anything. If you don't use one, or yours can't connect, we set up a simple pipeline in your name, so every lead, booking and estimate is in one place.",
+  },
+  {
     q: "Who owns the website?",
     a: "You do. The site, the domain and all your data are yours, and if you ever leave, you take it all with you.",
   },
   {
     q: "What is the crack checker?",
-    a: "A short set of questions a homeowner answers about a crack: where it is, what it looks like, how wide it is and what else the house is doing. It tells them how serious it probably is and books the right inspection. You can try it on this page and on our sample site.",
+    a: "A short set of questions a homeowner answers about a crack: where it is, what it looks like, how wide it is and what else the house is doing. It tells them how serious it probably is, books the right inspection and can email them the report as a PDF. Try it from the yellow button in the corner of this page, and you'll get the PDF yourself.",
+  },
+  {
+    q: "What is the house estimator?",
+    a: "A tool on your site where homeowners click the problem or tick their symptoms, pick a size, and get a ballpark price once they've left their details. They're emailed the estimate as a PDF, and it reaches you as a lead with the job already described, using your prices, not ours. Try it from the yellow button in the corner and we'll email you the PDF.",
   },
 ];
+
+/* ==========================================================================
+   Trade pages: one landing page per trade (/foundation-repair-websites,
+   /crawl-space-websites, /siding-websites), for the contractor who searches
+   for their own trade and wants to see that we know how it sells.
+
+   Same rule as the rest of this file: the leaks are described, never given a
+   number nobody measured, and every "fixed by" names something shown on the
+   homepage or listed as live in `trades`.
+   ========================================================================== */
+
+const sharedFaq = (q: string) => {
+  const f = faqs.find((x) => x.q === q);
+  if (!f) throw new Error(`No FAQ "${q}"`);
+  return f;
+};
+
+export type TradePage = {
+  path: string;
+  /** For the <title>, before the site name. */
+  title: string;
+  description: string;
+  h1: string;
+  lede: string;
+  /** e.g. "foundation repair", for running copy. */
+  short: string;
+  leaksTitle: string;
+  leaksLede: string;
+  /** Where this trade's leads leak, and what fixes each one. */
+  leaks: ProcessStep[];
+  journey: (typeof leadJourneys)[number];
+  /** Concept ids from the work showcase. */
+  concepts: string[];
+  /** Show the crack & symptom checker. */
+  tool: boolean;
+  /** The repair estimate\'s section to open first. */
+  focus: string;
+  /** Show the missed-call run (it's drawn for a foundation company). */
+  run: boolean;
+  /** Behind the form at the foot of the page. */
+  image: string;
+  /** Beside the headline: the problem as the homeowner sees it. */
+  heroImage: { src: string; alt: string };
+  faqs: Faq[];
+};
+
+export const tradePages: Record<"foundation" | "crawl" | "siding", TradePage> =
+  {
+    foundation: {
+      path: "/foundation-repair-websites",
+      title: "Foundation Repair Contractor Websites",
+      description:
+        "Websites and lead systems for foundation repair contractors: a crack & symptom checker, replies in seconds, inspection booking and estimate follow-up. See a free concept of your homepage first.",
+      h1: "Websites and lead systems for foundation repair contractors.",
+      lede: "Foundation leads start with a worried homeowner and end in a big-ticket decision. We build the site that answers the worry, books the inspection and follows up on the estimate until they decide.",
+      short: "foundation repair",
+      leaksTitle: "Where foundation repair leads leak.",
+      leaksLede:
+        "Three moments where a homeowner who was ready to call you ends up calling someone else.",
+      leaks: [
+        {
+          title: "The 9 PM worry",
+          body: "A homeowner spots a stair-step crack after dinner and wants to know if the house is safe. If your site can't tell them, they keep searching until one does.",
+          detail: "Fixed by the crack & symptom checker",
+        },
+        {
+          title: "Three quotes on the table",
+          body: "Homeowners often have more than one company out. The one that replies first and explains the repair clearly is the one they remember.",
+          detail: "Fixed by a text back in seconds",
+        },
+        {
+          title: "The estimate that goes quiet",
+          body: "Pier work is a big decision. Without follow-up, your estimate sits on the kitchen table until another company calls.",
+          detail: "Fixed by 5 follow-ups over 30 days",
+        },
+      ],
+      journey: leadJourneys[0],
+      concepts: ["cornerstone", "bedrock", "keystone"],
+      tool: true,
+      run: true,
+      focus: "foundation",
+      image: "/images/foundation-excavation.jpg",
+      heroImage: {
+        src: "/images/foundation-crack-brick.jpg",
+        alt: "A stair-step crack running through a brick wall",
+      },
+      faqs: [
+        {
+          q: "Can the crack checker use my prices and repair methods?",
+          a: "Yes. On your site, its answers, price ranges and booking options are set to your repair methods and the area you work in. Try it from the yellow button in the corner of this page.",
+        },
+        {
+          q: "Will the site cover waterproofing, drainage and concrete lifting too?",
+          a: "Yes. Many foundation companies also sell basement waterproofing, drainage or concrete lifting, and your site covers those services too.",
+        },
+        sharedFaq("What does a website cost?"),
+        sharedFaq("Does it work with my CRM, or do I have to switch?"),
+        sharedFaq("Is the concept my finished design?"),
+        sharedFaq("Who owns the website?"),
+      ],
+    },
+    crawl: {
+      path: "/crawl-space-websites",
+      title: "Crawl Space Contractor Websites",
+      description:
+        "Websites and lead systems for crawl space contractors: questions for musty smells, damp and sagging floors, photo upload, inspection booking and estimate follow-up. See a free concept of your homepage first.",
+      h1: "Websites and lead systems for crawl space contractors.",
+      lede: "Most homeowners don't know they have a crawl space problem. They know the house smells musty or a floor feels soft. We build the site that connects the symptom to an inspection, then books it.",
+      short: "crawl space",
+      leaksTitle: "Where crawl space leads leak.",
+      leaksLede:
+        "The homeowner can't see the problem, doesn't know its name, and is surprised by the price. Each of those loses you jobs.",
+      leaks: [
+        {
+          title: "They search the symptom",
+          body: "Homeowners type “musty smell in house” or “soft spot in floor”, not “crawl space encapsulation”. A site that only lists your services never meets them.",
+          detail: "Fixed by symptom question paths",
+        },
+        {
+          title: "Nobody wants to go down there",
+          body: "The homeowner can't see the problem, so they can't describe it on the phone. Questions and photos on the site give you the picture before you drive out.",
+          detail: "Fixed by questions & photo upload",
+        },
+        {
+          title: "A bigger number than they pictured",
+          body: "Encapsulation often costs more than the homeowner expected. Without follow-up and payment options, the estimate stalls.",
+          detail: "Fixed by follow-up & payment options",
+        },
+      ],
+      journey: leadJourneys[1],
+      concepts: ["dryline", "keystone"],
+      tool: true,
+      run: false,
+      focus: "crawl",
+      image: "/images/crawl-inspection.jpg",
+      heroImage: {
+        src: "/images/crawl-space-before.jpg",
+        alt: "A damp crawl space under a house, before any work",
+      },
+      faqs: [
+        {
+          q: "Can the site handle musty smells, damp and sagging floors?",
+          a: "Yes. The site asks what the homeowner is noticing, like a smell, damp or a soft floor, and books the right inspection. Try the symptom answers from the yellow button in the corner of this page.",
+        },
+        {
+          q: "Do you build before & after pages for encapsulation jobs?",
+          a: "Yes. Encapsulation sells on before & after photos, so your site gets a page for each job you want to show, with the photos and what you did.",
+        },
+        sharedFaq("What does a website cost?"),
+        sharedFaq("Does it work with my CRM, or do I have to switch?"),
+        sharedFaq("Is the concept my finished design?"),
+        sharedFaq("Who owns the website?"),
+      ],
+    },
+    siding: {
+      path: "/siding-websites",
+      title: "Siding Contractor Websites",
+      description:
+        "Websites and lead systems for siding contractors: project and material pages, a project qualifier, estimate requests and follow-up until the homeowner decides. See a free concept of your homepage first.",
+      h1: "Websites and lead systems for siding contractors.",
+      lede: "Siding is a looks-and-money decision, and homeowners take their time over it. We build the site that shows your work, qualifies the project and keeps your estimate alive until they're ready.",
+      short: "siding",
+      leaksTitle: "Where siding leads leak.",
+      leaksLede:
+        "Siding homeowners browse longer, compare more and decide slower. The site has to work for all of it.",
+      leaks: [
+        {
+          title: "They shop with their eyes",
+          body: "Homeowners want to see the material, the colour and a house like theirs. A thin gallery sends them to the next contractor's site.",
+          detail: "Fixed by project & material pages",
+        },
+        {
+          title: "Not every lead is a project",
+          body: "A cracked panel and a whole-house replacement shouldn't get the same call. The site asks first, so your estimators drive out for the right jobs.",
+          detail: "Fixed by the project qualifier",
+        },
+        {
+          title: "The long goodbye",
+          body: "Siding decisions take weeks, sometimes a season. Without follow-up, your estimate is forgotten by the time they're ready.",
+          detail: "Fixed by 5 follow-ups over 30 days",
+        },
+      ],
+      journey: leadJourneys[2],
+      concepts: ["clapboard"],
+      tool: false,
+      run: false,
+      focus: "siding",
+      image: "/images/siding-crew.jpg",
+      heroImage: {
+        src: "/images/siding-white-colonial.jpg",
+        alt: "A colonial house with new white lap siding",
+      },
+      faqs: [
+        {
+          q: "Can homeowners pick materials and colours on the site?",
+          a: "Yes. Our Clapboard concept puts a material and colour picker near the top of the homepage, and the house estimator (the yellow button in the corner) prices each material. What goes on your site depends on the materials you install.",
+        },
+        {
+          q: "Do you build a page for each siding material?",
+          a: "Yes. Fiber cement, vinyl, engineered wood or whatever you install each get their own page, written for the homeowner comparing them.",
+        },
+        sharedFaq("What does a website cost?"),
+        sharedFaq("Does it work with my CRM, or do I have to switch?"),
+        sharedFaq("Is the concept my finished design?"),
+        sharedFaq("Who owns the website?"),
+      ],
+    },
+  };

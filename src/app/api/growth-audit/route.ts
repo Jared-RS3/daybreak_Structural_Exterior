@@ -1,8 +1,13 @@
-import { NextResponse } from "next/server";
 import { normalizeDomain, readLead, validateLead } from "@/lib/lead";
-import { airtableConfigured, createAirtableRecord, noFormula } from "@/lib/server/airtable";
+import {
+  airtableConfigured,
+  createAirtableRecord,
+  noFormula,
+} from "@/lib/server/airtable";
 import { checkFormToken, issueFormToken } from "@/lib/server/form-token";
 import { clientIp, isSameOrigin, rateLimit } from "@/lib/server/rate-limit";
+import { readCapped, sourcePage } from "@/lib/server/request";
+import { NextResponse } from "next/server";
 
 /**
  * Receives free homepage concept requests from the site and writes each one
@@ -23,47 +28,8 @@ const MAX_BODY_BYTES = 8_000;
 /** Faster than this from page load to submit is a script, not a person. */
 const MIN_FILL_MS = 2_500;
 
-const fail = (status: number, error: string) => NextResponse.json({ ok: false, error }, { status });
-
-/**
- * Reads the body, but stops as soon as it passes `max` bytes, so a huge
- * upload is cut off instead of held in memory. Null means too large.
- */
-async function readCapped(request: Request, max: number): Promise<string | null> {
-  const declared = Number(request.headers.get("content-length"));
-  if (declared > max) return null;
-  if (!request.body) return "";
-  const reader = request.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    size += value.byteLength;
-    if (size > max) {
-      await reader.cancel();
-      return null;
-    }
-    chunks.push(value);
-  }
-  return new TextDecoder().decode(Buffer.concat(chunks));
-}
-
-/**
- * The page the form was sent from, kept only if it really is a page on this
- * site (the Referer header is whatever the sender says). No query string:
- * it can carry tracking ids or someone's details.
- */
-function sourcePage(request: Request): string | null {
-  try {
-    const ref = new URL(request.headers.get("referer") ?? "");
-    const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
-    if (ref.host !== host || !/^https?:$/.test(ref.protocol)) return null;
-    return `${ref.origin}${ref.pathname}`.slice(0, 500);
-  } catch {
-    return null;
-  }
-}
+const fail = (status: number, error: string) =>
+  NextResponse.json({ ok: false, error }, { status });
 
 /** Hands the form a fresh signed token when it appears (lib/server/form-token.ts). */
 export function GET(request: Request) {
@@ -78,7 +44,10 @@ export async function POST(request: Request) {
   if (!isSameOrigin(request)) return fail(403, "Forbidden.");
 
   if (!rateLimit(`lead:${clientIp(request)}`, 5, 10 * 60_000)) {
-    return fail(429, "Too many requests. Please wait a few minutes, or email us directly.");
+    return fail(
+      429,
+      "Too many requests. Please wait a few minutes, or email us directly.",
+    );
   }
 
   if (!request.headers.get("content-type")?.startsWith("application/json")) {
@@ -90,7 +59,8 @@ export async function POST(request: Request) {
   let body: Record<string, unknown>;
   try {
     const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error();
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+      throw new Error();
     body = parsed as Record<string, unknown>;
   } catch {
     return fail(400, "Malformed request.");
@@ -126,7 +96,9 @@ export async function POST(request: Request) {
     Website: l.domain ? normalizeDomain(l.domain) : null,
     Trade: l.trade,
     // Only sent with "Other", so leads without it don't need the column.
-    ...(l.trade === "Other" && l.services ? { Services: noFormula(l.services) } : {}),
+    ...(l.trade === "Other" && l.services
+      ? { Services: noFormula(l.services) }
+      : {}),
     // Optional questions: empty cells rather than blank options when skipped.
     "Jobs per month": l.jobs || null,
     "Average job size": l.jobValue || null,
@@ -135,7 +107,7 @@ export async function POST(request: Request) {
     // box ticked, so every saved lead carries its agreement, and "Received
     // at" records when it was given (POPIA puts the proof of consent on us).
     "POPIA Agreement": l.consent === "yes",
-    Offer: "Free homepage concept",
+    Offer: "Free web concept",
     Page: sourcePage(request),
     "Received at": new Date().toISOString(),
   };
@@ -144,11 +116,17 @@ export async function POST(request: Request) {
   // many leads in ten minutes. Far above real demand; it caps a flood.
   if (!rateLimit("lead:all", 30, 10 * 60_000)) {
     console.error("[lead] Site-wide limit reached — lead not saved:", fields);
-    return fail(429, "We're getting a lot of requests right now. Please email us directly.");
+    return fail(
+      429,
+      "We're getting a lot of requests right now. Please email us directly.",
+    );
   }
 
   if (!airtableConfigured()) {
-    console.warn("[lead] Airtable is not configured — lead captured to log only:", fields);
+    console.warn(
+      "[lead] Airtable is not configured — lead captured to log only:",
+      fields,
+    );
     return NextResponse.json({ ok: true });
   }
 
@@ -157,7 +135,10 @@ export async function POST(request: Request) {
   } catch (err) {
     // Logged in full so the lead can be recovered by hand.
     console.error("[lead] Airtable write failed", err, fields);
-    return fail(502, "We couldn't save that. Please try again, or email us directly.");
+    return fail(
+      502,
+      "We couldn't save that. Please try again, or email us directly.",
+    );
   }
 
   return NextResponse.json({ ok: true });

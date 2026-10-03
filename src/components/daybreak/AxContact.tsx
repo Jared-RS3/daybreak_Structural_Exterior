@@ -1,7 +1,7 @@
 import { Img } from "@/components/ui/Img";
 import { ZoomIn } from "@/components/motion/ZoomIn";
 import { DesignForm } from "./DesignForm";
-import { AxLabel } from "./ax";
+import { AxLabel, axTitle } from "./ax";
 
 /**
  * The one ask, set as Axion sets its contact block: a darkened photograph,
@@ -15,9 +15,12 @@ export function AxContact({
   includes,
   email,
   image,
+  note,
 }: {
   label: string;
   title: React.ReactNode;
+  /** A short line under the title, e.g. how many founding spots are open. */
+  note?: React.ReactNode;
   lede: React.ReactNode;
   includes: string[];
   email: string;
@@ -40,9 +43,15 @@ export function AxContact({
       <div className="container-wide grid gap-12 py-20 sm:py-24 lg:grid-cols-12 lg:gap-10 lg:py-28">
         <div className="flex flex-col lg:col-span-5">
           <AxLabel tone="light">{label}</AxLabel>
-          <h2 id="free-design-title" className="font-home mt-8 text-[clamp(2.2rem,4vw,3.4rem)] font-normal leading-[1.08] tracking-[-0.03em] text-white">
+          <h2 id="free-design-title" className={`${axTitle} mt-8 text-white`}>
             {title}
           </h2>
+          {note && (
+            <p className="mono-label mt-5 flex items-center gap-2.5 text-[12.5px] text-sun">
+              <span aria-hidden className="size-1.5 shrink-0 bg-sun" />
+              {note}
+            </p>
+          )}
           <p className="mt-5 max-w-md text-[17px] leading-[1.6] text-white/80">{lede}</p>
           <div className="mt-10 lg:mt-auto lg:pt-10">
             <p className="mono-label text-[12.5px] text-white/70">What you get</p>

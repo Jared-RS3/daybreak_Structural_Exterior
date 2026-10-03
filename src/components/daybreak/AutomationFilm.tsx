@@ -2,19 +2,25 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
+import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
-import { AxLabel } from "./ax";
+import { AxLabel, axTitle } from "./ax";
 
 /**
  * The founders' note: a short film on why a business has to run without its
- * owner on the phone. Kept compact (a small frame beside a short heading) so
- * it reads as a quick word from the founders rather than a chapter of its own.
+ * owner on the phone, at full size: the heading beside a film that takes the
+ * wider half of the row.
  *
  * The film's captions are burned in, so it works silent. While it's on
  * screen it plays muted on a loop as a preview; it pauses once it scrolls
  * away, so it never costs anything off screen. "Watch with sound" starts it
  * from the top with audio and native controls. With reduced motion nothing
  * plays until it's asked to.
+ *
+ * Analytics (only with the visitor's consent, lib/analytics.ts): video_start
+ * when they choose to watch with sound, video_progress at halfway and
+ * video_complete at the end. The muted preview isn't counted: nobody chose
+ * to watch it.
  */
 export function AutomationFilm({
   label,
@@ -34,6 +40,8 @@ export function AutomationFilm({
 }) {
   const video = useRef<HTMLVideoElement>(null);
   const [sound, setSound] = useState(false);
+  const halfway = useRef(false);
+  const film = { video_title: "Founders' film", video_url: src };
 
   useEffect(() => {
     const v = video.current;
@@ -58,15 +66,28 @@ export function AutomationFilm({
     v.muted = false;
     v.loop = false;
     setSound(true);
+    halfway.current = false;
+    track("video_start", film);
     v.play().catch(() => {});
   };
 
   return (
-    <div className="border-t border-rule pt-6">
-      <div className="grid gap-8 lg:grid-cols-12 lg:items-center lg:gap-10">
+    <div>
+      <div className="flex justify-center border-t border-rule pt-6 lg:justify-start">
+        <AxLabel>{label}</AxLabel>
+      </div>
+
+      <div className="mt-10 grid gap-10 lg:mt-14 lg:grid-cols-12 lg:items-center lg:gap-10">
+        <div className="text-center lg:col-span-5 lg:text-left">
+          <h2 className={`${axTitle} text-fg`}>
+            {title}
+          </h2>
+          <p className="mx-auto mt-5 max-w-md text-[17px] leading-[1.6] text-muted lg:mx-0">{lede}</p>
+        </div>
+
         {/* The button sits under the film, not on it, so it never covers
             the burned-in captions on a phone-sized frame. */}
-        <div className="mx-auto w-full max-w-md lg:col-span-5 lg:max-w-none">
+        <div className="lg:col-span-7">
           <div className="relative aspect-video overflow-hidden bg-fg">
             <video
               ref={video}
@@ -77,6 +98,13 @@ export function AutomationFilm({
               playsInline
               preload="metadata"
               controls={sound}
+              onTimeUpdate={(e) => {
+                const v = e.currentTarget;
+                if (!sound || halfway.current || !v.duration || v.currentTime / v.duration < 0.5) return;
+                halfway.current = true;
+                track("video_progress", { ...film, video_percent: 50 });
+              }}
+              onEnded={() => sound && track("video_complete", film)}
               aria-label="Why automation matters for your business (video, captions on screen)"
               className="size-full object-cover"
             />
@@ -99,16 +127,6 @@ export function AutomationFilm({
             </span>
             <span className="text-white/60">{duration}</span>
           </button>
-        </div>
-
-        <div className="text-center lg:col-span-6 lg:col-start-7 lg:text-left">
-          <div className="flex justify-center lg:justify-start">
-            <AxLabel>{label}</AxLabel>
-          </div>
-          <h2 className="font-home mt-5 text-[clamp(1.75rem,2.8vw,2.5rem)] font-normal leading-[1.08] tracking-[-0.03em] text-fg">
-            {title}
-          </h2>
-          <p className="mx-auto mt-4 max-w-md text-[16.5px] leading-[1.6] text-muted lg:mx-0">{lede}</p>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { agency, founders } from "./agency";
-import { automationFilm, bookingHref, faqs, trades } from "./daybreak";
+import { automationFilm, faqs, trades, type TradePage } from "./daybreak";
 import { houseImage } from "./demo-site";
 import { absoluteUrl, site, siteUrl } from "./seo";
 
@@ -72,7 +72,10 @@ export function homeStructuredData() {
         inLanguage: "en-US",
         isPartOf: { "@id": website },
         about: { "@id": org },
-        primaryImageOfPage: { "@type": "ImageObject", url: absoluteUrl(houseImage.src) },
+        primaryImageOfPage: {
+          "@type": "ImageObject",
+          url: absoluteUrl(houseImage.src),
+        },
         video: { "@id": film },
       },
       {
@@ -82,7 +85,10 @@ export function homeStructuredData() {
         description: agency.positioning,
         provider: { "@id": org },
         areaServed: { "@type": "Country", name: "United States" },
-        audience: { "@type": "BusinessAudience", audienceType: trades.map((t) => t.name).join(", ") },
+        audience: {
+          "@type": "BusinessAudience",
+          audienceType: trades.map((t) => t.name).join(", "),
+        },
         hasOfferCatalog: {
           "@type": "OfferCatalog",
           name: "Websites by trade",
@@ -102,7 +108,7 @@ export function homeStructuredData() {
             "A concept of your new homepage, with your logo, services and the towns you work in, shown on your first call.",
           price: "0",
           priceCurrency: "USD",
-          url: bookingHref,
+          url: absoluteUrl("/#free-design"),
         },
       },
       {
@@ -129,7 +135,13 @@ export function homeStructuredData() {
 }
 
 /** The how-it-works page, tied to the homepage graph by @id. */
-export function howItWorksStructuredData({ title, description }: { title: string; description: string }) {
+export function howItWorksStructuredData({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -142,6 +154,70 @@ export function howItWorksStructuredData({ title, description }: { title: string
         inLanguage: "en-US",
         isPartOf: { "@id": website },
         about: { "@id": org },
+      },
+    ],
+  };
+}
+
+/**
+ * A trade page: the page, the service it describes (offered by the
+ * organisation on the homepage graph), its FAQ and the breadcrumb home.
+ */
+export function tradePageStructuredData(page: TradePage) {
+  const url = absoluteUrl(page.path);
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${url}#webpage`,
+        url,
+        name: page.title,
+        description: page.description,
+        inLanguage: "en-US",
+        isPartOf: { "@id": website },
+        about: { "@id": org },
+        breadcrumb: { "@id": `${url}#breadcrumb` },
+      },
+      {
+        "@type": "Service",
+        name: page.title,
+        serviceType: "Contractor website design and lead generation",
+        description: page.description,
+        provider: { "@id": org },
+        areaServed: { "@type": "Country", name: "United States" },
+        audience: {
+          "@type": "BusinessAudience",
+          audienceType: `${page.journey.trade} contractors`,
+        },
+        offers: {
+          "@type": "Offer",
+          name: "Free homepage concept",
+          price: "0",
+          priceCurrency: "USD",
+          url: `${url}#free-design`,
+        },
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: page.faqs.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: absoluteUrl("/"),
+          },
+          { "@type": "ListItem", position: 2, name: page.title, item: url },
+        ],
       },
     ],
   };

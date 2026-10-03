@@ -109,7 +109,7 @@ export function SceneSearch() {
         </li>
         {others.map((o) => (
           <li key={o.name} className="border-b border-rule px-4 py-3 last:border-0">
-            <p className="text-[14px] text-fg/60">{o.name}</p>
+            <p className="text-[14px] text-fg/65">{o.name}</p>
             <p className="mt-0.5 text-[12px] text-muted">{o.meta}</p>
           </li>
         ))}

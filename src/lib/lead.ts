@@ -89,20 +89,17 @@ const maxLength: Partial<Record<LeadField, number>> = {
  * collapsed, trimmed.
  */
 export function readLead(get: (k: LeadField) => unknown): LeadRequest {
-  return Object.fromEntries(
-    leadFields.map((k) => {
-      const v = get(k);
-      const text = typeof v === "string" ? v : "";
-      return [
-        k,
-        text
-          .replace(/[\u0000-\u001f\u007f-\u009f]/g, " ")
-          .replace(/[\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2069\ufeff]/g, "")
-          .replace(/\s+/g, " ")
-          .trim(),
-      ];
-    }),
-  ) as LeadRequest;
+  return Object.fromEntries(leadFields.map((k) => [k, cleanText(get(k))])) as LeadRequest;
+}
+
+/** One untrusted value as plain, single-line text (see readLead). */
+export function cleanText(v: unknown): string {
+  const text = typeof v === "string" ? v : "";
+  return text
+    .replace(/[\u0000-\u001f\u007f-\u009f]/g, " ")
+    .replace(/[\u00ad\u200b-\u200f\u202a-\u202e\u2060-\u2069\ufeff]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /** Every rule the form and the route both enforce. Returns only the fields with a problem. */

@@ -1,6 +1,6 @@
 import type { Faq } from "@/lib/template/types";
 import { FaqList } from "@/components/template/FaqList";
-import { AxButton, AxLabel } from "./ax";
+import { AxButton, AxLabel, axTitle } from "./ax";
 
 /** Large left-set heading, square-chevron questions, a human at the bottom. */
 export function AxFaq({ items, email }: { items: Faq[]; email: string }) {
@@ -11,7 +11,7 @@ export function AxFaq({ items, email }: { items: Faq[]; email: string }) {
           <AxLabel>Questions</AxLabel>
         </div>
         <div className="mt-10 grid gap-10 lg:mt-14 lg:grid-cols-12">
-          <h2 id="faq-title" className="font-home text-[clamp(2.2rem,4.2vw,3.5rem)] font-normal leading-[1.08] tracking-[-0.03em] text-fg lg:col-span-4">
+          <h2 id="faq-title" className={`${axTitle} text-fg lg:col-span-4`}>
             Frequently
             <br /> asked questions.
           </h2>

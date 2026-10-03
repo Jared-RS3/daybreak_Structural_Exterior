@@ -64,7 +64,7 @@ export function Hero({
         <div
           className={cn(
             "container-x relative z-10 pt-14 text-center sm:pt-20 lg:pt-24",
-            pf && "max-sm:flex max-sm:flex-col max-sm:items-center max-sm:px-4 max-sm:pt-6",
+            pf && "max-sm:flex max-sm:flex-col max-sm:items-center max-sm:px-5 max-sm:pt-8",
           )}
         >
           {kicker && (
@@ -75,10 +75,10 @@ export function Hero({
           <h1
             id="hero-title"
             className={cn(
-              "home-display mx-auto mt-6 max-w-[17ch] animate-[rise-in_1.1s_var(--ease-out-expo)_0.08s_both] text-[clamp(2.6rem,6vw,5.25rem)] text-white",
-              // Sized to the screen so the headline (four lines on a phone)
-              // never breaks mid-word.
-              pf && "max-sm:mt-5 max-sm:max-w-none max-sm:text-[8.9vw] max-sm:font-bold max-sm:leading-[1.04] max-sm:tracking-[-0.045em]",
+              "home-display mx-auto mt-6 max-w-[17ch] animate-[rise-in-text_1.1s_var(--ease-out-expo)_0.08s_both] text-[clamp(2.6rem,6vw,5.25rem)] text-white",
+              // Sized to the screen so the headline never breaks mid-word,
+              // with a margin either side and its lines balanced.
+              pf && "max-sm:mt-0 max-sm:max-w-none max-sm:text-balance max-sm:text-[min(8vw,2.1rem)] max-sm:font-semibold max-sm:leading-[1.1] max-sm:tracking-[-0.035em]",
             )}
           >
             {title}
@@ -86,7 +86,7 @@ export function Hero({
           <p
             className={cn(
               "mx-auto mt-6 max-w-[36rem] animate-[rise-in_1.1s_var(--ease-out-expo)_0.2s_both] text-[17px] leading-[1.55] text-white sm:text-[19px]",
-              pf && "max-sm:mt-4 max-sm:max-w-[21.5rem] max-sm:text-[15px] max-sm:leading-[1.5]",
+              pf && "max-sm:mt-5 max-sm:max-w-[20rem] max-sm:text-pretty max-sm:text-[16px] max-sm:leading-[1.6] max-sm:text-white/85",
             )}
           >
             {lede}
@@ -94,7 +94,7 @@ export function Hero({
           <div
             className={cn(
               "mx-auto mt-9 max-w-xl animate-[rise-in_1.1s_var(--ease-out-expo)_0.32s_both]",
-              pf && "max-sm:mt-6 max-sm:w-full",
+              pf && "max-sm:mt-8 max-sm:w-full",
             )}
           >
             {action}

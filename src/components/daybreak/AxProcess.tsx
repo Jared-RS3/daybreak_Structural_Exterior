@@ -1,5 +1,5 @@
 import type { ProcessStep } from "@/lib/template/types";
-import { AxHead } from "./ax";
+import { AxHead, axCardTitle } from "./ax";
 
 /**
  * Three steps in ruled columns: the number in mono, the step, the detail.
@@ -25,13 +25,15 @@ export function AxProcess({
     <section id={id} aria-labelledby="process-title" className="scroll-mt-20 bg-white py-20 sm:py-24 lg:py-28">
       <div className="container-wide">
         <AxHead id="process-title" label={label} title={title} lede={lede} aside={action} />
-        <ol className="mt-14 grid gap-10 sm:grid-cols-3 sm:gap-8 lg:mt-16">
+        {/* Each column is a subgrid of the list's rows, so a title that wraps
+            in one column keeps every column's text and detail on one line. */}
+        <ol className="mt-14 grid gap-10 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-0 lg:mt-16">
           {steps.map((s, i) => (
-            <li key={s.title} className="border-t border-fg pt-5">
+            <li key={s.title} className="border-t border-fg pt-5 sm:row-span-4 sm:grid sm:grid-rows-subgrid">
               <p className="mono-label text-muted">{String(i + 1).padStart(2, "0")}</p>
-              <h3 className="font-home mt-8 text-[clamp(1.8rem,2.6vw,2.3rem)] font-normal tracking-[-0.03em] text-fg">{s.title}</h3>
+              <h3 className={`${axCardTitle} mt-8 text-fg`}>{s.title}</h3>
               <p className="mt-3 max-w-sm text-[17px] leading-[1.6] text-muted">{s.body}</p>
-              <p className="mono-label mt-6 inline-flex items-center gap-2 text-[12.5px] text-fg">
+              <p className="mono-label mt-6 flex items-center gap-2 self-start text-[12.5px] text-fg">
                 <span aria-hidden className="size-1.5 bg-sun" />
                 {s.detail}
               </p>

@@ -1,18 +1,19 @@
 import { CookieSettingsButton } from "@/components/consent/CookieConsent";
 import { DaybreakFooter } from "@/components/daybreak/DaybreakFooter";
+import { ToolLauncher } from "@/components/daybreak/ToolLauncher";
 import { SiteHeader } from "@/components/template/SiteHeader";
 import { legal } from "@/lib/agency";
 import { analyticsOn } from "@/lib/analytics";
-import { daybreak } from "@/lib/daybreak";
+import { daybreak, offer, tradePages } from "@/lib/daybreak";
 
 const nav = [
   { label: "Our work", href: "/#work" },
-  { label: "Try the crack checker", href: "/#tools" },
+  { label: "Try our tools", href: "/#tools" },
   { label: "How it works", href: "/how-it-works" },
   { label: "FAQ", href: "/#faq" },
 ];
 
-const primary = { label: "Free homepage concept", href: daybreak.offerHref };
+const primary = { label: offer.cta, href: daybreak.offerHref };
 const secondary = { label: "See our work", href: "/#work" };
 
 /**
@@ -32,7 +33,17 @@ export default function MarketingLayout({
         nav={nav}
         primary={primary}
         secondary={secondary}
-        solidOn={["/privacy", "/terms", "/accessibility", "/paia", "/how-it-works", "/calculator"]}
+        solidOn={[
+          "/privacy",
+          "/terms",
+          "/accessibility",
+          "/paia",
+          "/how-it-works",
+          "/calculator",
+          "/foundation-repair-websites",
+          "/crawl-space-websites",
+          "/siding-websites",
+        ]}
         wide
       />
       <main id="main" className="flex-1">
@@ -49,7 +60,11 @@ export default function MarketingLayout({
         ]
           .filter(Boolean)
           .join(" · ")}
-        company={{ name: legal.company, legalName: legal.entity, href: legal.companyUrl }}
+        company={{
+          name: legal.company,
+          legalName: legal.entity,
+          href: legal.companyUrl,
+        }}
         legalExtra={
           analyticsOn && (
             <CookieSettingsButton className="mono-label text-[12.5px] text-white/60 underline underline-offset-4 transition-colors hover:text-white" />
@@ -62,7 +77,18 @@ export default function MarketingLayout({
               { label: "Our work", href: "/#work" },
               { label: "How it works", href: "/how-it-works" },
               { label: "Who you'll work with", href: "/#about" },
-              { label: "Free homepage concept", href: daybreak.offerHref },
+              { label: "Book a free call", href: daybreak.offerHref },
+            ],
+          },
+          {
+            title: "Trades",
+            links: [
+              {
+                label: "Foundation repair",
+                href: "/foundation-repair-websites",
+              },
+              { label: "Crawl space", href: "/crawl-space-websites" },
+              { label: "Siding", href: "/siding-websites" },
             ],
           },
           {
@@ -75,6 +101,13 @@ export default function MarketingLayout({
             ],
           },
         ]}
+      />
+      {/* The live tools, in the corner of every sales page. Each trade page
+          says which tools it shows and which section opens first. */}
+      <ToolLauncher
+        pages={Object.fromEntries(
+          Object.values(tradePages).map((p) => [p.path, { checker: p.tool, focus: p.focus }]),
+        )}
       />
       {/* <StickyCta
         primary={primary}

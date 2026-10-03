@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { founders } from "@/lib/agency";
-import { automationFilm } from "@/lib/daybreak";
+import { automationFilm, tradePages } from "@/lib/daybreak";
 import { houseImage } from "@/lib/demo-site";
 import { absoluteUrl } from "@/lib/seo";
 
@@ -33,6 +33,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       ],
     },
     { url: absoluteUrl("/how-it-works"), lastModified: "2026-10-02", changeFrequency: "monthly", priority: 0.8 },
+    ...Object.values(tradePages).map((p) => ({
+      url: absoluteUrl(p.path),
+      lastModified: "2026-10-02",
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    })),
     /* Listed rather than hidden. These are the pages a visitor goes looking for
        when they want to know what happens to their data, and a policy that is
        hard to find reads as one that is trying not to be read. */

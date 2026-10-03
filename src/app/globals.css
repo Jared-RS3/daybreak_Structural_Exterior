@@ -75,7 +75,8 @@
      change these on the site wrapper (see `siteTheme` in lib/demo-site.ts)
      and every template component follows. The agency site never uses them.
 
-     fg / muted  #1c1c1c and #6e6e73 — 16.7:1 and 5.0:1 on white.
+     fg / muted  #1c1c1c and #68686d — 16.7:1 and 5.6:1 on white; muted
+                 is 4.7:1 on panel-2 (#ececec), the darkest grey it sits on.
      accent      primary action. Black pills, as Crest uses them.
      signal      measured things (outlines, figures). 4.6:1 on white.
      sky-1..5    the sky, deep to pale. Crest's own sky is paler, but white
@@ -83,7 +84,7 @@
                  below sky-2 (4.65:1) wherever text sits, then opens up to
                  Crest's pale blues where the house stands. */
   --color-fg: #1c1c1c;
-  --color-muted: #6e6e73;
+  --color-muted: #68686d;
   --color-line: #e6e6ea;
   --color-card: #f2f2f2;
   --color-accent: #111111;
@@ -142,6 +143,14 @@
 @keyframes rise-in {
   from { opacity: 0; transform: translateY(28px); }
   to { opacity: 1; transform: none; }
+}
+/* The hero headline's entrance: a slide with no fade, so the headline is on
+   screen from the first paint. Browsers don't count text that first paints
+   at opacity 0 as the page's main content, so a fade-in headline hands
+   "largest contentful paint" to whatever shows up later (the cookie banner). */
+@keyframes rise-in-text {
+  from { transform: translateY(14px); }
+  to { transform: none; }
 }
 @keyframes house-in {
   from { opacity: 0; transform: translateY(48px) scale(1.08); }

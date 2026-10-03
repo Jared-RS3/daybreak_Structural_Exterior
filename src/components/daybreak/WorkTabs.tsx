@@ -11,7 +11,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { axButton } from "./ax";
+import { axButton, axCardTitle } from "./ax";
 
 export type WorkItem = {
   id: string;
@@ -109,7 +109,9 @@ export function WorkTabs({
   const current = picked ?? order[0];
   const pos = order.indexOf(current);
   const item = items[current];
-  const timed = canPlay && mode !== "manual";
+  /** One site (a trade page with a single concept): no tabs, arrows or timer. */
+  const single = items.length === 1;
+  const timed = canPlay && mode !== "manual" && !single;
   const running = timed && mode === "auto" && inView && !held;
 
   /** Only count down while the preview itself is on screen. */
@@ -185,7 +187,7 @@ export function WorkTabs({
     >
       <div
         ref={strip}
-        className="-mx-5 overflow-x-auto px-5 scrollbar-none sm:mx-0 sm:px-0"
+        className={cn("-mx-5 overflow-x-auto px-5 scrollbar-none sm:mx-0 sm:px-0", single && "hidden")}
       >
         <div
           role="tablist"
@@ -319,6 +321,7 @@ export function WorkTabs({
             );
           })}
 
+          {!single && (
           <button
             type="button"
             onClick={() => go(pos - 1)}
@@ -327,6 +330,8 @@ export function WorkTabs({
           >
             <Icon name="arrowRight" className="size-4 rotate-180" />
           </button>
+          )}
+          {!single && (
           <button
             type="button"
             onClick={() => go(pos + 1)}
@@ -335,11 +340,16 @@ export function WorkTabs({
           >
             <Icon name="arrowRight" className="size-4" />
           </button>
+          )}
         </div>
 
         {/* ---- The chosen site, in words ---- */}
         <div key={item.id + "-info"} className="mx-auto mt-4 max-w-xl animate-[panel-in_0.6s_var(--ease-out-expo)_both] text-center sm:mt-6">
           <p className="mono-label flex items-center justify-center gap-3 text-[12.5px] text-muted">
+            {single ? (
+              <span>{item.trade}</span>
+            ) : (
+            <>
             <button type="button" onClick={() => go(pos - 1)} aria-label="Previous site" className="flex size-9 items-center justify-center rounded-full bg-white text-fg sm:hidden">
               <Icon name="arrowRight" className="size-3.5 rotate-180" />
             </button>
@@ -374,8 +384,10 @@ export function WorkTabs({
             <button type="button" onClick={() => go(pos + 1)} aria-label="Next site" className="flex size-9 items-center justify-center rounded-full bg-white text-fg sm:hidden">
               <Icon name="arrowRight" className="size-3.5" />
             </button>
+            </>
+            )}
           </p>
-          <h3 className="font-home mt-3 text-[clamp(1.8rem,3vw,2.6rem)] font-normal leading-[1.08] tracking-[-0.03em] text-fg">
+          <h3 className={`${axCardTitle} mt-3 text-fg`}>
             {item.name}
           </h3>
           <p className="mt-3 text-[17px] leading-[1.6] text-muted">{item.blurb}</p>

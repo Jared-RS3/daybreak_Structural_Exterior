@@ -61,6 +61,7 @@ const nextConfig: NextConfig = {
       { source: "/(.*)", headers: securityHeaders },
       // Form submissions and their answers are never cached anywhere.
       { source: "/api/growth-audit", headers: [{ key: "Cache-Control", value: "no-store" }] },
+      { source: "/api/tool-lead", headers: [{ key: "Cache-Control", value: "no-store" }] },
     ];
   },
   images: {

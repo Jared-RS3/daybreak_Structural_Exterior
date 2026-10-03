@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { SystemStep } from "@/lib/daybreak";
 import { Icon } from "@/components/ui/Icon";
 import { cn } from "@/lib/utils";
-import { AxLabel, axButton } from "./ax";
+import { AxLabel, axButton, axTitle } from "./ax";
 
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 
@@ -138,7 +138,7 @@ export function SystemJourney({
         <div className="mb-8 text-center lg:col-span-6 lg:mb-14 lg:text-left">
           <h2
             id={titleId}
-            className="font-home text-[clamp(2.2rem,4.2vw,3.6rem)] font-normal leading-[1.06] tracking-[-0.03em] text-fg lg:text-[clamp(2.2rem,3.75vw,3.4rem)]"
+            className={`${axTitle} text-fg`}
           >
             {title}
           </h2>

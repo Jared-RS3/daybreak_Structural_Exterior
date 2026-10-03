@@ -60,6 +60,23 @@ export function Wordmark({
 }
 
 /**
+ * A "/#section" link stays on the current page when that section is here,
+ * so the header's main action reaches the form on whichever page has one
+ * (the agency site puts one at the foot of every sales page). Elsewhere it
+ * goes to the homepage's.
+ */
+function scrollIfHere(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+  const id = /^\/#(.+)$/.exec(href)?.[1];
+  const el = id ? document.getElementById(id) : null;
+  if (!el) return;
+  e.preventDefault();
+  history.replaceState(null, "", `#${id}`);
+  const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // After the mobile menu has closed and let go of the page's scroll lock.
+  requestAnimationFrame(() => el.scrollIntoView({ behavior: still ? "auto" : "smooth" }));
+}
+
+/**
  * Transparent over the sky, as Crest's is, then solid white once the sky has
  * scrolled away so the nav stays legible over white sections. The switch is
  * driven by a sentinel the hero places at its bottom edge
@@ -201,6 +218,7 @@ export function SiteHeader({
             <span className="hidden sm:block">
               <Link
                 href={primary.href}
+                onClick={(e) => scrollIfHere(e, primary.href)}
                 className={pillClass(clear ? "light" : "dark", "md")}
               >
                 {primary.label}
@@ -269,7 +287,10 @@ export function SiteHeader({
         >
           <Link
             href={primary.href}
-            onClick={close}
+            onClick={(e) => {
+              close();
+              scrollIfHere(e, primary.href);
+            }}
             className={cn(pillClass("dark", "lg"), "w-full")}
           >
             {primary.label}

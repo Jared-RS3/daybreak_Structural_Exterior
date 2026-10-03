@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { useId, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
+import { assess, pattern, signs, where, width, type PatternId, type SignId, type WhereId, type WidthId } from "@/lib/crack-check";
+import type { ToolLeadResult } from "@/lib/tool-lead";
 import { cn } from "@/lib/utils";
+import { ToolLeadForm, ToolLeadSent } from "./ToolLeadForm";
 
 /* ==========================================================================
    Crack & symptom checker
@@ -14,105 +17,12 @@ import { cn } from "@/lib/utils";
    answer is a severity, the usual cause, and what a fix typically costs —
    then the button that books the right visit.
 
-   Everything runs in the browser; nothing is sent anywhere. The scoring is a
-   triage rule of thumb for a demo, not an engineering assessment, and the
-   result says so.
+   The answer appears as they tap, in the browser (lib/crack-check.ts holds
+   the scoring). To keep it, they leave their details and get the report as
+   a PDF by email; that's the lead, saved to Airtable (ToolLeadForm →
+   /api/tool-lead). The scoring is a triage rule of thumb for a demo, not an
+   engineering assessment, and the result says so.
    ========================================================================== */
-
-const where = [
-  { id: "brick", label: "Brick or stone outside" },
-  { id: "drywall", label: "Inside wall or ceiling" },
-  { id: "slab", label: "Slab or garage floor" },
-  { id: "block", label: "Block or basement wall" },
-] as const;
-
-const pattern = [
-  { id: "vertical", label: "Straight up and down", score: 0 },
-  { id: "stair", label: "Stair-step or diagonal", score: 2 },
-  { id: "horizontal", label: "Horizontal, along the wall", score: 3 },
-  { id: "offset", label: "One side sits higher", score: 3 },
-] as const;
-
-const width = [
-  { id: "hair", label: "Hairline", note: "under 1/16 in", score: 0 },
-  { id: "pencil", label: "Pencil-lead wide", note: "up to 1/8 in", score: 1 },
-  { id: "nickel", label: "A nickel fits edge-on", note: "up to 1/4 in", score: 2 },
-  { id: "coin", label: "A coin slides in", note: "over 1/4 in", score: 3 },
-] as const;
-
-const signs = [
-  { id: "doors", label: "Doors or windows stick" },
-  { id: "floors", label: "Floors slope or bounce" },
-  { id: "gaps", label: "Gaps at trim or baseboards" },
-  { id: "musty", label: "Musty smell or damp crawl space" },
-  { id: "water", label: "Water pools after rain" },
-] as const;
-
-type WhereId = (typeof where)[number]["id"];
-type PatternId = (typeof pattern)[number]["id"];
-type WidthId = (typeof width)[number]["id"];
-type SignId = (typeof signs)[number]["id"];
-
-type Level = { id: "watch" | "inspect" | "soon"; label: string; line: string; tone: string; dot: string };
-
-const levels: Record<Level["id"], Level> = {
-  watch: {
-    id: "watch",
-    label: "Keep an eye on it",
-    line: "This looks like normal shrinkage or early settling. Mark both ends of the crack with a pencil and today's date. If it grows in the next three months, get it checked.",
-    tone: "bg-[#e3f4ea] text-[#1d6b3f]",
-    dot: "bg-[#2f9e5b]",
-  },
-  inspect: {
-    id: "inspect",
-    label: "Worth an inspection",
-    line: "These are signs of movement. A free inspection and elevation survey will show whether it's active, before it gets any bigger.",
-    tone: "bg-[#fff4d6] text-[#8a5a00]",
-    dot: "bg-[#e5a50a]",
-  },
-  soon: {
-    id: "soon",
-    label: "Book an inspection soon",
-    line: "Several signs point to active foundation movement. The sooner it's measured, the fewer piers it usually takes to fix.",
-    tone: "bg-[#fde7e4] text-[#a8321f]",
-    dot: "bg-[#d9482b]",
-  },
-};
-
-function assess(w: WhereId, p: PatternId, wd: WidthId, s: SignId[]) {
-  const structural = s.filter((x) => x === "doors" || x === "floors" || x === "gaps").length;
-  let score = pattern.find((x) => x.id === p)!.score + width.find((x) => x.id === wd)!.score + structural;
-  // A hairline, vertical crack in a slab is almost always curing shrinkage.
-  if (w === "slab" && p === "vertical") score -= 1;
-  // A horizontal crack in a block wall means the wall is being pushed in.
-  if (w === "block" && p === "horizontal") score += 1;
-
-  const level = score <= 1 ? levels.watch : score <= 4 ? levels.inspect : levels.soon;
-
-  const cause =
-    w === "block" && p === "horizontal"
-      ? "Soil pressure pushing the wall inward, usually from wet ground on the outside."
-      : p === "offset"
-        ? "One part of the foundation has settled more than the part beside it."
-        : p === "stair" && (w === "brick" || w === "block")
-          ? "Differential settlement: one corner of the house is dropping as the soil under it dries and shrinks."
-          : w === "drywall" && structural > 0
-            ? "The frame is racking as the foundation moves, which shows up first at door and window corners."
-            : s.includes("floors")
-              ? "Failed supports in the crawl space, like rotted shims, sinking piers or a soft sill plate."
-              : "Concrete shrinking as it cures and ages, plus normal seasonal movement.";
-
-  const fixes: { label: string; range: string }[] = [];
-  if (level.id === "watch") fixes.push({ label: "Seal and monitor", range: "$150 – $400" });
-  if (level.id === "inspect") fixes.push({ label: "If it's settlement: 4–8 piers", range: "$5,400 – $14,000" });
-  if (level.id === "soon") fixes.push({ label: "Often 8–16 piers plus drainage", range: "$10,800 – $28,000" });
-  if (w === "block" && p === "horizontal") fixes.push({ label: "Wall anchors or carbon-fiber straps", range: "$4,500 – $12,000" });
-  if (s.includes("floors")) fixes.push({ label: "Crawl space supports & re-level", range: "$2,400 – $7,500" });
-  if (s.includes("musty")) fixes.push({ label: "Crawl space encapsulation", range: "$6,500 – $15,000" });
-  if (s.includes("water")) fixes.push({ label: "Drainage & downspout extensions", range: "$1,200 – $4,800" });
-
-  return { level, cause, fixes };
-}
 
 export function CrackChecker({
   bookHref,
@@ -135,7 +45,14 @@ export function CrackChecker({
   const [wd, setWd] = useState<WidthId>("pencil");
   const [s, setS] = useState<SignId[]>(["doors"]);
 
-  const { level, cause, fixes } = assess(w, p, wd, s);
+  const answers = { where: w, pattern: p, width: wd, signs: s };
+  const { level, cause, fixes } = assess(answers);
+  // The report they asked for, and the answers it was for: change an answer
+  // and they can send the new one.
+  const [asking, setAsking] = useState(false);
+  const [sent, setSent] = useState<{ key: string; result: ToolLeadResult & { email: string } } | null>(null);
+  const key = JSON.stringify(answers);
+  const sentNow = sent?.key === key ? sent.result : null;
   const toggle = (id: SignId) => setS((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
 
   const chip = (on: boolean) =>
@@ -153,12 +70,15 @@ export function CrackChecker({
   );
 
   return (
-    <div className={cn("grid gap-2 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-2.5", className)}>
+    // Laid out by its own width (a container query), so it works in the
+    // small tools window and full screen alike.
+    <div className={cn("@container", className)}>
+    <div className="grid gap-2 @4xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] @4xl:gap-2.5">
       {/* ---- questions ---- */}
-      <div className={cn("space-y-7 bg-card p-5 sm:p-7", !sq && "rounded-[24px]")}>
+      <div className={cn("space-y-7 bg-card p-5 @lg:p-7", !sq && "rounded-[24px]")}>
         <fieldset>
           {question(1, "Where is the crack?")}
-          <div className="mt-3 grid gap-1.5 sm:grid-cols-2">
+          <div className="mt-3 grid gap-1.5 @lg:grid-cols-2">
             {where.map((o) => (
               <button key={o.id} type="button" aria-pressed={w === o.id} onClick={() => setW(o.id)} className={chip(w === o.id)}>
                 {o.label}
@@ -169,7 +89,7 @@ export function CrackChecker({
 
         <fieldset>
           {question(2, "What does it look like?")}
-          <div className="mt-3 grid gap-1.5 sm:grid-cols-2">
+          <div className="mt-3 grid gap-1.5 @lg:grid-cols-2">
             {pattern.map((o) => (
               <button key={o.id} type="button" aria-pressed={p === o.id} onClick={() => setP(o.id)} className={chip(p === o.id)}>
                 {o.label}
@@ -180,7 +100,7 @@ export function CrackChecker({
 
         <fieldset>
           {question(3, "How wide is it at the widest point?")}
-          <div className="mt-3 grid gap-1.5 sm:grid-cols-2">
+          <div className="mt-3 grid gap-1.5 @lg:grid-cols-2">
             {width.map((o) => (
               <button key={o.id} type="button" aria-pressed={wd === o.id} onClick={() => setWd(o.id)} className={chip(wd === o.id)}>
                 <span>
@@ -221,7 +141,7 @@ export function CrackChecker({
       <div
         aria-live="polite"
         aria-labelledby={`${uid}-result`}
-        className={cn("flex flex-col bg-white p-6 sm:p-8", sq ? "border border-rule" : "rounded-[24px] border border-line")}
+        className={cn("flex flex-col bg-white p-6 @lg:p-8", sq ? "border border-rule" : "rounded-[24px] border border-line")}
       >
         <p className="text-[14px] text-muted">Our read</p>
         <p
@@ -253,7 +173,7 @@ export function CrackChecker({
           </div>
         </dl>
 
-        <div className="mt-6 flex flex-col gap-2 pt-1 sm:flex-row lg:mt-auto">
+        <div className="mt-6 flex flex-col gap-2 pt-1 @lg:flex-row @4xl:mt-auto">
           {bookHref && (
             <Link
               href={`${bookHref}${bookHref.includes("?") ? "&" : "?"}problem=cracks`}
@@ -279,11 +199,42 @@ export function CrackChecker({
             </a>
           )}
         </div>
+        <div className="mt-5 border-t border-line pt-5">
+          {sentNow ? (
+            <ToolLeadSent result={sentNow} />
+          ) : asking ? (
+            <>
+              <p className="mb-4 text-[15px] font-medium text-fg">Get this report as a PDF</p>
+              <ToolLeadForm
+                tool="crack"
+                payload={() => ({ answers })}
+                submitLabel="Email me the report"
+                onDone={(result) => {
+                  setSent({ key, result });
+                  setAsking(false);
+                }}
+              />
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setAsking(true)}
+              className={cn(
+                "inline-flex h-12 w-full items-center justify-center gap-2 border border-fg/25 px-5 text-[15px] font-medium text-fg transition-colors hover:border-fg",
+                !sq && "rounded-full",
+              )}
+            >
+              <Icon name="document" className="size-4" />
+              Email me this report
+            </button>
+          )}
+        </div>
         <p className="mt-4 text-[12.5px] leading-snug text-muted">
           A rule of thumb from what you told us, not an engineering assessment. The inspection is free and gives you the
           real answer in writing.
         </p>
       </div>
+    </div>
     </div>
   );
 }

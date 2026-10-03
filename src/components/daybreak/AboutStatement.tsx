@@ -2,6 +2,7 @@ import { Img } from "@/components/ui/Img";
 import { ScrollText } from "@/components/motion/ScrollText";
 import { RollingNumber } from "@/components/motion/RollingNumber";
 import { ZoomIn } from "@/components/motion/ZoomIn";
+import { offer } from "@/lib/daybreak";
 import { AxButton, AxLabel } from "./ax";
 
 /**
@@ -56,7 +57,7 @@ export function AboutStatement({
               className="font-home text-[clamp(1.7rem,2.9vw,2.75rem)] font-normal leading-[1.32] tracking-[-0.02em] text-fg"
             />
             <div className="mt-10 flex flex-wrap gap-2">
-              <AxButton href={offerHref}>Get a free homepage concept</AxButton>
+              <AxButton href={offerHref}>{offer.cta}</AxButton>
               <AxButton href="#work" variant="line">
                 See our work
               </AxButton>

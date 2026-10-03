@@ -356,7 +356,7 @@ export function DesignForm() {
               Sending
             </>
           ) : (
-            offer.cta
+            offer.submit
           )}
         </button>
         {/* <p className="text-[14.5px] text-muted">Takes a minute. Free, no obligation.</p> */}
