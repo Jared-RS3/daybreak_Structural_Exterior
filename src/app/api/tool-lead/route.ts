@@ -8,7 +8,8 @@ import {
   updateAirtableRecord,
   uploadAirtableAttachment,
 } from "@/lib/server/airtable";
-import { emailConfigured, escapeHtml, sendEmail } from "@/lib/server/email";
+import { emailConfigured, sendEmail } from "@/lib/server/email";
+import { quoteEmail } from "@/lib/server/quote-email";
 import { checkFormToken, issueFormToken } from "@/lib/server/form-token";
 import { renderQuotePdf, type QuoteDoc } from "@/lib/server/quote-pdf";
 import { clientIp, isSameOrigin, rateLimit } from "@/lib/server/rate-limit";
@@ -187,7 +188,7 @@ export async function POST(request: Request) {
   let status = "Not set up";
   if (emailConfigured()) {
     try {
-      await sendEmail({ to: contact.email, ...emailFor(doc), attachments: [{ filename, bytes: pdf }] });
+      await sendEmail({ to: contact.email, ...quoteEmail(doc), attachments: [{ filename, bytes: pdf }] });
       emailed = true;
       status = "Sent";
     } catch (err) {
@@ -207,32 +208,4 @@ export async function POST(request: Request) {
     emailed,
     pdf: Buffer.from(pdf).toString("base64"),
   } satisfies ToolLeadResult);
-}
-
-/** The email that carries the PDF: short, plain, the answer in the subject. */
-function emailFor(doc: QuoteDoc) {
-  const first = doc.contact.name.split(" ")[0];
-  const headline =
-    doc.kind === "estimate"
-      ? `Your ballpark estimate is ${usd(doc.low)} – ${usd(doc.high)}.`
-      : `Our read on your crack: ${doc.level.label.toLowerCase()}.`;
-  const subject =
-    doc.kind === "estimate"
-      ? `Your repair estimate: ${usd(doc.low)} – ${usd(doc.high)}`
-      : `Your crack check report: ${doc.level.label}`;
-  const body = [
-    `Hi ${first},`,
-    headline,
-    `Your full ${doc.kind === "estimate" ? "estimate" : "report"} is attached as a PDF (reference ${doc.reference}). The exact answer comes from a free, no-obligation inspection, and a specialist will be in touch to book it.`,
-    "This came from a live tool on a Daybreak Structure-Works demo site, so the prices are samples. On a contractor's own site, it carries their logo, prices and phone number.",
-  ];
-  const html = `<div style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.6;color:#1c1c1c;max-width:560px">
-<div style="background:#1c1c1c;color:#fff;padding:18px 22px;font-weight:bold;font-size:16px;border-bottom:4px solid #fcc600">Daybreak Structure-Works</div>
-<div style="padding:22px">
-<p>${escapeHtml(body[0])}</p>
-<p style="font-size:20px;line-height:1.35;margin:18px 0">${escapeHtml(body[1])}</p>
-<p>${escapeHtml(body[2])}</p>
-<p style="color:#68686d;font-size:13px;border-top:1px solid #dcdcdc;padding-top:14px;margin-top:22px">${escapeHtml(body[3])}</p>
-</div></div>`;
-  return { subject, html, text: body.join("\n\n") };
 }

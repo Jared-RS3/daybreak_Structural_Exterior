@@ -1,11 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
+import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 /* ==========================================================================
    The live tools, as a launcher in the corner of every sales page.
@@ -21,14 +21,21 @@ import { cn } from "@/lib/utils";
    The tools' code loads the first time the window opens, not with the page.
    ========================================================================== */
 
-const CrackChecker = dynamic(() => import("@/components/tools/CrackChecker").then((m) => m.CrackChecker), {
-  ssr: false,
-  loading: () => <Loading />,
-});
-const RepairEstimator = dynamic(() => import("@/components/tools/RepairEstimator").then((m) => m.RepairEstimator), {
-  ssr: false,
-  loading: () => <Loading />,
-});
+const CrackChecker = dynamic(
+  () => import("@/components/tools/CrackChecker").then((m) => m.CrackChecker),
+  {
+    ssr: false,
+    loading: () => <Loading />,
+  },
+);
+const RepairEstimator = dynamic(
+  () =>
+    import("@/components/tools/RepairEstimator").then((m) => m.RepairEstimator),
+  {
+    ssr: false,
+    loading: () => <Loading />,
+  },
+);
 
 type Tab = "checker" | "estimate";
 export type PageTools = { checker: boolean; focus?: string };
@@ -99,7 +106,9 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
     const hash = window.location.hash;
     const frame =
       hash === "#tools" || hash === "#estimate"
-        ? requestAnimationFrame(() => show(hash === "#tools" ? "checker" : "estimate", "url"))
+        ? requestAnimationFrame(() =>
+            show(hash === "#tools" ? "checker" : "estimate", "url"),
+          )
         : 0;
     return () => {
       document.removeEventListener("click", onClick, true);
@@ -118,7 +127,10 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
     try {
       if (sessionStorage.getItem(big ? CLOSED_KEY : TEASER_KEY)) return;
     } catch {}
-    const t = window.setTimeout(() => (big ? show(undefined, "auto") : setTeaser(true)), big ? AUTO_OPEN_MS : TEASER_MS);
+    const t = window.setTimeout(
+      () => (big ? show(undefined, "auto") : setTeaser(true)),
+      big ? AUTO_OPEN_MS : TEASER_MS,
+    );
     return () => window.clearTimeout(t);
     // `show` only sets state and reads stable values; re-binding per render isn't needed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -129,7 +141,8 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
     if (!open) return;
     if (!auto.current) panel.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !document.querySelector("dialog[open]")) close();
+      if (e.key === "Escape" && !document.querySelector("dialog[open]"))
+        close();
     };
     window.addEventListener("keydown", onKey);
     if (full) document.body.style.overflow = "hidden";
@@ -170,12 +183,18 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
               <span aria-hidden className="size-2 rounded-full bg-[#2f9e5b]" />
               Live tools
             </p>
-            <button type="button" onClick={dismissTeaser} aria-label="Dismiss" className="-mr-1.5 -mt-1.5 p-1.5">
+            <button
+              type="button"
+              onClick={dismissTeaser}
+              aria-label="Dismiss"
+              className="-mr-1.5 -mt-1.5 p-1.5"
+            >
               <Icon name="close" className="size-4" />
             </button>
           </div>
           <p className="font-home mt-2 text-[1.2rem] leading-snug tracking-[-0.01em]">
-            Click a house to price a repair, or find out how serious a crack is. Exactly what your customers would use.
+            Tap on the house diagram to estimate a repair, or check how serious
+            a crack might be — just like your customers would.
           </p>
           <div className="mt-3 grid grid-cols-2 gap-1.5">
             <button
@@ -202,7 +221,12 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
 
       {/* ---- The button ---- */}
       {!full && (
-        <div className={cn("fixed bottom-5 right-4 z-[60] flex items-center gap-3 sm:right-6", open && "max-sm:hidden")}>
+        <div
+          className={cn(
+            "fixed bottom-5 right-4 z-[60] flex items-center gap-3 sm:right-6",
+            open && "max-sm:hidden",
+          )}
+        >
           {!open && !teaser && (
             <button
               type="button"
@@ -218,11 +242,18 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
             onClick={() => (open ? close() : show(undefined, "button"))}
             aria-expanded={open}
             aria-controls="live-tools"
-            aria-label={open ? "Close the live tools" : "Open the live tools: house estimator and crack checker"}
+            aria-label={
+              open
+                ? "Close the live tools"
+                : "Open the live tools: house estimator and crack checker"
+            }
             className="relative flex size-16 items-center justify-center rounded-full bg-sun text-fg shadow-[0_14px_34px_-10px_rgb(0_0_0/0.55)] transition-transform hover:scale-105"
           >
             {!open && (
-              <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-sun opacity-40 motion-reduce:hidden" />
+              <span
+                aria-hidden
+                className="absolute inset-0 animate-ping rounded-full bg-sun opacity-40 motion-reduce:hidden"
+              />
             )}
             <Icon name={open ? "close" : "crack"} className="relative size-7" />
             {/* Phones: a small label just above the circle. */}
@@ -271,11 +302,26 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
                     setFull(!full);
                     if (!full) track("tools_expand", { tool: tab });
                   }}
-                  aria-label={full ? "Back to the small window" : "Expand to full screen"}
+                  aria-label={
+                    full ? "Back to the small window" : "Expand to full screen"
+                  }
                   className="flex size-9 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                 >
-                  <svg viewBox="0 0 24 24" aria-hidden className="size-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    {full ? <path d="M9 4v5H4M15 20v-5h5M20 9h-5V4M4 15h5v5" /> : <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5" />}
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden
+                    className="size-4.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    {full ? (
+                      <path d="M9 4v5H4M15 20v-5h5M20 9h-5V4M4 15h5v5" />
+                    ) : (
+                      <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5" />
+                    )}
                   </svg>
                 </button>
                 <button
@@ -289,7 +335,11 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
               </div>
             </div>
             {tabs.length > 1 && (
-              <div role="tablist" aria-label="Live tools" className="mt-3 flex gap-1 bg-white/10 p-1">
+              <div
+                role="tablist"
+                aria-label="Live tools"
+                className="mt-3 flex gap-1 bg-white/10 p-1"
+              >
                 {tabs.map((t) => (
                   <button
                     key={t}
@@ -300,7 +350,9 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
                     onClick={() => setPicked(t)}
                     className={cn(
                       "mono-label flex-1 px-3 py-2.5 text-[11.5px] transition-colors",
-                      tab === t ? "bg-white text-fg" : "text-white/75 hover:text-white",
+                      tab === t
+                        ? "bg-white text-fg"
+                        : "text-white/75 hover:text-white",
                     )}
                   >
                     {t === "checker" ? "Crack checker" : "House estimator"}
@@ -317,10 +369,14 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
             )}
             {/* To the contractor trying it: the PDF is the part worth seeing. */}
             <p className="mt-3 flex items-start gap-2 text-[13px] leading-snug text-white/85">
-              <Icon name="document" className="mt-px size-4 shrink-0 text-sun" />
+              <Icon
+                name="document"
+                className="mt-px size-4 shrink-0 text-sun"
+              />
               <span>
-                Try it as a homeowner would: finish {tab === "checker" ? "the check" : "an estimate"} and we&rsquo;ll email
-                you the PDF.
+                Try it as a homeowner would: finish{" "}
+                {tab === "checker" ? "the check" : "an estimate"} and
+                we&rsquo;ll email you the PDF.
               </span>
             </p>
           </div>
@@ -328,14 +384,26 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-2 sm:px-3 sm:pb-3">
             <div className={cn(full && "mx-auto max-w-6xl")}>
               {page.checker && (
-                <div id="live-tools-checker" role="tabpanel" hidden={tab !== "checker"}>
+                <div
+                  id="live-tools-checker"
+                  role="tabpanel"
+                  hidden={tab !== "checker"}
+                >
                   <CrackChecker shape="square" />
                 </div>
               )}
-              <div id="live-tools-estimate" role="tabpanel" hidden={tab !== "estimate"}>
+              <div
+                id="live-tools-estimate"
+                role="tabpanel"
+                hidden={tab !== "estimate"}
+              >
                 <RepairEstimator
                   focus={page.focus}
-                  cta={{ href: "/#free-design", label: "Get this on your site", onClick: toForm }}
+                  cta={{
+                    href: "/#free-design",
+                    label: "Get this on your site",
+                    onClick: toForm,
+                  }}
                 />
               </div>
             </div>
@@ -347,5 +415,9 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
 }
 
 function Loading() {
-  return <div className="flex h-60 items-center justify-center text-[13px] text-white/60">Loading the tool…</div>;
+  return (
+    <div className="flex h-60 items-center justify-center text-[13px] text-white/60">
+      Loading the tool…
+    </div>
+  );
 }
