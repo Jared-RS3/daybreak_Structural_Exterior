@@ -31,10 +31,10 @@ import { NextResponse } from "next/server";
  *      the numbers are always the site's own;
  *   3. draws the PDF (lib/server/quote-pdf.ts), and in development saves a
  *      copy to ./quotes;
- *   4. saves the lead as a row in Airtable, then puts the PDF in its
- *      "Quote PDF" column. Nothing is emailed for a lead that wasn't saved;
- *   5. emails the PDF to the homeowner (lib/server/email.ts) and records on
- *      the row whether it went;
+ *   4. saves the lead as a row in Airtable. Nothing is emailed for a lead
+ *      that wasn't saved;
+ *   5. emails the PDF to the homeowner (lib/server/email.ts) while putting
+ *      it in the row's "Quote PDF" column, then records whether it went;
  *   6. hands the PDF back, so the visitor can download it there and then.
  *
  * With Airtable not configured (local development), the lead goes to the
@@ -181,17 +181,18 @@ export async function POST(request: Request) {
       console.error("[tool-lead] Airtable write failed", err, fields);
       return fail(502, "We couldn't save that. Please try again.");
     }
-    try {
-      await uploadAirtableAttachment(recordId, PDF_FIELD, { bytes: pdf, filename, contentType: "application/pdf" });
-    } catch (err) {
-      // The lead is saved; the PDF can be made again from the row's answers.
-      console.error("[tool-lead] PDF upload to Airtable failed", reference, err);
-    }
   } else {
     console.warn("[tool-lead] Airtable is not configured — lead captured to log only:", fields);
   }
 
-  // ---- 5. The email ----
+  // ---- 5. The email, alongside the PDF upload to the row ----
+  // Neither waits on the other, so the visitor waits for the slower of the two.
+  const upload = recordId
+    ? uploadAirtableAttachment(recordId, PDF_FIELD, { bytes: pdf, filename, contentType: "application/pdf" }).catch(
+        // The lead is saved; the PDF can be made again from the row's answers.
+        (err) => console.error("[tool-lead] PDF upload to Airtable failed", reference, err),
+      )
+    : null;
   let emailed = false;
   let status = "Not set up";
   if (emailConfigured()) {
@@ -205,9 +206,12 @@ export async function POST(request: Request) {
     }
   }
   if (recordId) {
-    await updateAirtableRecord(TABLE(), recordId, { "Email status": status }).catch((err) =>
-      console.error("[tool-lead] Couldn't record the email status", reference, err),
-    );
+    await Promise.all([
+      upload,
+      updateAirtableRecord(TABLE(), recordId, { "Email status": status }).catch((err) =>
+        console.error("[tool-lead] Couldn't record the email status", reference, err),
+      ),
+    ]);
   }
 
   return NextResponse.json({

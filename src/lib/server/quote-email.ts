@@ -1,5 +1,6 @@
 import "server-only";
 import { agency } from "@/lib/agency";
+import { bookingHref } from "@/lib/daybreak";
 import { siteUrl } from "@/lib/seo";
 import { escapeHtml } from "./email";
 import type { QuoteDoc } from "./quote-pdf";
@@ -130,7 +131,7 @@ ${label("What happens next")}
 
 <tr><td style="padding:0 28px 28px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px dashed ${rule}"><tr><td style="padding:16px 18px;font-family:${sans};font-size:13px;line-height:1.55;color:${muted}">
-<strong style="color:${ink}">This is a live demo.</strong> It came from a tool on a Daybreak Structure-Works demo site, so the prices are samples. On a contractor's own site, it carries their logo, prices and phone number. <a href="${e(`${siteUrl}/#free-design`)}" style="color:${ink};font-weight:bold">See it for your company &rarr;</a>
+<strong style="color:${ink}">This is a live demo.</strong> It came from a tool on a Daybreak Structure-Works demo site, so the prices are samples. On a contractor's own site, it carries their logo, prices and phone number. <a href="${e(bookingHref)}" style="color:${ink};font-weight:bold">See it for your company &rarr;</a>
 </td></tr></table>
 </td></tr>
 

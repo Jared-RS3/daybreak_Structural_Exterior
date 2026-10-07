@@ -1,7 +1,7 @@
 "use client";
 
 import { Icon } from "@/components/ui/Icon";
-import { cn } from "@/lib/utils";
+import { cn, newTab } from "@/lib/utils";
 import Link from "next/link";
 import {
   useEffect,
@@ -402,7 +402,7 @@ export function WorkTabs({
                 Open the live site
               </Link>
             ) : (
-              <Link href={offerHref} className={axButton("dark")}>
+              <Link href={offerHref} className={axButton("dark")} {...newTab(offerHref)}>
                 Get a site like this
               </Link>
             )}

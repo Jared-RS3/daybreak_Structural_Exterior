@@ -44,12 +44,10 @@ export const daybreak = {
   wordmark: agency.name,
   descriptor: "",
   email: agency.email,
-  /** The free concept is asked for on the short form (#free-design, at the
-      foot of every sales page), which then hands off to the booking calendar
-      with the visitor's details filled in. Asking on the form first means a
-      lead who never books still reaches the Airtable base. The header moves
-      to the form on the current page when there is one (SiteHeader). */
-  offerHref: "/#free-design",
+  /** Every call-to-action opens the booking calendar directly. The short
+      form (#free-design) stays at the foot of every sales page for anyone
+      who scrolls to it, but no button leads there. */
+  offerHref: bookingHref,
 };
 
 /**
@@ -104,7 +102,7 @@ export const founderNote =
  */
 export const offer = {
   label: "Free call + homepage concept",
-  /** Every button that leads to the form. It says what happens (a call); the
+  /** Every button that opens the booking calendar. It says what happens (a call); the
       free concept is the reason to book it, said beside the button. */
   cta: "Book my free call",
   /** The form's own button: the calendar comes next, so it says so. */

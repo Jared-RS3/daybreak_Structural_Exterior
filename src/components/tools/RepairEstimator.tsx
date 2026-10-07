@@ -1,9 +1,9 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { Img } from "@/components/ui/Img";
-import { cn } from "@/lib/utils";
+import { cn, newTab } from "@/lib/utils";
 import { areas, categories, defaultQty, itemsById, priceEstimate, sceneImages, type Area, type Hotspot } from "@/lib/estimator";
 import type { ToolLeadResult } from "@/lib/tool-lead";
 import { HouseScene, scenes } from "./EstimatorScenes";
@@ -55,6 +55,9 @@ export function RepairEstimator({
   const [step, setStep] = useState<"form" | "result">("form");
   const [sent, setSent] = useState<(ToolLeadResult & { email: string }) | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
+  /** The card a number opens: over the picture on wide layouts, under it on narrow ones. */
+  const cardOver = useRef<HTMLDivElement>(null);
+  const cardUnder = useRef<HTMLDivElement>(null);
 
   const area = areas.find((a) => a.id === areaId) ?? null;
   const Scene = area ? scenes[area.id] : HouseScene;
@@ -85,6 +88,19 @@ export function RepairEstimator({
       document.getElementById(`${uid}-${h.item}`)?.scrollIntoView({ block: "center", behavior: still() ? "auto" : "smooth" }),
     );
   };
+
+  // A number opens its card; bring the card, and its "get pricing" button,
+  // into view. Under the picture on a phone it would otherwise open below
+  // the fold, and the tap would seem to do nothing. Already in view: no scroll.
+  useEffect(() => {
+    if (spot === null) return;
+    const frame = requestAnimationFrame(() =>
+      [cardOver.current, cardUnder.current]
+        .find((el) => el && el.offsetParent !== null)
+        ?.scrollIntoView({ block: "nearest", behavior: still() ? "auto" : "smooth" }),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [areaId, spot]);
 
   const reset = () => {
     setPicked({});
@@ -188,6 +204,7 @@ export function RepairEstimator({
 
           {active && (
             <div
+              ref={cardOver}
               className="absolute z-30 hidden w-[17rem] -translate-x-1/2 @xl:block"
               style={{
                 left: `clamp(8.75rem, ${active.x}%, calc(100% - 8.75rem))`,
@@ -219,7 +236,7 @@ export function RepairEstimator({
           })}
         </ol>
         {active && (
-          <div className="mt-2 @xl:hidden">
+          <div ref={cardUnder} className="mt-2 scroll-mb-4 @xl:hidden">
             <SpotCard h={active} added={active.item in picked} onPrice={() => price(active)} onClose={() => setSpot(null)} />
           </div>
         )}
@@ -492,6 +509,7 @@ export function RepairEstimator({
                 {cta && (
                   <a
                     href={cta.href}
+                    {...newTab(cta.href)}
                     onClick={(e) => {
                       dialog.current?.close();
                       cta.onClick?.(e);

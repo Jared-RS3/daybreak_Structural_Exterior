@@ -1,4 +1,5 @@
 import { AxLabel } from "@/components/daybreak/ax";
+import { bookingHref } from "@/lib/daybreak";
 import { RepairEstimator } from "@/components/tools/RepairEstimator";
 import { categories } from "@/lib/estimator";
 import { openGraphDefaults } from "@/lib/seo";
@@ -52,7 +53,7 @@ export default async function EstimatorPage({
         <div className="mt-10 lg:mt-12">
           <RepairEstimator
             focus={section}
-            cta={{ href: "/#free-design", label: "Get this on your site" }}
+            cta={{ href: bookingHref, label: "Get this on your site" }}
           />
         </div>
       </div>

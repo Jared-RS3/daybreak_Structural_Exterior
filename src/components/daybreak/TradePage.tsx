@@ -10,6 +10,7 @@ import { ToolPrompt } from "@/components/daybreak/ToolPrompt";
 import { WorkShowcase } from "@/components/daybreak/WorkShowcase";
 import { Img } from "@/components/ui/Img";
 import {
+  bookingHref,
   daybreak,
   estimateFollowUp,
   liveRun,
@@ -19,8 +20,8 @@ import {
 } from "@/lib/daybreak";
 import { jsonLd, tradePageStructuredData } from "@/lib/structured-data";
 
-/** Every ask on a trade page goes to the form at its foot. */
-const formHref = "#free-design";
+/** Every ask opens the booking calendar; the form stays at the foot. */
+const formHref = bookingHref;
 
 /**
  * One trade's landing page, for the contractor who searched for their own

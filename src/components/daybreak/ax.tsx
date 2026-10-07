@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, newTab } from "@/lib/utils";
 import { Reveal } from "@/components/ui/Reveal";
 
 /* ==========================================================================
@@ -134,7 +134,7 @@ export function AxButton({
     );
   }
   return (
-    <Link href={href} className={cls}>
+    <Link href={href} className={cls} {...newTab(href)}>
       {children}
     </Link>
   );

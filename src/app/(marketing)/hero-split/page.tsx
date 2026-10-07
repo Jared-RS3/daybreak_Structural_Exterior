@@ -7,7 +7,6 @@ import { Icon } from "@/components/ui/Icon";
 import { founders } from "@/lib/agency";
 import {
   about,
-  bookingHref,
   daybreak,
   heroPromises,
   heroTrust,
@@ -38,10 +37,6 @@ export default function HeroSplitPreview() {
             <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               <PillLink href={daybreak.offerHref} variant="light" size="lg">
                 {offer.cta}
-              </PillLink>
-              <PillLink href={bookingHref} variant="glass" size="lg">
-                <Icon name="calendar" className="size-4.5" />
-                Book a call
               </PillLink>
             </div>
             {/* Phones skip the list so the house reaches the first screen; the

@@ -2,7 +2,7 @@
 
 import { Icon } from "@/components/ui/Icon";
 import type { Cta } from "@/lib/template/types";
-import { cn } from "@/lib/utils";
+import { cn, newTab } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -219,6 +219,7 @@ export function SiteHeader({
               <Link
                 href={primary.href}
                 onClick={(e) => scrollIfHere(e, primary.href)}
+                {...newTab(primary.href)}
                 className={pillClass(clear ? "light" : "dark", "md")}
               >
                 {primary.label}
@@ -291,6 +292,7 @@ export function SiteHeader({
               close();
               scrollIfHere(e, primary.href);
             }}
+            {...newTab(primary.href)}
             className={cn(pillClass("dark", "lg"), "w-full")}
           >
             {primary.label}

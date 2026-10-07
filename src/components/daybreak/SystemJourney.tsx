@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { SystemStep } from "@/lib/daybreak";
 import { Icon } from "@/components/ui/Icon";
-import { cn } from "@/lib/utils";
+import { cn, newTab } from "@/lib/utils";
 import { AxLabel, axButton, axTitle } from "./ax";
 
 const pad = (i: number) => String(i + 1).padStart(2, "0");
@@ -292,7 +292,7 @@ export function SystemJourney({
           From a Google search to a signed job.
         </p>
         <div className="flex shrink-0 flex-wrap gap-2">
-          <Link href={end.href} className={axButton("light")}>
+          <Link href={end.href} className={axButton("light")} {...newTab(end.href)}>
             {end.label}
           </Link>
           {live && (

@@ -20,6 +20,7 @@ import {
 } from "@/components/daybreak/SystemScenes";
 import {
   beforeAfter,
+  bookingHref,
   daybreak,
   estimateFollowUp,
   integrations,
@@ -36,8 +37,8 @@ import { howItWorksStructuredData, jsonLd } from "@/lib/structured-data";
 import type { Metadata } from "next";
 
 const title = "How it works";
-/** Every ask on this page goes to the form at its foot. */
-const formHref = "#free-design";
+/** Every ask opens the booking calendar; the form stays at the foot. */
+const formHref = bookingHref;
 const description =
   "How a Daybreak website and the lead system behind it turn more of a foundation, crawl space or siding contractor's leads into booked inspections and signed jobs, from the first reply to the estimate follow-up.";
 

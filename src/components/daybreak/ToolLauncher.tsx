@@ -2,6 +2,7 @@
 
 import { Icon } from "@/components/ui/Icon";
 import { track } from "@/lib/analytics";
+import { bookingHref } from "@/lib/daybreak";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
@@ -159,15 +160,6 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
     try {
       sessionStorage.setItem(TEASER_KEY, "dismissed");
     } catch {}
-  };
-
-  /** The estimate's last button goes to the form on this page, or the homepage's. */
-  const toForm = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    const form = document.getElementById("free-design");
-    close();
-    if (!form) return;
-    e.preventDefault();
-    form.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -400,9 +392,9 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
                 <RepairEstimator
                   focus={page.focus}
                   cta={{
-                    href: "/#free-design",
+                    href: bookingHref,
                     label: "Get this on your site",
-                    onClick: toForm,
+                    onClick: close,
                   }}
                 />
               </div>
