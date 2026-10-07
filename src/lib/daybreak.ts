@@ -105,8 +105,8 @@ export const offer = {
   /** Every button that opens the booking calendar. It says what happens (a call); the
       free concept is the reason to book it, said beside the button. */
   cta: "Book my free call",
-  /** The form's own button: the calendar comes next, so it says so. */
-  submit: "Next: pick a time",
+  /** The form's own button: it just sends; we reply to set up the call. */
+  submit: "Send my request",
   includes: [
     "A call with both founders",
     "A concept of your homepage",
@@ -118,7 +118,7 @@ export const offer = {
   /** The form section at the foot of every sales page. */
   formTitle: "Book your free call.",
   formLede:
-    "Answer a few quick questions about your business, then pick a time. We'll design a concept of your new homepage, with your logo, services and towns, and show it to you on the call. No cost, no obligation.",
+    "Answer a few quick questions about your business, and we'll be in touch within one business day to set up a call. We'll design a concept of your new homepage, with your logo, services and towns, and show it to you on the call. No cost, no obligation.",
 };
 
 /**

@@ -2,7 +2,7 @@
 
 import { Icon } from "@/components/ui/Icon";
 import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
-import { bookingHref, offer } from "@/lib/daybreak";
+import { offer } from "@/lib/daybreak";
 import {
   jobValues,
   jobVolumes,
@@ -61,42 +61,17 @@ export function DesignForm() {
   }, []);
 
   if (state === "sent" && sent) {
-    const book = new URL(bookingHref);
-    book.searchParams.set("name", sent.name);
-    book.searchParams.set("email", sent.email);
-    book.searchParams.set(
-      "notes",
-      [
-        sent.company,
-        sent.trade === "Other" && sent.services ? sent.services : sent.trade,
-        sent.area,
-      ].join(" · "),
-    );
     return (
       <div role="status" className="bg-white py-4 text-left">
         <span className="flex size-10 items-center justify-center rounded-full bg-[#e3f1e8] text-[#1d6b3f]">
           <Icon name="check" className="size-5" />
         </span>
         <p className="home-title mt-5 text-[24px] text-fg">
-          Thanks, {sent.name.split(" ")[0]}. Last step: pick a time for your
-          call.
+          Thanks, {sent.name.split(" ")[0]}. We&rsquo;ve got your request.
         </p>
         <p className="mt-2 max-w-lg text-[17px] leading-[1.6] text-muted">
-          On the call we&rsquo;ll walk you through a concept of {sent.company}
-          &rsquo;s new homepage and answer your questions. There&rsquo;s nothing
-          to pay.
-        </p>
-        <a
-          href={book.toString()}
-          target="_blank"
-          rel="noopener"
-          className="mono-label mt-7 inline-flex h-12 items-center justify-center gap-2.5 bg-fg px-6 text-white transition-colors hover:bg-[#333]"
-        >
-          <Icon name="calendar" className="size-4" />
-          Pick a time
-        </a>
-        <p className="mt-4 text-[15px] text-muted">
-          Can&rsquo;t pick one now? We&rsquo;ll contact you {offer.reply}.
+          We&rsquo;ll be in touch {offer.reply} to set up a call, where we walk you through a concept of {sent.company}
+          &rsquo;s new homepage and answer your questions. There&rsquo;s nothing to pay.
         </p>
       </div>
     );

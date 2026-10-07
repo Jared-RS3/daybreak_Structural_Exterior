@@ -36,8 +36,8 @@ export const metadata: Metadata = {
  * misrepresentation rather than an omission.
  *
  * Where the data goes, as of this version: the concept form posts to
- * /api/growth-audit, which writes to Airtable; "Pick a time" opens Cal.com
- * with the name, email and a note filled in (DesignForm.tsx); town
+ * /api/growth-audit, which writes to Airtable; the "Book my free call" links
+ * open Cal.com (nothing is passed to it from the form); town
  * suggestions come from /api/places on this server; the form's consent box
  * is saved as "POPIA Agreement". One fact is a practice rather than code:
  * calls use an AI note-taker, announced at the start of each call. Add a new
@@ -133,8 +133,6 @@ export default function PrivacyPage() {
           <strong>2. Booking a call.</strong> Our booking calendar is run by Cal.com. When
           you pick a time you leave this site, and what you enter on the booking page —
           your name, email, any notes and the time you choose — goes to Cal.com and to us.
-          If you arrive there from the form, the link fills in your name, email and a
-          short note (your company, trade and town) so you do not have to type them twice.
         </p>
         <p className="pt-1 text-ink-900">
           <strong>3. Emails and calls.</strong> If you email us or speak to us, we have

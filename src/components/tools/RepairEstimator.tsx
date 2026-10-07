@@ -137,7 +137,7 @@ export function RepairEstimator({
 
   const marker = (on: boolean) =>
     cn(
-      "flex size-7 items-center justify-center text-[12.5px] font-medium tabular-nums shadow-[0_4px_14px_-4px_rgb(0_0_0/0.5)] transition-colors",
+      "flex size-5 items-center justify-center text-[10px] font-medium tabular-nums @xl:size-7 @xl:text-[12.5px] shadow-[0_4px_14px_-4px_rgb(0_0_0/0.5)] transition-colors",
       on ? "bg-sun text-fg" : "bg-fg text-white hover:bg-sun hover:text-fg",
     );
   // Each problem's name beside its number: tiny in the side window and on a
@@ -205,10 +205,11 @@ export function RepairEstimator({
                     onClick={() => tap(i)}
                     aria-expanded={spot === i}
                     aria-label={`${i + 1}. ${h.label}`}
-                    className={cn(marker(on), "absolute z-20 -translate-x-1/2 -translate-y-1/2")}
+                    // Small on a phone, so an invisible margin keeps it easy to tap.
+                    className={cn(marker(on), "absolute z-20 -translate-x-1/2 -translate-y-1/2 before:absolute before:-inset-2.5 before:content-['']")}
                     style={{ left: `${h.x}%`, top: `${h.y}%` }}
                   >
-                    {h.item in picked ? <Icon name="check" className="size-3.5" /> : i + 1}
+                    {h.item in picked ? <Icon name="check" className="size-3 @xl:size-3.5" /> : i + 1}
                   </button>
                 </div>
               );
