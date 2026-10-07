@@ -64,8 +64,8 @@ export const categories: RepairCategory[] = [
         symptom: "Stair-step cracks, sticking doors",
         fix: "Push piers",
         note: "Per pier.",
-        low: 1300,
-        high: 1700,
+        low: 1400,
+        high: 1600,
         unit: "piers",
         question: "How much of the house is settling?",
         sizes: [
@@ -81,8 +81,8 @@ export const categories: RepairCategory[] = [
         symptom: "A sinking or dropped corner",
         fix: "Helical piers",
         note: "Per pier. For lighter loads and wet soil.",
-        low: 1500,
-        high: 2100,
+        low: 1650,
+        high: 1950,
         unit: "piers",
         question: "How much of the house is sinking?",
         sizes: [
@@ -98,8 +98,8 @@ export const categories: RepairCategory[] = [
         symptom: "Bowing or leaning basement wall",
         fix: "Wall anchors",
         note: "Per anchor, about every 5 feet of wall.",
-        low: 800,
-        high: 1200,
+        low: 900,
+        high: 1100,
         unit: "anchors",
         question: "How much of the wall is bowing?",
         sizes: [
@@ -115,8 +115,8 @@ export const categories: RepairCategory[] = [
         symptom: "Small cracks letting water in",
         fix: "Crack injection",
         note: "Per crack. Seals it from the inside.",
-        low: 500,
-        high: 900,
+        low: 625,
+        high: 775,
         unit: "cracks",
         question: "How many cracks?",
         sizes: [
@@ -139,8 +139,8 @@ export const categories: RepairCategory[] = [
         symptom: "Water seeping in at the floor or wall",
         fix: "Interior drainage system",
         note: "Per linear foot of wall.",
-        low: 45,
-        high: 75,
+        low: 54,
+        high: 66,
         unit: "feet",
         question: "How much wall is wet at the bottom?",
         sizes: [
@@ -155,24 +155,24 @@ export const categories: RepairCategory[] = [
         symptom: "Standing water, or no sump pump",
         fix: "Sump pump install",
         note: "Complete install.",
-        low: 1200,
-        high: 2200,
+        low: 1550,
+        high: 1850,
       },
       {
         id: "battery-backup",
         symptom: "Pump stops when the power goes out",
         fix: "Battery back-up pump",
         note: "Backup pump system.",
-        low: 900,
-        high: 1600,
+        low: 1150,
+        high: 1350,
       },
       {
         id: "wall-liner",
         symptom: "Damp or white-stained walls",
         fix: "Basement wall liner",
         note: "Per sq ft of foundation wall.",
-        low: 5,
-        high: 9,
+        low: 6.5,
+        high: 7.5,
         unit: "sq ft",
         question: "How much wall do you want covered?",
         sizes: [
@@ -197,8 +197,8 @@ export const categories: RepairCategory[] = [
         symptom: "Musty smell, mold on the joists",
         fix: "Full encapsulation",
         note: "Per sq ft of crawl space.",
-        low: 5,
-        high: 9,
+        low: 6.5,
+        high: 7.5,
         unit: "sq ft",
         question: "How big is the crawl space?",
         sizes: [
@@ -214,16 +214,16 @@ export const categories: RepairCategory[] = [
         symptom: "Damp air, sweating pipes and ducts",
         fix: "Crawl space dehumidifier",
         note: "Installed and drained.",
-        low: 1500,
-        high: 2800,
+        low: 2000,
+        high: 2300,
       },
       {
         id: "crawl-drain",
         symptom: "Standing water on the ground",
         fix: "Crawl space drain & sump",
         note: "Drain line and pump.",
-        low: 2000,
-        high: 4000,
+        low: 2750,
+        high: 3250,
       },
     ],
   },
@@ -239,8 +239,8 @@ export const categories: RepairCategory[] = [
         symptom: "Sunken slab or a trip ledge",
         fix: "Lift & level the slab",
         note: "Per slab section.",
-        low: 600,
-        high: 1300,
+        low: 850,
+        high: 1050,
         unit: "sections",
         question: "How many sections have dropped?",
         sizes: [
@@ -256,8 +256,8 @@ export const categories: RepairCategory[] = [
         symptom: "Open cracks and joints",
         fix: "Seal cracks & joints",
         note: "Per linear foot.",
-        low: 4,
-        high: 8,
+        low: 5.5,
+        high: 6.5,
         unit: "feet",
         question: "How much needs sealing?",
         sizes: [
@@ -280,8 +280,8 @@ export const categories: RepairCategory[] = [
         symptom: "Sagging or bouncy floor",
         fix: "Sister floor joists",
         note: "Per joist.",
-        low: 250,
-        high: 450,
+        low: 320,
+        high: 380,
         unit: "joists",
         question: "How big is the sagging area?",
         sizes: [
@@ -297,8 +297,8 @@ export const categories: RepairCategory[] = [
         symptom: "Cracked or failing main beam",
         fix: "Replace the girder",
         note: "Per linear foot.",
-        low: 150,
-        high: 300,
+        low: 205,
+        high: 245,
         unit: "feet",
         question: "How much of the beam?",
         sizes: [
@@ -312,8 +312,8 @@ export const categories: RepairCategory[] = [
         symptom: "Leaning, rotted or missing posts",
         fix: "New support posts",
         note: "Per post, with a footing.",
-        low: 350,
-        high: 650,
+        low: 450,
+        high: 550,
         unit: "posts",
         question: "How many posts?",
         sizes: [
@@ -327,8 +327,8 @@ export const categories: RepairCategory[] = [
         symptom: "Soft or rotted rim joist",
         fix: "Replace the rim joist",
         note: "Per linear foot.",
-        low: 40,
-        high: 80,
+        low: 54,
+        high: 66,
         unit: "feet",
         question: "How much is rotted?",
         sizes: [
@@ -351,8 +351,8 @@ export const categories: RepairCategory[] = [
         symptom: "Cracked, loose or missing boards",
         fix: "Siding repair",
         note: "Per damaged spot, matched to your siding.",
-        low: 350,
-        high: 800,
+        low: 525,
+        high: 625,
         unit: "spots",
         question: "How many damaged spots?",
         sizes: [
@@ -368,15 +368,15 @@ export const categories: RepairCategory[] = [
         symptom: "Warped, faded or failing siding",
         fix: "New siding",
         note: "Per sq ft of wall. The price depends on the material.",
-        low: 5,
-        high: 9,
+        low: 6.5,
+        high: 7.5,
         unit: "sq ft",
         options: {
           question: "Which material?",
           choices: [
-            { label: "Vinyl", low: 5, high: 9 },
-            { label: "Engineered wood", low: 7, high: 11 },
-            { label: "Fiber cement", low: 9, high: 14 },
+            { label: "Vinyl", low: 6.5, high: 7.5 },
+            { label: "Engineered wood", low: 8.5, high: 9.5 },
+            { label: "Fiber cement", low: 11, high: 12 },
           ],
         },
         question: "How much of the house?",
@@ -393,8 +393,8 @@ export const categories: RepairCategory[] = [
         symptom: "Rotted trim, soffit or fascia",
         fix: "Trim, soffit & fascia repair",
         note: "Per linear foot.",
-        low: 12,
-        high: 25,
+        low: 17,
+        high: 20,
         unit: "feet",
         question: "How much is rotted?",
         sizes: [
@@ -408,8 +408,8 @@ export const categories: RepairCategory[] = [
         symptom: "Water stains inside, under windows",
         fix: "Window flashing & housewrap repair",
         note: "Per window or door.",
-        low: 250,
-        high: 600,
+        low: 390,
+        high: 460,
         unit: "windows",
         question: "How many windows or doors?",
         sizes: [
@@ -436,7 +436,7 @@ export const defaultQty = (item: RepairItem) =>
 export type Pick = { id: string; qty: number; variant: number };
 
 /**
- * Prices the picks: each line, and the total rounded out to the hundred.
+ * Prices the picks: each line, and the total rounded to the nearest hundred.
  * The estimator and the emailed PDF both use this, and the server runs it
  * again on the ids it's sent, so a quote always carries the site's prices.
  */
@@ -447,8 +447,8 @@ export function priceEstimate(picks: Pick[]) {
     const per = choice ?? item;
     return { item, qty, choice: choice?.label, low: per.low * qty, high: per.high * qty };
   });
-  const low = Math.floor(lines.reduce((s, l) => s + l.low, 0) / 100) * 100;
-  const high = Math.ceil(lines.reduce((s, l) => s + l.high, 0) / 100) * 100;
+  const low = Math.round(lines.reduce((s, l) => s + l.low, 0) / 100) * 100;
+  const high = Math.round(lines.reduce((s, l) => s + l.high, 0) / 100) * 100;
   return { lines, low, high };
 }
 

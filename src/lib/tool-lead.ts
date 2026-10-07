@@ -30,7 +30,8 @@ export function validateToolContact(c: ToolContact): Partial<Record<ToolContactF
   if (c.name.length < 2 || c.name.length > 100) errors.name = "Enter your name.";
   if (!isEmail(c.email) || c.email.length > 254) errors.email = "Enter an email address so we can send it to you.";
   if (!isPhone(c.phone) || c.phone.length > 30) errors.phone = "Enter a phone number, area code first.";
-  if (!/^\d{5}(-\d{4})?$/.test(c.zip)) errors.zip = "Enter a 5-digit ZIP code.";
+  // A US ZIP (5 digits, or ZIP+4), or a 4-digit postal code.
+  if (!/^(\d{4}|\d{5}(-\d{4})?)$/.test(c.zip)) errors.zip = "Enter a 4- or 5-digit ZIP or postal code.";
   if (c.consent !== "yes") errors.consent = "Tick the box to agree before sending.";
   return errors;
 }

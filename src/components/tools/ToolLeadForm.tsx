@@ -9,6 +9,7 @@ import {
   type ToolContactField,
   type ToolLeadResult,
 } from "@/lib/tool-lead";
+import { track } from "@/lib/analytics";
 import { turnstileOn } from "@/lib/turnstile";
 import { cn } from "@/lib/utils";
 import { useEffect, useId, useRef, useState } from "react";
@@ -84,6 +85,9 @@ export function ToolLeadForm({
         errors?: Partial<Record<ToolContactField, string>>;
       };
       if (res.ok && json.ok) {
+        // GA4's own lead event, so it can be marked as a key event. Never
+        // the contact details: only which tool the lead came from.
+        track("generate_lead", { tool });
         onDone({ ...(json as ToolLeadResult), email: contact.email });
         return;
       }
@@ -127,7 +131,7 @@ export function ToolLeadForm({
         {field("email", "Email", "jane@email.com", "email")}
         <div className="grid gap-3.5 sm:grid-cols-2">
           {field("phone", "Phone", "(555) 555-0100", "tel")}
-          {field("zip", "Property ZIP code", "76248", "postal-code")}
+          {field("zip", "Property ZIP / postal code", "76248", "postal-code")}
         </div>
       </div>
 

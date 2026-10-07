@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { Img } from "@/components/ui/Img";
+import { track } from "@/lib/analytics";
 import { cn, newTab } from "@/lib/utils";
 import { areas, categories, defaultQty, itemsById, priceEstimate, sceneImages, type Area, type Hotspot } from "@/lib/estimator";
 import type { ToolLeadResult } from "@/lib/tool-lead";
@@ -68,18 +69,33 @@ export function RepairEstimator({
   const picks = Object.entries(picked).map(([id, qty]) => ({ id, qty, variant: variant[id] ?? 0 }));
   const { lines, low, high } = priceEstimate(picks);
 
-  const toggle = (id: string) =>
+  const toggle = (id: string) => {
+    if (!(id in picked)) track("estimator_add", { repair: id, from: "list" });
     setPicked((cur) => {
       const next = { ...cur };
       if (id in next) delete next[id];
       else next[id] = defaultQty(itemsById[id]);
       return next;
     });
+  };
   const setQty = (id: string, qty: number) => setPicked((cur) => ({ ...cur, [id]: Math.max(1, Math.round(qty) || 1) }));
+
+  /** Looks inside one part of the house. */
+  const enter = (id: Area["id"]) => {
+    setAreaId(id);
+    track("estimator_area", { area: id });
+  };
+
+  /** Opens or closes a problem's card on the picture. */
+  const tap = (i: number) => {
+    if (spot !== i && area) track("estimator_problem", { area: area.id, repair: area.hotspots[i].item });
+    setSpot(spot === i ? null : i);
+  };
 
   /** From a hotspot: add the repair, open its list and bring it into view. */
   const price = (h: Hotspot) => {
     const item = itemsById[h.item];
+    if (!(h.item in picked)) track("estimator_add", { repair: h.item, from: "picture" });
     setPicked((cur) => (h.item in cur ? cur : { ...cur, [h.item]: defaultQty(item) }));
     setOpen(open.includes(item.category) ? open : [...open, item.category]);
     setSpot(null);
@@ -112,6 +128,7 @@ export function RepairEstimator({
   };
 
   const reveal = () => {
+    track("estimator_see_price", { repairs: lines.length });
     setStep("form");
     setSent(null);
     dialog.current?.showModal();
@@ -163,7 +180,7 @@ export function RepairEstimator({
               <button
                 key={a.id}
                 type="button"
-                onClick={() => setAreaId(a.id)}
+                onClick={() => enter(a.id)}
                 aria-label={`Look inside: ${a.label}`}
                 className="group absolute border-2 border-dashed border-sun/90 bg-sun/0 transition-colors hover:bg-sun/20 focus-visible:bg-sun/20"
                 style={{ left: `${a.zone.x}%`, top: `${a.zone.y}%`, width: `${a.zone.w}%`, height: `${a.zone.h}%` }}
@@ -184,7 +201,7 @@ export function RepairEstimator({
                   </span>
                   <button
                     type="button"
-                    onClick={() => setSpot(spot === i ? null : i)}
+                    onClick={() => tap(i)}
                     aria-expanded={spot === i}
                     aria-label={`${i + 1}. ${h.label}`}
                     className={cn(marker(on), "absolute z-20 -translate-x-1/2 -translate-y-1/2")}
@@ -218,7 +235,7 @@ export function RepairEstimator({
               <li key={x.label}>
                 <button
                   type="button"
-                  onClick={() => (area ? setSpot(spot === i ? null : i) : setAreaId((x as Area).id))}
+                  onClick={() => (area ? tap(i) : enter((x as Area).id))}
                   className={cn("flex w-full items-center gap-3 bg-white px-3 py-2.5 text-left text-[14.5px]", on && "ring-2 ring-sun")}
                 >
                   <span className="flex size-6 shrink-0 items-center justify-center bg-fg text-[12px] text-white">{i + 1}</span>
@@ -471,6 +488,7 @@ export function RepairEstimator({
                 payload={() => ({ picks })}
                 submitLabel="Show my instant estimate"
                 onDone={(r) => {
+                  track("estimator_complete", { repairs: lines.length, low, high });
                   setSent(r);
                   setStep("result");
                 }}
