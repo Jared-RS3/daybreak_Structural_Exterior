@@ -143,7 +143,9 @@ export function Hero({
             <div
               className={cn(
                 "relative z-10 -mt-24 flex animate-[card-in_1s_var(--ease-out-expo)_1.1s_both] justify-center px-5 sm:absolute sm:right-[5%] sm:top-[16%] sm:mt-0 sm:block sm:px-0 lg:right-[3%]",
-                pf && "max-sm:absolute max-sm:right-[calc(8%+1rem)] max-sm:top-[7%] max-sm:mt-0 max-sm:block max-sm:px-0",
+                // Phone: low on the house, over the street where the photo fades, so
+                // it never sits on top of the house itself.
+                pf && "max-sm:absolute max-sm:bottom-[7%] max-sm:right-[calc(8%+1rem)] max-sm:mt-0 max-sm:block max-sm:px-0",
               )}
             >
               {inset}
