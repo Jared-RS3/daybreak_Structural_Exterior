@@ -476,6 +476,10 @@ export function readPicks(v: unknown): Pick[] | null {
 type Point = { x: number; y: number };
 
 export type Hotspot = Point & {
+  /** Which side of its number the label sits on. Left out, it goes above
+      (below near the top). Set where the labels would otherwise overlap,
+      checked from a 290 px phone up to full width. */
+  side?: "above" | "below" | "left" | "right";
   label: string;
   title: string;
   body: string;
@@ -520,6 +524,7 @@ export const areas: Area[] = [
       {
         x: 51,
         y: 48.5,
+        side: "below",
         label: "Horizontal crack & bowing",
         title: "Horizontal crack & bowing",
         body: "A horizontal crack with an inward bow means soil pressure is pushing the wall in. It needs anchoring.",
@@ -577,6 +582,7 @@ export const areas: Area[] = [
       {
         x: 89,
         y: 80,
+        side: "below",
         label: "Where the water goes",
         title: "When the power goes out",
         body: "Storms bring the most water and the most power cuts. A battery back-up keeps the pump running.",
@@ -594,6 +600,7 @@ export const areas: Area[] = [
       {
         x: 18,
         y: 15,
+        side: "right",
         label: "Mold & musty smell",
         title: "Mold on the joists and a musty smell",
         body: "Damp crawl space air rises into the house. Sealing the space off, walls and floor, stops it at the source.",
@@ -602,6 +609,7 @@ export const areas: Area[] = [
       {
         x: 48,
         y: 32,
+        side: "below",
         label: "Sweating duct",
         title: "Damp air, sweating pipes and ducts",
         body: "Condensation on cold surfaces means the air is too wet. A dehumidifier keeps it dry year round.",
@@ -651,6 +659,7 @@ export const areas: Area[] = [
       {
         x: 50,
         y: 31,
+        side: "below",
         label: "Cracked main beam",
         title: "A cracked main beam",
         body: "The girder carries the whole floor. Once it cracks, it needs replacing.",
@@ -659,6 +668,7 @@ export const areas: Area[] = [
       {
         x: 72,
         y: 58.5,
+        side: "below",
         label: "Leaning post",
         title: "A leaning or rotted post",
         body: "Posts hold the beam up. One that leans, rots or sits on bare soil needs replacing with a proper footing.",
@@ -692,6 +702,7 @@ export const areas: Area[] = [
       {
         x: 54,
         y: 53,
+        side: "below",
         label: "Sunken slab",
         title: "A sunken slab",
         body: "The soil under it has washed out or settled. Lifting it from below levels it in an afternoon.",
@@ -717,6 +728,7 @@ export const areas: Area[] = [
       {
         x: 85.5,
         y: 12,
+        side: "left",
         label: "Rotted fascia & soffit",
         title: "Rotted fascia and soffit",
         body: "Water from the gutter soaks the boards along the roof edge until they soften and open up to pests.",

@@ -27,12 +27,16 @@ import { ToolLeadForm, ToolLeadSent } from "./ToolLeadForm";
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 const still = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** Where a label sits beside a point, kept inside the picture at the edges. */
-function chipPos(p: { x: number; y: number }) {
-  const below = p.y < 18;
+/** Where a label sits beside its point (the hotspot's `side`), kept inside
+    the picture at the edges. */
+function chipPos(p: Hotspot) {
+  const side = p.side ?? (p.y < 18 ? "below" : "above");
+  const at = { left: `${p.x}%`, top: `${p.y}%` };
+  if (side === "left") return { ...at, transform: "translate(calc(-100% - 18px), -50%)" };
+  if (side === "right") return { ...at, transform: "translate(18px, -50%)" };
   const tx = p.x < 16 ? "-14px" : p.x > 84 ? "calc(-100% + 14px)" : "-50%";
-  const ty = below ? "18px" : "calc(-100% - 18px)";
-  return { left: `${p.x}%`, top: `${p.y}%`, transform: `translate(${tx}, ${ty})` };
+  const ty = side === "below" ? "18px" : "calc(-100% - 18px)";
+  return { ...at, transform: `translate(${tx}, ${ty})` };
 }
 
 export function RepairEstimator({
