@@ -9,7 +9,7 @@ There are two sets:
 
 ## Rules for the whole set
 
-**Format.** 16:9 landscape, 2400 px wide or more, saved as `public/images/estimator/<image name>.jpg`. The estimator frame is 1000 × 560 and crops with `object-cover`, so nothing important should sit in the top or bottom 5%. If a model only offers 3:2, generate 3:2 and crop to 16:9 from the middle.
+**Format.** 16:9 landscape, 2400 px wide or more, saved as `public/images/estimator_pics/<image name>.png`. The estimator frame is 1000 × 560 and crops with `object-cover`, so nothing important should sit in the top or bottom 5%. If a model only offers 3:2, generate 3:2 and crop to 16:9 from the middle.
 
 **Camera and light.** Every prompt ends with one of four fixed paragraphs: outdoors, basement, crawl space or living space. Don't edit them. They are what makes 62 separate generations look like one professional shoot.
 

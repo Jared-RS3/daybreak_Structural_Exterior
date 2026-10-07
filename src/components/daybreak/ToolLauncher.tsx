@@ -374,7 +374,9 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-2 sm:px-3 sm:pb-3">
-            <div className={cn(full && "mx-auto max-w-6xl")}>
+            {/* Full screen, the estimator's photos run the window's width;
+                the checker is a form, so it keeps a readable measure. */}
+            <div className={cn(full && tab === "checker" && "mx-auto max-w-6xl")}>
               {page.checker && (
                 <div
                   id="live-tools-checker"

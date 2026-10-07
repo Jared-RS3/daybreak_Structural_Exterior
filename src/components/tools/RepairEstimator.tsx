@@ -152,7 +152,7 @@ export function RepairEstimator({
         </div>
 
         <div className="relative mt-4 aspect-[1000/560] border border-rule bg-white">
-          {photo ? <Img src={photo.src} alt={photo.alt} sizes="(min-width:1280px) 1100px, 100vw" /> : <Scene />}
+          {photo ? <Img src={photo.src} alt={photo.alt} sizes="100vw" /> : <Scene />}
 
           {!area &&
             areas.map((a, i) => (

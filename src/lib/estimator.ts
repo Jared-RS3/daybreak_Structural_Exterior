@@ -497,36 +497,36 @@ export const areas: Area[] = [
   {
     id: "foundation",
     label: "Foundation",
-    zone: { x: 15, y: 40, w: 13, h: 55 },
+    zone: { x: 13, y: 54.5, w: 15, h: 35.5 },
     chip: "above",
     title: "The foundation wall, from the outside",
     hotspots: [
       {
-        x: 38,
-        y: 33,
+        x: 26,
+        y: 31,
         label: "Stair-step cracks",
         title: "Stair-step cracks",
         body: "Cracks that follow the mortar joints like steps mean one part of the house is settling more than another.",
         item: "push-piers",
       },
       {
-        x: 64,
-        y: 31,
+        x: 72.5,
+        y: 21,
         label: "Small crack, letting water in",
         title: "A small crack that leaks",
         body: "Not structural on its own, but it lets water in every time it rains. Injection seals it from the inside.",
         item: "foam-injection",
       },
       {
-        x: 50,
-        y: 54,
+        x: 51,
+        y: 48.5,
         label: "Horizontal crack & bowing",
         title: "Horizontal crack & bowing",
         body: "A horizontal crack with an inward bow means soil pressure is pushing the wall in. It needs anchoring.",
         item: "wall-anchors",
       },
       {
-        x: 70,
+        x: 84,
         y: 88,
         label: "Sinking corner",
         title: "A sinking corner",
@@ -538,45 +538,45 @@ export const areas: Area[] = [
   {
     id: "basement",
     label: "Basement",
-    zone: { x: 28, y: 67, w: 18, h: 26 },
+    zone: { x: 28.8, y: 58.3, w: 17.8, h: 27.8 },
     chip: "inside",
     title: "Inside the basement",
     hotspots: [
       {
-        x: 30,
-        y: 38,
+        x: 27,
+        y: 32,
         label: "Wall cracks letting water in",
         title: "Wall cracks letting water in",
         body: "Water follows the crack through the wall. Injecting it seals the path.",
         item: "foam-injection",
       },
       {
-        x: 66,
-        y: 45,
+        x: 64.5,
+        y: 42.5,
         label: "White chalky staining",
         title: "White chalky staining (efflorescence)",
         body: "That white residue is mineral deposit left by water moving through the wall: a sign of ongoing moisture.",
         item: "wall-liner",
       },
       {
-        x: 56,
-        y: 75,
+        x: 54,
+        y: 70,
         label: "Water seeping at the floor",
         title: "Water seeping where the wall meets the floor",
         body: "The joint between wall and floor is the most common way water gets in. An interior drain catches it there.",
         item: "interior-drain",
       },
       {
-        x: 40,
-        y: 89,
+        x: 27,
+        y: 84,
         label: "Standing water",
         title: "Standing water",
         body: "Water that pools with nowhere to go needs a sump pump to lift it out of the basement.",
         item: "sump-pump",
       },
       {
-        x: 86,
-        y: 28,
+        x: 89,
+        y: 80,
         label: "Where the water goes",
         title: "When the power goes out",
         body: "Storms bring the most water and the most power cuts. A battery back-up keeps the pump running.",
@@ -587,21 +587,21 @@ export const areas: Area[] = [
   {
     id: "crawl",
     label: "Crawl space",
-    zone: { x: 47, y: 67, w: 17, h: 12 },
+    zone: { x: 48, y: 58.3, w: 17, h: 16 },
     chip: "below",
     title: "Under the house, in the crawl space",
     hotspots: [
       {
-        x: 24,
-        y: 14,
+        x: 18,
+        y: 15,
         label: "Mold & musty smell",
         title: "Mold on the joists and a musty smell",
         body: "Damp crawl space air rises into the house. Sealing the space off, walls and floor, stops it at the source.",
         item: "encapsulation",
       },
       {
-        x: 58,
-        y: 31,
+        x: 48,
+        y: 32,
         label: "Sweating duct",
         title: "Damp air, sweating pipes and ducts",
         body: "Condensation on cold surfaces means the air is too wet. A dehumidifier keeps it dry year round.",
@@ -609,32 +609,40 @@ export const areas: Area[] = [
       },
       {
         x: 78,
-        y: 25,
+        y: 21.5,
         label: "Sagging joist",
         title: "A sagging joist",
         body: "Years of damp soften the wood, and the floor above starts to dip. A new joist alongside takes the load.",
         item: "sister-joists",
       },
       {
-        x: 70,
-        y: 86,
+        x: 75,
+        y: 76.5,
         label: "Standing water",
         title: "Standing water on the ground",
         body: "Water that collects under the house needs a drain and a pump to get it out.",
         item: "crawl-drain",
+      },
+      {
+        x: 22.5,
+        y: 74.5,
+        label: "Torn vapor barrier",
+        title: "A torn vapor barrier",
+        body: "Torn or pushed aside, the plastic on the ground stops keeping its moisture out. A sealed liner over the floor and walls replaces it.",
+        item: "encapsulation",
       },
     ],
   },
   {
     id: "framing",
     label: "Floor & framing",
-    zone: { x: 28, y: 61.5, w: 36, h: 5.5 },
+    zone: { x: 29, y: 51.8, w: 36, h: 6.4 },
     chip: "above",
     title: "The floor framing, from below",
     hotspots: [
       {
         x: 78,
-        y: 10,
+        y: 23,
         label: "Sagging floor",
         title: "A sagging, bouncy floor",
         body: "The joists under it have weakened or were undersized. New joists alongside the old ones stiffen it.",
@@ -642,23 +650,23 @@ export const areas: Area[] = [
       },
       {
         x: 50,
-        y: 26,
+        y: 31,
         label: "Cracked main beam",
         title: "A cracked main beam",
         body: "The girder carries the whole floor. Once it cracks, it needs replacing.",
         item: "girder",
       },
       {
-        x: 55,
-        y: 58,
+        x: 72,
+        y: 58.5,
         label: "Leaning post",
         title: "A leaning or rotted post",
         body: "Posts hold the beam up. One that leans, rots or sits on bare soil needs replacing with a proper footing.",
         item: "support-posts",
       },
       {
-        x: 6,
-        y: 20,
+        x: 14.5,
+        y: 30.5,
         label: "Rotted rim joist",
         title: "A rotted rim joist",
         body: "The board around the edge of the floor frame rots where water gets behind the siding.",
@@ -669,13 +677,13 @@ export const areas: Area[] = [
   {
     id: "driveway",
     label: "Driveway / concrete",
-    zone: { x: 83, y: 59.5, w: 17, h: 7.5 },
-    chip: "above",
-    title: "The driveway, from the side",
+    zone: { x: 66, y: 54.6, w: 34, h: 9.6 },
+    chip: "below",
+    title: "The driveway, from ground level",
     hotspots: [
       {
-        x: 30,
-        y: 53,
+        x: 20.5,
+        y: 57.5,
         label: "Open cracks",
         title: "Open cracks and joints",
         body: "Water gets into open joints and washes out the soil underneath. Sealing them stops the slab from dropping.",
@@ -683,15 +691,15 @@ export const areas: Area[] = [
       },
       {
         x: 54,
-        y: 59,
+        y: 53,
         label: "Sunken slab",
         title: "A sunken slab",
         body: "The soil under it has washed out or settled. Lifting it from below levels it in an afternoon.",
         item: "slab-lift",
       },
       {
-        x: 66,
-        y: 52,
+        x: 75,
+        y: 56.5,
         label: "Trip ledge",
         title: "A trip ledge",
         body: "Where one slab has dropped against the next, it leaves an edge people trip on. Lifting it removes the ledge.",
@@ -702,45 +710,45 @@ export const areas: Area[] = [
   {
     id: "siding",
     label: "Siding & exterior",
-    zone: { x: 64, y: 41.5, w: 19, h: 21 },
+    zone: { x: 66, y: 19, w: 24, h: 35.5 },
     chip: "above",
     title: "The siding, up close",
     hotspots: [
       {
-        x: 73,
-        y: 15,
+        x: 85.5,
+        y: 12,
         label: "Rotted fascia & soffit",
         title: "Rotted fascia and soffit",
         body: "Water from the gutter soaks the boards along the roof edge until they soften and open up to pests.",
         item: "trim-soffit",
       },
       {
-        x: 80,
-        y: 40,
+        x: 75,
+        y: 40.5,
         label: "Warped, faded boards",
         title: "Warped and faded siding",
         body: "Boards that wave, chalk or fade have reached the end of their life. Patching won't match; it's time for new siding.",
         item: "siding-replace",
       },
       {
-        x: 22,
-        y: 54,
+        x: 14.5,
+        y: 48.5,
         label: "Cracked board",
         title: "A cracked board",
         body: "A crack lets water behind the siding. One damaged board can be replaced and matched.",
         item: "siding-repair",
       },
       {
-        x: 45,
-        y: 75,
+        x: 43,
+        y: 72.5,
         label: "Leaky window",
         title: "Water getting in at a window",
         body: "Stains under a window mean the flashing around it has failed. It's resealed and the housewrap patched behind the siding.",
         item: "flashing",
       },
       {
-        x: 78,
-        y: 72,
+        x: 80,
+        y: 75,
         label: "Missing board",
         title: "A board blown off in a storm",
         body: "The wall behind is exposed to every rain. A matching board goes back in, often the same week.",
@@ -772,11 +780,39 @@ export const estimatorTool = {
 
 /**
  * Photographic versions of the scenes, used instead of the drawings when set.
- * Generated renders go in public/images/estimator/ (16:9, 2400 px wide or
- * more): house, foundation, basement, crawl, framing, driveway, siding. When one is
- * added here, move that scene's `zone` / `hotspots` in `areas` onto what the
- * image actually shows; the drawing's positions won't line up with it.
+ * They live in public/images/estimator_pics/ (16:9, prompts in
+ * docs/estimator-photo-prompts.md). The `zone`s and `hotspots` in `areas` are
+ * placed on these photos: replace one and they need moving onto it again.
  */
 export const sceneImages: Partial<
   Record<"house" | Area["id"], { src: string; alt: string }>
-> = {};
+> = {
+  house: {
+    src: "/images/estimator_pics/house.png",
+    alt: "The house in cutaway: the brick front and the rooms, the basement and crawl space below, the garage and the driveway.",
+  },
+  foundation: {
+    src: "/images/estimator_pics/foundation.png",
+    alt: "The outside of a block foundation wall, dug out down to its footing.",
+  },
+  basement: {
+    src: "/images/estimator_pics/basement.png",
+    alt: "Inside an unfinished basement: one block wall, the floor and the sump pump.",
+  },
+  crawl: {
+    src: "/images/estimator_pics/crawl.png",
+    alt: "Inside a damp crawl space, under the floor joists and a metal duct.",
+  },
+  framing: {
+    src: "/images/estimator_pics/framing.png",
+    alt: "The floor framing from below: the joists, the main beam and the posts holding it up.",
+  },
+  driveway: {
+    src: "/images/estimator_pics/driveway.png",
+    alt: "A concrete driveway beside the garage, seen from ground level.",
+  },
+  siding: {
+    src: "/images/estimator_pics/siding.png",
+    alt: "One wall of vinyl siding with a window, up to the roof edge.",
+  },
+};
