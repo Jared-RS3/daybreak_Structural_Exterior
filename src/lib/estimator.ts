@@ -497,8 +497,8 @@ export const areas: Area[] = [
   {
     id: "foundation",
     label: "Foundation",
-    zone: { x: 13, y: 54.5, w: 15, h: 35.5 },
-    chip: "above",
+    zone: { x: 13, y: 54.5, w: 15, h: 32 },
+    chip: "below",
     title: "The foundation wall, from the outside",
     hotspots: [
       {

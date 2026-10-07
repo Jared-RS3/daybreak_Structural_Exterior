@@ -6,6 +6,7 @@ import { Img } from "@/components/ui/Img";
 import { cn, newTab } from "@/lib/utils";
 import { areas, categories, defaultQty, itemsById, priceEstimate, sceneImages, type Area, type Hotspot } from "@/lib/estimator";
 import type { ToolLeadResult } from "@/lib/tool-lead";
+import { AreaTag } from "./AreaTag";
 import { HouseScene, scenes } from "./EstimatorScenes";
 import { ToolLeadForm, ToolLeadSent } from "./ToolLeadForm";
 
@@ -121,7 +122,10 @@ export function RepairEstimator({
       "flex size-7 items-center justify-center text-[12.5px] font-medium tabular-nums shadow-[0_4px_14px_-4px_rgb(0_0_0/0.5)] transition-colors",
       on ? "bg-sun text-fg" : "bg-fg text-white hover:bg-sun hover:text-fg",
     );
-  const label = "mono-label pointer-events-none absolute z-10 hidden whitespace-nowrap bg-fg px-2 py-1 text-[10.5px] text-white @xl:block";
+  // Each problem's name beside its number: tiny in the side window and on a
+  // phone so it doesn't cover the photo, full size when the estimator is wide.
+  const label =
+    "mono-label pointer-events-none absolute z-10 whitespace-nowrap bg-fg px-1 py-0.5 text-[7px] text-white @xl:px-2 @xl:py-1 @xl:text-[10.5px]";
 
   return (
     // A container: everything below is laid out by the estimator's own
@@ -129,13 +133,13 @@ export function RepairEstimator({
     <div className="@container bg-card text-fg">
       {/* ---- Look inside ---- */}
       <div className="p-5 @xl:p-7">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-[15.5px] font-medium">{area ? area.title : "Click an area to look inside"}</p>
-            <p className="mt-1 text-[14px] text-muted">
-              {area ? "Tap a number to see what it means and get pricing." : "Step into the basement, crawl space, foundation and more, then get pricing."}
-            </p>
-          </div>
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-[1.3rem] font-bold leading-tight tracking-[-0.02em] @xl:text-[1.85rem]">
+            {area ? area.title : "Click an area to look inside"}
+          </p>
+          <p className="mt-1.5 text-[14px] leading-snug text-muted @xl:text-[15.5px]">
+            {area ? "Tap a number to see what it means and get pricing." : "Step into the basement, crawl space, foundation and more, then get pricing."}
+          </p>
           {area && (
             <button
               type="button"
@@ -143,7 +147,7 @@ export function RepairEstimator({
                 setAreaId(null);
                 setSpot(null);
               }}
-              className="mono-label inline-flex h-10 items-center gap-2 border border-fg/25 bg-white px-3.5 text-[12px] transition-colors hover:border-fg"
+              className="mono-label mt-3 inline-flex h-10 items-center gap-2 border border-fg/25 bg-white px-3.5 text-[12px] transition-colors hover:border-fg"
             >
               <Icon name="arrowRight" className="size-3.5 rotate-180" />
               Back to the house
@@ -164,19 +168,9 @@ export function RepairEstimator({
                 className="group absolute border-2 border-dashed border-sun/90 bg-sun/0 transition-colors hover:bg-sun/20 focus-visible:bg-sun/20"
                 style={{ left: `${a.zone.x}%`, top: `${a.zone.y}%`, width: `${a.zone.w}%`, height: `${a.zone.h}%` }}
               >
-                <span
-                  className="absolute left-1/2 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap bg-fg py-1 pl-1 pr-1 text-white @xl:pr-2.5"
-                  style={
-                    a.chip === "above"
-                      ? { bottom: "calc(100% + 4px)" }
-                      : a.chip === "below"
-                        ? { top: "calc(100% + 4px)" }
-                        : { bottom: "4px" }
-                  }
-                >
-                  <span className="flex size-5 items-center justify-center bg-sun text-[11px] font-medium text-fg">{i + 1}</span>
-                  <span className="mono-label hidden text-[10.5px] @xl:inline">{a.label}</span>
-                </span>
+                {/* Small type in the side window and on a phone, so the tags
+                    name each area without covering the house. */}
+                <AreaTag area={a} n={i + 1} scale="container" />
               </button>
             ))}
 

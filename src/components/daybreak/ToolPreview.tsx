@@ -1,3 +1,4 @@
+import { AreaTag } from "@/components/tools/AreaTag";
 import { HouseScene } from "@/components/tools/EstimatorScenes";
 import { Icon } from "@/components/ui/Icon";
 import { Img } from "@/components/ui/Img";
@@ -66,10 +67,10 @@ export function ToolPreview() {
             <span
               key={a.id}
               aria-hidden
-              className="absolute flex size-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center bg-sun text-[12px] font-medium text-fg shadow-[0_4px_14px_-4px_rgb(0_0_0/0.5)] sm:size-7"
-              style={{ left: `${a.zone.x + a.zone.w / 2}%`, top: `${a.zone.y + Math.min(a.zone.h / 2, 8)}%` }}
+              className="absolute"
+              style={{ left: `${a.zone.x}%`, top: `${a.zone.y}%`, width: `${a.zone.w}%`, height: `${a.zone.h}%` }}
             >
-              {i + 1}
+              <AreaTag area={a} n={i + 1} scale="screen" />
             </span>
           ))}
         </div>
