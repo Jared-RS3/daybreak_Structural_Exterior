@@ -1,7 +1,7 @@
 "use client";
 
 import { Icon } from "@/components/ui/Icon";
-import { track } from "@/lib/analytics";
+import { analyticsOn, consentCookie, track } from "@/lib/analytics";
 import { bookingHref } from "@/lib/daybreak";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
@@ -128,10 +128,18 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
     try {
       if (sessionStorage.getItem(big ? CLOSED_KEY : TEASER_KEY)) return;
     } catch {}
-    const t = window.setTimeout(
-      () => (big ? show(undefined, "auto") : setTeaser(true)),
-      big ? AUTO_OPEN_MS : TEASER_MS,
-    );
+    // Phones: never on top of the cookie banner. While it's still waiting
+    // for an answer, check again every few seconds.
+    const answered = () => !analyticsOn || document.cookie.includes(`${consentCookie}=`);
+    let t = 0;
+    const later = (ms: number) => {
+      t = window.setTimeout(() => {
+        if (big) return show(undefined, "auto");
+        if (!answered()) return later(3000);
+        setTeaser(true);
+      }, ms);
+    };
+    later(big ? AUTO_OPEN_MS : TEASER_MS);
     return () => window.clearTimeout(t);
     // `show` only sets state and reads stable values; re-binding per render isn't needed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -168,10 +176,10 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
       {teaser && !open && (
         <div
           role="status"
-          className="fixed bottom-24 right-4 z-[60] w-[min(19rem,calc(100vw-2rem))] animate-[panel-in_0.5s_var(--ease-out-expo)_both] border-t-[3px] border-sun bg-white p-4 text-fg shadow-[0_24px_60px_-20px_rgb(0_0_0/0.5)] sm:right-6"
+          className="fixed bottom-24 right-4 z-[60] w-[min(15rem,calc(100vw-2rem))] animate-[panel-in_0.5s_var(--ease-out-expo)_both] border-t-[3px] border-sun bg-white p-3 text-fg shadow-[0_24px_60px_-20px_rgb(0_0_0/0.5)] sm:right-6 sm:w-[19rem] sm:p-4"
         >
           <div className="flex items-start justify-between gap-3">
-            <p className="mono-label flex items-center gap-2 text-[11.5px]">
+            <p className="mono-label flex items-center gap-2 text-[10.5px] sm:text-[11.5px]">
               <span aria-hidden className="size-2 rounded-full bg-[#2f9e5b]" />
               Live tools
             </p>
@@ -184,16 +192,20 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
               <Icon name="close" className="size-4" />
             </button>
           </div>
-          <p className="font-home mt-2 text-[1.2rem] leading-snug tracking-[-0.01em]">
+          {/* Phones get the short version. */}
+          <p className="font-home mt-1.5 text-[0.95rem] leading-snug tracking-[-0.01em] sm:hidden">
+            Estimate a repair or check a crack, like your customers would.
+          </p>
+          <p className="font-home mt-2 hidden text-[1.2rem] leading-snug tracking-[-0.01em] sm:block">
             Tap on the house diagram to estimate a repair, or check how serious
             a crack might be — just like your customers would.
           </p>
-          <div className="mt-3 grid grid-cols-2 gap-1.5">
+          <div className="mt-2.5 grid grid-cols-2 gap-1.5 sm:mt-3">
             <button
               type="button"
               onClick={() => show("estimate", "teaser")}
               className={cn(
-                "mono-label h-10 bg-fg text-[11px] text-white transition-colors hover:bg-[#333]",
+                "mono-label h-9 bg-fg text-[10.5px] text-white transition-colors hover:bg-[#333] sm:h-10 sm:text-[11px]",
                 !page.checker && "col-span-2",
               )}
             >
@@ -203,7 +215,7 @@ export function ToolLauncher({ pages }: { pages: Record<string, PageTools> }) {
               type="button"
               onClick={() => show("checker", "teaser")}
               disabled={!page.checker}
-              className="mono-label h-10 border border-fg/25 text-[11px] transition-colors hover:border-fg disabled:hidden"
+              className="mono-label h-9 border border-fg/25 text-[10.5px] transition-colors hover:border-fg disabled:hidden sm:h-10 sm:text-[11px]"
             >
               Crack checker
             </button>

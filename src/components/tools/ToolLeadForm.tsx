@@ -12,6 +12,7 @@ import {
 import { track } from "@/lib/analytics";
 import { turnstileOn } from "@/lib/turnstile";
 import { cn } from "@/lib/utils";
+import { PhotoUpload } from "./PhotoUpload";
 import { useEffect, useId, useRef, useState } from "react";
 
 /**
@@ -25,12 +26,15 @@ export function ToolLeadForm({
   payload,
   submitLabel,
   onDone,
+  photos = false,
 }: {
   tool: "estimate" | "crack";
   /** The answers, read at the moment they press send. */
   payload: () => Record<string, unknown>;
   submitLabel: string;
   onDone: (result: ToolLeadResult & { email: string }) => void;
+  /** Show the photo step (a demo on this site: see PhotoUpload). */
+  photos?: boolean;
 }) {
   const uid = useId();
   const [errors, setErrors] = useState<Partial<Record<ToolContactField, string>>>({});
@@ -134,6 +138,8 @@ export function ToolLeadForm({
           {field("zip", "Property ZIP / postal code", "76248", "postal-code")}
         </div>
       </div>
+
+      {photos && <PhotoUpload variant="full" />}
 
       <label className="mt-4 flex cursor-pointer items-start gap-3 text-[13.5px] leading-[1.5] text-fg">
         <input

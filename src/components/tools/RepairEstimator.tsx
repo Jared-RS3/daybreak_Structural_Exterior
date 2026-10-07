@@ -9,6 +9,7 @@ import { areas, categories, defaultQty, itemsById, priceEstimate, sceneImages, t
 import type { ToolLeadResult } from "@/lib/tool-lead";
 import { AreaTag } from "./AreaTag";
 import { HouseScene, scenes } from "./EstimatorScenes";
+import { PhotoUpload } from "./PhotoUpload";
 import { ToolLeadForm, ToolLeadSent } from "./ToolLeadForm";
 
 /* ==========================================================================
@@ -411,6 +412,7 @@ export function RepairEstimator({
                                   Added
                                 </span>
                               </div>
+                              <PhotoUpload variant="inline" />
                             </div>
                           )}
                         </li>
@@ -485,6 +487,7 @@ export function RepairEstimator({
               </p>
               <ToolLeadForm
                 tool="estimate"
+                photos
                 payload={() => ({ picks })}
                 submitLabel="Show my instant estimate"
                 onDone={(r) => {
