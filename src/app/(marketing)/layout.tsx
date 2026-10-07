@@ -40,6 +40,7 @@ export default function MarketingLayout({
           "/paia",
           "/how-it-works",
           "/calculator",
+          "/estimator",
           "/foundation-repair-websites",
           "/crawl-space-websites",
           "/siding-websites",

@@ -1,6 +1,7 @@
 "use client";
 
 import { Icon } from "@/components/ui/Icon";
+import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
 import { bookingHref, offer } from "@/lib/daybreak";
 import {
   jobValues,
@@ -13,6 +14,7 @@ import {
   type LeadField,
   type LeadRequest,
 } from "@/lib/lead";
+import { turnstileOn } from "@/lib/turnstile";
 import { cn } from "@/lib/utils";
 import { useEffect, useId, useRef, useState } from "react";
 import { PlaceInput } from "./PlaceInput";
@@ -43,6 +45,7 @@ export function DesignForm() {
   // Picking "Other" opens a box for them to list their services.
   const [trade, setTrade] = useState("");
   const uid = useId();
+  const human = useRef<TurnstileHandle>(null);
   // A token the route signs when the form appears; it treats a submit that
   // comes back near-instantly as a bot (lib/server/form-token.ts).
   const token = useRef("");
@@ -121,6 +124,11 @@ export function DesignForm() {
     }
 
     setState("sending");
+    const check = turnstileOn ? ((await human.current?.get()) ?? "") : "";
+    if (turnstileOn && !check) {
+      setFailure("We couldn’t confirm you’re a person. Complete the check above the button and try again.");
+      return setState("failed");
+    }
     try {
       const res = await fetch("/api/growth-audit", {
         method: "POST",
@@ -129,6 +137,7 @@ export function DesignForm() {
           ...body,
           fax: String(data.get("fax") ?? ""),
           token: token.current,
+          turnstile: check,
         }),
       });
       const json = (await res.json()) as {
@@ -140,10 +149,13 @@ export function DesignForm() {
         setSent(body);
         return setState("sent");
       }
+      // A Turnstile token works once; the next try needs a fresh one.
+      human.current?.reset();
       if (json.errors) setErrors(json.errors);
       setFailure(json.error ?? "");
       setState(json.errors ? "idle" : "failed");
     } catch {
+      human.current?.reset();
       setFailure("");
       setState("failed");
     }
@@ -341,6 +353,7 @@ export function DesignForm() {
           <input type="text" name="fax" tabIndex={-1} autoComplete="off" />
         </label>
       </div>
+      <Turnstile action="growth-audit" ref={human} className="empty:hidden sm:col-span-2" />
       <div className="flex flex-col gap-3 sm:col-span-2 sm:flex-row sm:items-center sm:gap-5">
         <button
           type="submit"

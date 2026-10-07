@@ -11,6 +11,7 @@ import {
 } from "@/components/agency/LegalDoc";
 import { legal } from "@/lib/agency";
 import { analyticsOn } from "@/lib/analytics";
+import { turnstileOn } from "@/lib/turnstile";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -299,7 +300,10 @@ export default function PrivacyPage() {
           Server logs are used for security, debugging and capacity — not to profile
           visitors. Our spam checks are automatic: a submission sent faster than a person
           could fill in the form, or that fills in a field hidden from people, is
-          discarded. Nothing else about you is decided by automated means, and nothing
+          discarded.
+          {turnstileOn &&
+            " Our forms also use Cloudflare Turnstile, which looks at technical signals from your browser and device (such as your IP address) to tell people from bots, and occasionally asks you to tick a box."}{" "}
+          Nothing else about you is decided by automated means, and nothing
           with legal or similarly significant effects. If you think a genuine request of
           yours was caught, email us.
         </p>
@@ -337,6 +341,15 @@ export default function PrivacyPage() {
               <strong className="text-ink-900">Our email provider</strong>, which carries
               our emails to you and yours to us.
             </>,
+            ...(turnstileOn
+              ? [
+                  <>
+                    <strong className="text-ink-900">Cloudflare (Turnstile)</strong>, which
+                    checks that a form is being sent by a person, not a bot. It sets no
+                    advertising or analytics cookies.
+                  </>,
+                ]
+              : []),
             ...(analyticsOn
               ? [
                   <>

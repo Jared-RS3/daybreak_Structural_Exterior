@@ -1,6 +1,7 @@
 "use client";
 
 import { Icon } from "@/components/ui/Icon";
+import { Turnstile, type TurnstileHandle } from "@/components/ui/Turnstile";
 import {
   readToolContact,
   toolContactFields,
@@ -8,6 +9,7 @@ import {
   type ToolContactField,
   type ToolLeadResult,
 } from "@/lib/tool-lead";
+import { turnstileOn } from "@/lib/turnstile";
 import { cn } from "@/lib/utils";
 import { useEffect, useId, useRef, useState } from "react";
 
@@ -35,6 +37,7 @@ export function ToolLeadForm({
   const [failure, setFailure] = useState("");
   // Signed by the server when the form appears (lib/server/form-token.ts).
   const token = useRef("");
+  const human = useRef<TurnstileHandle>(null);
   const fetchToken = () =>
     fetch("/api/tool-lead", { cache: "no-store" })
       .then((r) => r.json() as Promise<{ token?: string }>)
@@ -65,11 +68,16 @@ export function ToolLeadForm({
     }
 
     setState("sending");
+    const check = turnstileOn ? ((await human.current?.get()) ?? "") : "";
+    if (turnstileOn && !check) {
+      setFailure("We couldn't confirm you're a person. Complete the check above the button and try again.");
+      return setState("failed");
+    }
     try {
       const res = await fetch("/api/tool-lead", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ...contact, ...payload(), tool, token: token.current, fax: data.get("fax") ?? "" }),
+        body: JSON.stringify({ ...contact, ...payload(), tool, token: token.current, turnstile: check, fax: data.get("fax") ?? "" }),
       });
       const json = (await res.json().catch(() => ({}))) as Partial<ToolLeadResult> & {
         error?: string;
@@ -79,10 +87,13 @@ export function ToolLeadForm({
         onDone({ ...(json as ToolLeadResult), email: contact.email });
         return;
       }
+      // A Turnstile token works once; the next try needs a fresh one.
+      human.current?.reset();
       if (json.errors) setErrors(json.errors);
       setFailure(json.error ?? (json.errors ? "" : "That didn't go through. Please try again."));
       setState("failed");
     } catch {
+      human.current?.reset();
       setFailure("That didn't go through. Check your connection and try again.");
       setState("failed");
     }
@@ -145,6 +156,8 @@ export function ToolLeadForm({
           <input type="text" name="fax" tabIndex={-1} autoComplete="off" />
         </label>
       </div>
+
+      <Turnstile action="tool-lead" ref={human} className="mt-4 empty:hidden" />
 
       <button
         type="submit"

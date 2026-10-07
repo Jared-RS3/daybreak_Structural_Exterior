@@ -6,6 +6,7 @@ import {
 } from "@/lib/server/airtable";
 import { checkFormToken, issueFormToken } from "@/lib/server/form-token";
 import { clientIp, isSameOrigin, rateLimit } from "@/lib/server/rate-limit";
+import { checkTurnstile } from "@/lib/server/turnstile";
 import { readCapped, sourcePage } from "@/lib/server/request";
 import { NextResponse } from "next/server";
 
@@ -83,6 +84,11 @@ export async function POST(request: Request) {
   const errors = validateLead(l);
   if (Object.keys(errors).length) {
     return NextResponse.json({ ok: false, errors }, { status: 422 });
+  }
+
+  // A person solved the check (lib/server/turnstile.ts), when it's set up.
+  if (!(await checkTurnstile(body.turnstile, clientIp(request), "growth-audit"))) {
+    return fail(403, "We couldn't confirm you're a person. Please try again.");
   }
 
   // Column names in the Airtable table. Typed answers are guarded against

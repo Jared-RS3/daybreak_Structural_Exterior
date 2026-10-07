@@ -10,6 +10,7 @@ import {
 } from "@/components/agency/LegalDoc";
 import { legal } from "@/lib/agency";
 import { analyticsOn } from "@/lib/analytics";
+import { turnstileOn } from "@/lib/turnstile";
 
 export const metadata: Metadata = {
   title: "PAIA Manual",
@@ -219,7 +220,7 @@ export default function PaiaPage() {
         </p>
         <LegalList
           items={[
-            `Service providers that handle it on our behalf, under written terms: our website host, our customer relationship management system (Airtable), our booking calendar (Cal.com) and the calendar and video-call services connected to it, our AI note-taking service, and our email provider${analyticsOn ? ", and, for visitors who accept analytics cookies, Google (Google Analytics)" : ""}.`,
+            `Service providers that handle it on our behalf, under written terms: our website host, our customer relationship management system (Airtable), our booking calendar (Cal.com) and the calendar and video-call services connected to it, our AI note-taking service, and our email provider${turnstileOn ? ", Cloudflare (Turnstile), which checks that forms are sent by people, not bots" : ""}${analyticsOn ? ", and, for visitors who accept analytics cookies, Google (Google Analytics)" : ""}.`,
             "Our professional advisers, such as accountants and lawyers, where they need it.",
             "The South African Revenue Service, the Companies and Intellectual Property Commission and other authorities, where the law requires it.",
           ]}

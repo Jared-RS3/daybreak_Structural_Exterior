@@ -6,13 +6,16 @@ const isDev = process.env.NODE_ENV === "development";
 const ga = /^G-[A-Z0-9]{4,}$/.test((process.env.NEXT_PUBLIC_GA_ID ?? "").trim());
 const gaScript = ga ? " https://www.googletagmanager.com" : "";
 const gaData = ga ? " https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com" : "";
+/** Cloudflare Turnstile's script and frame, allowed only when it's switched on (lib/turnstile.ts). */
+const turnstile = (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "").trim() ? " https://challenges.cloudflare.com" : "";
 
 /**
  * Content Security Policy: the browser only runs scripts, loads styles and
  * fonts, and sends requests to this site. Everything the site uses is
  * self-hosted (fonts via next/font, images, video), so nothing else is
- * needed — except Google Analytics when NEXT_PUBLIC_GA_ID is set, whose
- * domains are added below. If you add a chat widget or an embed, add its
+ * needed — except Google Analytics when NEXT_PUBLIC_GA_ID is set, and
+ * Cloudflare Turnstile when NEXT_PUBLIC_TURNSTILE_SITE_KEY is, whose domains
+ * are added below. If you add a chat widget or an embed, add its
  * domain to the matching line or the browser will block it.
  *
  * 'unsafe-inline' on scripts is what Next needs without per-request nonces
@@ -22,12 +25,13 @@ const gaData = ga ? " https://*.google-analytics.com https://*.analytics.google.
  */
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${gaScript}`,
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}${gaScript}${turnstile}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' blob: data:${gaData}`,
   "font-src 'self'",
   "media-src 'self'",
   `connect-src 'self'${isDev ? " ws:" : ""}${gaData}`,
+  `frame-src 'self'${turnstile}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

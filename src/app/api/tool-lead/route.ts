@@ -12,6 +12,7 @@ import { emailConfigured, sendEmail } from "@/lib/server/email";
 import { quoteEmail } from "@/lib/server/quote-email";
 import { checkFormToken, issueFormToken } from "@/lib/server/form-token";
 import { renderQuotePdf, type QuoteDoc } from "@/lib/server/quote-pdf";
+import { checkTurnstile } from "@/lib/server/turnstile";
 import { clientIp, isSameOrigin, rateLimit } from "@/lib/server/rate-limit";
 import { readCapped, sourcePage } from "@/lib/server/request";
 import { randomBytes } from "node:crypto";
@@ -24,7 +25,8 @@ import { NextResponse } from "next/server";
  * and the crack checker) and, in order:
  *
  *   1. checks the request the same way /api/growth-audit does (this site
- *      only, rate limits, a signed form token, bot checks, validation);
+ *      only, rate limits, a signed form token, bot checks, validation, and
+ *      Cloudflare Turnstile when it's set up);
  *   2. rebuilds the estimate or report from the answers on the server, so
  *      the numbers are always the site's own;
  *   3. draws the PDF (lib/server/quote-pdf.ts), and in development saves a
@@ -122,6 +124,12 @@ export async function POST(request: Request) {
       ...fixes.map((f) => `${f.label}: ${f.range}`),
     ].join("\n");
     extra = { "Estimate low": null, "Estimate high": null, Severity: level.label };
+  }
+
+  // A person solved the check (lib/server/turnstile.ts). Last of the request
+  // checks, as it's the only one that calls out; the form resets it on failure.
+  if (!(await checkTurnstile(body.turnstile, clientIp(request), "tool-lead"))) {
+    return fail(403, "We couldn't confirm you're a person. Please try again.");
   }
 
   // One address can't be used to send it a stream of emails from our domain.

@@ -33,6 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       ],
     },
     { url: absoluteUrl("/how-it-works"), lastModified: "2026-10-02", changeFrequency: "monthly", priority: 0.8 },
+    { url: absoluteUrl("/estimator"), lastModified: "2026-10-07", changeFrequency: "monthly", priority: 0.7 },
     ...Object.values(tradePages).map((p) => ({
       url: absoluteUrl(p.path),
       lastModified: "2026-10-02",
