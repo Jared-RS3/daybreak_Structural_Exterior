@@ -104,3 +104,7 @@ are drawn in code (`components/daybreak/MiniSites.tsx`), not screenshots.
    their engineer.
 5. **Legal pages** still use the previous visual style inside the new header
    and footer.
+
+## Contractor estimator concepts
+
+The shared estimator can render allowlisted contractor demos without enabling the live lead workflow. See [contractor-estimator-demos.md](docs/contractor-estimator-demos.md) for the HomeSpec concept, safeguards, and how to add the next contractor.

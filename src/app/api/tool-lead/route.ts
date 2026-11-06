@@ -47,6 +47,19 @@ const PDF_FIELD = "Quote PDF";
 
 const fail = (status: number, error: string) => NextResponse.json({ ok: false, error }, { status });
 
+/** Demo pages have no operational lead path. This is defense in depth: the
+ * HomeSpec UI never calls this route, and a request sourced from a demo page
+ * cannot reach Airtable, email, or PDF delivery here. */
+function fromDemoPage(request: Request) {
+  const referer = request.headers.get("referer");
+  if (!referer) return false;
+  try {
+    const page = new URL(referer);
+    const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? new URL(request.url).host;
+    return page.host === host && page.pathname.startsWith("/demo/");
+  } catch { return false; }
+}
+
 const tools = { estimate: "House estimator", crack: "Crack checker" } as const;
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
@@ -57,13 +70,13 @@ const newReference = (d: Date) =>
 
 /** The same token the concept form uses; the tools fetch one when they open. */
 export function GET(request: Request) {
-  if (!isSameOrigin(request)) return fail(403, "Forbidden.");
+  if (!isSameOrigin(request) || fromDemoPage(request)) return fail(403, "Forbidden.");
   if (!rateLimit(`tool-token:${clientIp(request)}`, 30, 10 * 60_000)) return fail(429, "Too many requests.");
   return NextResponse.json({ token: issueFormToken() });
 }
 
 export async function POST(request: Request) {
-  if (!isSameOrigin(request)) return fail(403, "Forbidden.");
+  if (!isSameOrigin(request) || fromDemoPage(request)) return fail(403, "Forbidden.");
   if (!rateLimit(`tool-lead:${clientIp(request)}`, 6, 10 * 60_000)) {
     return fail(429, "Too many requests. Please wait a few minutes and try again.");
   }
