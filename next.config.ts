@@ -50,9 +50,31 @@ const securityHeaders = [
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
 ];
 
+/**
+ * Client branch: this branch deploys Southeast Crawlspace Consulting's demo
+ * site. Its front door is the SECC page, and Daybreak's own sales pages send
+ * visitors there too, so the client never lands on the agency site. The
+ * legal pages stay reachable. Client branches are never merged into main,
+ * so main has no such block. Temporary (307), so nothing caches it.
+ */
+const clientHome = "/demo/southeast";
+const agencyPages = [
+  "/",
+  "/estimator",
+  "/calculator",
+  "/how-it-works",
+  "/foundation-repair-websites",
+  "/crawl-space-websites",
+  "/siding-websites",
+  "/hero-split",
+];
+
 const nextConfig: NextConfig = {
   // Don't advertise the framework in every response.
   poweredByHeader: false,
+  async redirects() {
+    return agencyPages.map((source) => ({ source, destination: clientHome, permanent: false }));
+  },
   experimental: {
     // Turbopack's build cache (on by default since 16.3) records the env
     // values the build read, and Netlify's secrets scan reads that cache and

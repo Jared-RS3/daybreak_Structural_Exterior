@@ -422,11 +422,67 @@ export const categories: RepairCategory[] = [
   },
 ];
 
-export const itemsById = Object.fromEntries(
-  categories.flatMap((c) =>
-    c.items.map((i) => [i.id, { ...i, category: c.id }]),
-  ),
-) as Record<string, RepairItem & { category: string }>;
+/**
+ * Client branch: repairs a client demo sells that Daybreak's own estimator
+ * doesn't show (Southeast Crawlspace Consulting's cleanouts, vapor barriers
+ * and French drains). They're priced and checked like any other item, but
+ * sit in no category, so /estimator never lists them. Sample prices.
+ */
+export const extraItems: RepairItem[] = [
+  {
+    id: "crawl-cleanout",
+    symptom: "Debris, old insulation or junk under the house",
+    fix: "Crawl space cleanout",
+    note: "Per sq ft of crawl space.",
+    low: 1.25,
+    high: 1.75,
+    unit: "sq ft",
+    question: "How big is the crawl space?",
+    sizes: [
+      { label: "Small (~800 sq ft)", qty: 800 },
+      { label: "Average (~1,200)", qty: 1200 },
+      { label: "Large (~1,800)", qty: 1800 },
+    ],
+    measure: "It's usually close to the footprint of the ground floor, without the garage and porch.",
+  },
+  {
+    id: "vapor-barrier",
+    symptom: "Torn, missing or thin plastic on the ground",
+    fix: "Vapor barrier",
+    note: "Per sq ft of crawl space floor.",
+    low: 2,
+    high: 3,
+    unit: "sq ft",
+    question: "How big is the crawl space?",
+    sizes: [
+      { label: "Small (~800 sq ft)", qty: 800 },
+      { label: "Average (~1,200)", qty: 1200 },
+      { label: "Large (~1,800)", qty: 1800 },
+    ],
+    measure: "It's usually close to the footprint of the ground floor, without the garage and porch.",
+  },
+  {
+    id: "french-drain",
+    symptom: "Water pooling around the foundation after rain",
+    fix: "French drain",
+    note: "Per linear foot.",
+    low: 45,
+    high: 65,
+    unit: "feet",
+    question: "How far does it need to run?",
+    sizes: [
+      { label: "One side (~40 ft)", qty: 40 },
+      { label: "Two sides (~80 ft)", qty: 80 },
+      { label: "Around the house (~160 ft)", qty: 160 },
+    ],
+    measure: "Pace along the wet side of the house; one long stride is about 3 feet.",
+  },
+];
+
+export const itemsById = Object.fromEntries([
+  ...categories.flatMap((c) => c.items.map((i) => [i.id, { ...i, category: c.id }])),
+  ...extraItems.map((i) => [i.id, { ...i, category: "extra" }]),
+]) as Record<string, RepairItem & { category: string }>;
 
 /** The middle size, or 1 for a fixed-price item: what "Get pricing" adds. */
 export const defaultQty = (item: RepairItem) =>

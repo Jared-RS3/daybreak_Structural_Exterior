@@ -1,5 +1,5 @@
 import { assess, describeAnswers, readCrackAnswers } from "@/lib/crack-check";
-import { priceEstimate, readPicks } from "@/lib/estimator";
+import { itemsById, priceEstimate, readPicks } from "@/lib/estimator";
 import { readToolContact, validateToolContact, type ToolLeadResult } from "@/lib/tool-lead";
 import {
   airtableConfigured,
@@ -9,7 +9,11 @@ import {
   uploadAirtableAttachment,
 } from "@/lib/server/airtable";
 import { emailConfigured, sendEmail } from "@/lib/server/email";
+import { southeastEmail } from "@/lib/server/southeast-email";
 import { quoteEmail } from "@/lib/server/quote-email";
+import { createSoutheastPdf } from "@/lib/demos/southeast-pdf";
+import { southeastItems } from "@/lib/demos/southeast";
+import { southeastLogoPng } from "@/lib/demos/southeast-logo";
 import { checkFormToken, issueFormToken } from "@/lib/server/form-token";
 import { renderQuotePdf, type QuoteDoc } from "@/lib/server/quote-pdf";
 import { checkTurnstile } from "@/lib/server/turnstile";
@@ -39,6 +43,12 @@ import { NextResponse } from "next/server";
  *
  * With Airtable not configured (local development), the lead goes to the
  * server log instead, as with the concept form.
+ *
+ * `brand: "southeast"` comes from the Southeast Crawlspace Consulting concept
+ * page (/demo/southeast). Same checks, same table, same email account; the
+ * estimate is told in SECC's words (lib/demos/southeast.ts), the reference
+ * starts SE-, and the PDF and email wear SECC's look. Prices are the same
+ * sample figures. Client branch only: main has no such brand.
  */
 const MAX_BODY_BYTES = 8_000;
 const MIN_FILL_MS = 2_500;
@@ -51,9 +61,9 @@ const tools = { estimate: "House estimator", crack: "Crack checker" } as const;
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 
-/** e.g. DB-261003-4F9A2C: the date, then enough randomness to never repeat. */
-const newReference = (d: Date) =>
-  `DB-${d.toISOString().slice(2, 10).replace(/-/g, "")}-${randomBytes(3).toString("hex").toUpperCase()}`;
+/** e.g. DB-261003-4F9A2C: the brand, the date, then enough randomness to never repeat. */
+const newReference = (d: Date, prefix = "DB") =>
+  `${prefix}-${d.toISOString().slice(2, 10).replace(/-/g, "")}-${randomBytes(3).toString("hex").toUpperCase()}`;
 
 /** The same token the concept form uses; the tools fetch one when they open. */
 export function GET(request: Request) {
@@ -94,23 +104,40 @@ export async function POST(request: Request) {
   // ---- The answer, rebuilt here from the answers alone ----
   const tool = body.tool === "estimate" || body.tool === "crack" ? body.tool : null;
   if (!tool) return fail(400, "Malformed request.");
+  const client = body.brand === "southeast";
+  // The SECC page only has the estimator, and only SECC's services.
+  if (client && tool !== "estimate") return fail(400, "Malformed request.");
+  // The name goes into an email to whatever address was typed: no links in
+  // it, so the form can't be used to mail someone a URL in SECC's name.
+  if (client && /:\/\/|www\.|@|\.(com|net|org|io|co|ru|xyz|info|biz|link|top)\b/i.test(contact.name)) {
+    return NextResponse.json({ ok: false, errors: { name: "Enter your name." } }, { status: 422 });
+  }
   const date = new Date();
-  const reference = newReference(date);
+  const reference = newReference(date, client ? "SE" : "DB");
   let doc: QuoteDoc;
   let summary: string;
   let extra: Record<string, string | number | null>;
   if (tool === "estimate") {
     const picks = readPicks(body.picks);
     if (!picks) return fail(400, "Pick at least one repair first.");
+    if (client && !picks.every((p) => Object.hasOwn(southeastItems, p.id))) return fail(400, "Pick at least one repair first.");
+    // Daybreak's own estimator never offers the client-only extras.
+    if (!client && picks.some((p) => itemsById[p.id].category === "extra")) return fail(400, "Pick at least one repair first.");
     const { lines, low, high } = priceEstimate(picks);
-    const rows = lines.map((l) => ({
-      label: l.item.fix,
-      detail: [l.choice, l.item.unit ? `${l.qty.toLocaleString("en-US")} ${l.item.unit}` : ""].filter(Boolean).join(", "),
-      low: l.low,
-      high: l.high,
-    }));
+    const rows = lines.map((l) => {
+      const item = client ? southeastItems[l.item.id] : l.item;
+      return {
+        label: item.fix,
+        detail: [l.choice, item.unit ? `${l.qty.toLocaleString("en-US")} ${item.unit}` : client ? "Complete install" : ""].filter(Boolean).join(", "),
+        low: l.low,
+        high: l.high,
+      };
+    });
     doc = { kind: "estimate", reference, date, contact, low, high, lines: rows };
-    summary = rows.map((r) => `${r.label}${r.detail ? ` (${r.detail})` : ""}: ${usd(r.low)} – ${usd(r.high)}`).join("\n");
+    summary = [
+      ...(client ? ["Southeast Crawlspace Consulting demo (/demo/southeast)"] : []),
+      ...rows.map((r) => `${r.label}${r.detail ? ` (${r.detail})` : ""}: ${usd(r.low)} – ${usd(r.high)}`),
+    ].join("\n");
     extra = { "Estimate low": low, "Estimate high": high, Severity: null };
   } else {
     const answers = readCrackAnswers(body.answers);
@@ -141,8 +168,24 @@ export async function POST(request: Request) {
     return fail(429, "We're getting a lot of requests right now. Please try again shortly.");
   }
 
-  const pdf = await renderQuotePdf(doc);
-  const filename = `${tool === "estimate" ? "Repair-estimate" : "Crack-check"}-${reference}.pdf`;
+  const pdf =
+    client && doc.kind === "estimate"
+      ? await createSoutheastPdf({
+          name: contact.name,
+          zip: contact.zip,
+          phone: contact.phone,
+          email: contact.email,
+          reference,
+          date,
+          low: doc.low,
+          high: doc.high,
+          lines: doc.lines.map((l) => ({ fix: l.label, size: l.detail, low: l.low, high: l.high })),
+          logo: Buffer.from(southeastLogoPng, "base64"),
+        })
+      : await renderQuotePdf(doc);
+  const filename = client
+    ? `Southeast-Crawlspace-estimate-${reference}.pdf`
+    : `${tool === "estimate" ? "Repair-estimate" : "Crack-check"}-${reference}.pdf`;
 
   // A local copy while developing, so you can open what was sent. Never in
   // production: the server's disk isn't kept, and it holds people's details.
@@ -197,7 +240,22 @@ export async function POST(request: Request) {
   let status = "Not set up";
   if (emailConfigured()) {
     try {
-      await sendEmail({ to: contact.email, ...quoteEmail(doc), attachments: [{ filename, bytes: pdf }] });
+      const message =
+        client && doc.kind === "estimate"
+          ? {
+              ...southeastEmail({
+                name: contact.name,
+                zip: contact.zip,
+                reference,
+                date,
+                low: doc.low,
+                high: doc.high,
+                lines: doc.lines.map((l) => ({ fix: l.label, size: l.detail, low: l.low, high: l.high })),
+              }),
+              fromName: "Southeast Crawlspace Estimates (Daybreak demo)",
+            }
+          : quoteEmail(doc);
+      await sendEmail({ to: contact.email, ...message, attachments: [{ filename, bytes: pdf }] });
       emailed = true;
       status = "Sent";
     } catch (err) {

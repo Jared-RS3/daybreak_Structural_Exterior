@@ -23,7 +23,11 @@ export async function sendEmail(message: {
   html: string;
   text: string;
   attachments?: { filename: string; bytes: Uint8Array }[];
+  /** A display name in place of EMAIL_FROM's own, same address (the verified domain). */
+  fromName?: string;
 }): Promise<void> {
+  const configured = process.env.EMAIL_FROM ?? "";
+  const address = configured.match(/<([^>]+)>/)?.[1] ?? configured.trim();
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -31,7 +35,7 @@ export async function sendEmail(message: {
       "content-type": "application/json",
     },
     body: JSON.stringify({
-      from: process.env.EMAIL_FROM,
+      from: message.fromName ? `${message.fromName.replace(/[<>"]/g, "")} <${address}>` : configured,
       to: [message.to],
       ...(process.env.EMAIL_REPLY_TO ? { reply_to: process.env.EMAIL_REPLY_TO } : {}),
       subject: message.subject,
