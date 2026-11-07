@@ -626,9 +626,10 @@ export function HomeSpecEstimator() {
                   className="mt-0.5 size-5 shrink-0 cursor-pointer accent-(--hs-blue-ink)"
                 />
                 <span>
-                  Email me my estimate and contact me about a free inspection by email, phone or text, as set out in the{" "}
-                  <a href="/privacy" target="_blank" rel="noopener" className="font-bold text-(--hs-navy) underline underline-offset-4">
-                    Privacy Policy
+                  Email me my estimate, and let Daybreak StructureWorks, which built this demo for HomeSpec, contact me about it
+                  by email, phone or text, as set out in the{" "}
+                  <a href="/demo/homespec/privacy" target="_blank" rel="noopener" className="font-bold text-(--hs-navy) underline underline-offset-4">
+                    Privacy Notice
                   </a>
                   .
                 </span>
@@ -719,8 +720,9 @@ export function HomeSpecEstimator() {
                 <p role="status" className="mt-3 flex gap-2.5 rounded-lg bg-[#eef4fe] p-4 text-[14.5px] leading-snug text-(--hs-ink)">
                   <Icon name="calendar" className="mt-0.5 size-5 shrink-0 text-(--hs-blue-ink)" />
                   <span>
-                    <strong>You’re all set.</strong> Your estimate is with our team, and a specialist will call{" "}
-                    {contact.phone.trim()} to book your free inspection.
+                    <strong>This is where the booking happens.</strong> On HomeSpec’s live site, this sends your request to their
+                    team, who call to set up your free inspection. This is a concept demo, so no inspection is booked and HomeSpec
+                    hasn’t received your details; to book a real one, call {homespec.phone}.
                   </span>
                 </p>
               ) : (

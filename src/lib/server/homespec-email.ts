@@ -1,5 +1,5 @@
 import "server-only";
-import { agency } from "@/lib/agency";
+import { legal } from "@/lib/agency";
 import { homespec } from "@/lib/demos/homespec";
 import { escapeHtml } from "./email";
 
@@ -45,14 +45,13 @@ export function homespecEmail(d: HomeSpecEmailInput) {
   const first = greet(d.name);
   const subject = `Your HomeSpec repair estimate: ${usd(d.low)} – ${usd(d.high)}`;
   const preheader = `Ballpark ${usd(d.low)} – ${usd(d.high)}. Your full estimate is attached as a PDF.`;
-  const replyTo = process.env.EMAIL_REPLY_TO || agency.email;
-  const book = `mailto:${replyTo}?subject=${encodeURIComponent(`Book my free inspection (${d.reference})`)}`;
+  const call = `tel:+1${homespec.phone.replace(/\D/g, "").slice(-10)}`;
   const date = d.date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
   const label = (s: string) =>
     `<div style="font-family:${sans};font-size:12px;font-weight:bold;letter-spacing:.08em;text-transform:uppercase;color:${navy}">${e(s)}</div>`;
   const next = [
     "Open the PDF attached to this email: it has your full estimate and reference number.",
-    "A HomeSpec specialist will be in touch to book your free, no-obligation inspection.",
+    "On HomeSpec's live site, their team would now call to book your free, no-obligation inspection. This is a concept demo, so HomeSpec hasn't received your details: to book a real inspection, call them.",
     "Every home is different, so the inspection gives you the exact price in writing, with lifetime warranties and financing available.",
   ];
 
@@ -113,14 +112,13 @@ ${label("What happens next")}
 
 <tr><td align="center" style="padding:0 28px 30px">
 <table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="background:#000000;border-radius:999px">
-<a href="${e(book)}" style="display:inline-block;padding:15px 32px;font-family:${sans};font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none">Book My Free Inspection</a>
+<a href="${e(call)}" style="display:inline-block;padding:15px 32px;font-family:${sans};font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none">Call ${e(homespec.phone)} to Book</a>
 </td></tr></table>
-<div style="font-family:${sans};font-size:14px;color:${muted};margin-top:12px">Or call us at <strong style="color:${blue}">${e(homespec.phone)}</strong></div>
 </td></tr>
 
 <tr><td style="padding:0 28px 28px">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px dashed #c9ced5"><tr><td style="padding:14px 16px;font-family:${sans};font-size:12.5px;line-height:1.55;color:${muted}">
-<strong style="color:${ink}">Concept demo.</strong> This came from an estimator Daybreak StructureWorks built for HomeSpec Waterproofing &amp; Foundation Repair. The prices are samples, not HomeSpec's.
+<strong style="color:${ink}">Concept demo.</strong> This email comes from ${e(legal.tradingName)}, which built this estimator for HomeSpec Waterproofing &amp; Foundation Repair and runs the demo. HomeSpec has not received your details, and the prices are samples, not HomeSpec's. Questions about your data, or to have it deleted: <a href="mailto:${e(legal.privacyEmail)}" style="color:${ink}">${e(legal.privacyEmail)}</a>.
 </td></tr></table>
 </td></tr>
 
@@ -138,8 +136,8 @@ You're getting this because you asked for your estimate. We only email you about
     `Your HomeSpec ballpark estimate for ZIP ${d.zip} is ${usd(d.low)} – ${usd(d.high)}.`,
     d.lines.map((l) => `- ${l.fix} (${l.size}): ${usd(l.low)} – ${usd(l.high)}`).join("\n"),
     `What happens next:\n${next.map((s, i) => `${i + 1}. ${s}`).join("\n")}`,
-    `Book your free inspection: reply to this email, or call ${homespec.phone}.`,
-    "Concept demo: this came from an estimator Daybreak StructureWorks built for HomeSpec. The prices are samples, not HomeSpec's.",
+    `To book a real inspection, call HomeSpec at ${homespec.phone}.`,
+    `Concept demo: this email comes from ${legal.tradingName}, which built this estimator for HomeSpec and runs the demo. HomeSpec has not received your details, and the prices are samples. Questions about your data, or to have it deleted: ${legal.privacyEmail}.`,
     `Ref. ${d.reference} · ${date}`,
   ].join("\n\n");
 

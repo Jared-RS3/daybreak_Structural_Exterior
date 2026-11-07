@@ -125,7 +125,7 @@ export async function createHomeSpecPdf(input: PdfInput): Promise<Uint8Array> {
   // ---- The fine print ----
   page.drawLine({ start: { x: M, y: 92 }, end: { x: W - M, y: 92 }, thickness: 0.6, color: rule });
   para(
-    "SAMPLE ESTIMATE FROM A CONCEPT DEMO built for HomeSpec by Daybreak StructureWorks. The prices are sample figures, not HomeSpec's pricing. A ballpark only, not a quote.",
+    "SAMPLE ESTIMATE FROM A CONCEPT DEMO built for HomeSpec by Daybreak StructureWorks, which runs the demo. HomeSpec has not received your details. The prices are sample figures, not HomeSpec's pricing. A ballpark only, not a quote.",
     M, 76, W - 2 * M, 8.5, regular,
   );
 
