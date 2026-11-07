@@ -57,7 +57,10 @@ test('the PDF builds with the logo, and without it', async () => {
     lines: [{ fix: 'Sump pump system', size: 'Complete install', low: 1550, high: 1850 }],
   };
   const logo = require('node:fs').readFileSync(path.join(root, 'public/demo/homespec/logo.png'));
-  for (const extra of [{ logo: new Uint8Array(logo) }, {}]) {
+  // The server uses the built-in copy; it must be the same file as the page's.
+  const { homespecLogoPng } = require('../src/lib/demos/homespec-logo.ts');
+  assert.ok(Buffer.from(homespecLogoPng, 'base64').equals(logo));
+  for (const extra of [{ logo: new Uint8Array(Buffer.from(homespecLogoPng, 'base64')) }, {}]) {
     const doc = await PDFDocument.load(await createHomeSpecPdf({ ...input, ...extra }));
     assert.equal(doc.getPageCount(), 1);
     assert.match(doc.getSubject() ?? '', /concept demo/);

@@ -13,14 +13,14 @@ import { homespecEmail } from "@/lib/server/homespec-email";
 import { quoteEmail } from "@/lib/server/quote-email";
 import { createHomeSpecPdf } from "@/lib/demos/homespec-pdf";
 import { homespecItems } from "@/lib/demos/homespec";
+import { homespecLogoPng } from "@/lib/demos/homespec-logo";
 import { checkFormToken, issueFormToken } from "@/lib/server/form-token";
 import { renderQuotePdf, type QuoteDoc } from "@/lib/server/quote-pdf";
 import { checkTurnstile } from "@/lib/server/turnstile";
 import { clientIp, isSameOrigin, rateLimit } from "@/lib/server/rate-limit";
 import { readCapped, sourcePage } from "@/lib/server/request";
-import { siteUrl } from "@/lib/seo";
 import { randomBytes } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 
@@ -63,29 +63,6 @@ const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 /** e.g. DB-261003-4F9A2C: the brand, the date, then enough randomness to never repeat. */
 const newReference = (d: Date, prefix = "DB") =>
   `${prefix}-${d.toISOString().slice(2, 10).replace(/-/g, "")}-${randomBytes(3).toString("hex").toUpperCase()}`;
-
-/**
- * HomeSpec's logo for its PDF: from disk, else from the site's own fixed
- * address (a serverless function may not ship /public), else none (the PDF
- * sets the name in type). Never from the request's URL: its host comes from
- * the Host header, and fetching that would let a caller aim the server at
- * any address it likes.
- */
-async function homespecLogo(): Promise<Uint8Array | undefined> {
-  try {
-    return await readFile(path.join(process.cwd(), "public/demo/homespec/logo.png"));
-  } catch {
-    try {
-      const res = await fetch(`${siteUrl}/demo/homespec/logo.png`, { signal: AbortSignal.timeout(4000), redirect: "error" });
-      const type = res.headers.get("content-type") ?? "";
-      const size = Number(res.headers.get("content-length") ?? 0);
-      if (!res.ok || !type.startsWith("image/png") || size > 200_000) return undefined;
-      return new Uint8Array(await res.arrayBuffer());
-    } catch {
-      return undefined;
-    }
-  }
-}
 
 /** The same token the concept form uses; the tools fetch one when they open. */
 export function GET(request: Request) {
@@ -200,7 +177,7 @@ export async function POST(request: Request) {
           low: doc.low,
           high: doc.high,
           lines: doc.lines.map((l) => ({ fix: l.label, size: l.detail, low: l.low, high: l.high })),
-          logo: await homespecLogo(),
+          logo: Buffer.from(homespecLogoPng, "base64"),
         })
       : await renderQuotePdf(doc);
   const filename = homespec
