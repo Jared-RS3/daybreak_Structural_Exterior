@@ -42,7 +42,7 @@ type Tab = "checker" | "estimate";
 export type PageTools = { checker: boolean; focus?: string };
 
 /** Pages without the launcher: the legal ones, and the estimator's own page. */
-const quiet = ["/privacy", "/terms", "/paia", "/accessibility", "/estimator", "/demo/"];
+const quiet = ["/privacy", "/terms", "/paia", "/accessibility", "/estimator"];
 const TEASER_KEY = "daybreak-tools-teaser";
 const TEASER_MS = 3500;
 /** Large screens open the small window by themselves, once per visit, after

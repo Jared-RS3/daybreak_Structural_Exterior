@@ -107,4 +107,4 @@ are drawn in code (`components/daybreak/MiniSites.tsx`), not screenshots.
 
 ## Contractor estimator concepts
 
-The shared estimator can render allowlisted contractor demos without enabling the live lead workflow. See [contractor-estimator-demos.md](docs/contractor-estimator-demos.md) for the HomeSpec concept, safeguards, and how to add the next contractor.
+`/demo/homespec` shows the house estimator dressed as a page on HomeSpec's site, for pitching them. Its leads go through the live `/api/tool-lead` path (Airtable and email) in HomeSpec's branding. See [contractor-estimator-demos.md](docs/contractor-estimator-demos.md).

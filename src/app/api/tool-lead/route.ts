@@ -9,14 +9,18 @@ import {
   uploadAirtableAttachment,
 } from "@/lib/server/airtable";
 import { emailConfigured, sendEmail } from "@/lib/server/email";
+import { homespecEmail } from "@/lib/server/homespec-email";
 import { quoteEmail } from "@/lib/server/quote-email";
+import { createHomeSpecPdf } from "@/lib/demos/homespec-pdf";
+import { homespecItems } from "@/lib/demos/homespec";
 import { checkFormToken, issueFormToken } from "@/lib/server/form-token";
 import { renderQuotePdf, type QuoteDoc } from "@/lib/server/quote-pdf";
 import { checkTurnstile } from "@/lib/server/turnstile";
 import { clientIp, isSameOrigin, rateLimit } from "@/lib/server/rate-limit";
 import { readCapped, sourcePage } from "@/lib/server/request";
+import { siteUrl } from "@/lib/seo";
 import { randomBytes } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 
@@ -39,6 +43,11 @@ import { NextResponse } from "next/server";
  *
  * With Airtable not configured (local development), the lead goes to the
  * server log instead, as with the concept form.
+ *
+ * `brand: "homespec"` comes from the HomeSpec concept page (/demo/homespec).
+ * Same checks, same table, same email account; the estimate is told in
+ * HomeSpec's words (lib/demos/homespec.ts), the reference starts HS-, and the
+ * PDF and email wear HomeSpec's look. Prices are the same sample figures.
  */
 const MAX_BODY_BYTES = 8_000;
 const MIN_FILL_MS = 2_500;
@@ -47,36 +56,46 @@ const PDF_FIELD = "Quote PDF";
 
 const fail = (status: number, error: string) => NextResponse.json({ ok: false, error }, { status });
 
-/** Demo pages have no operational lead path. This is defense in depth: the
- * HomeSpec UI never calls this route, and a request sourced from a demo page
- * cannot reach Airtable, email, or PDF delivery here. */
-function fromDemoPage(request: Request) {
-  const referer = request.headers.get("referer");
-  if (!referer) return false;
-  try {
-    const page = new URL(referer);
-    const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? new URL(request.url).host;
-    return page.host === host && page.pathname.startsWith("/demo/");
-  } catch { return false; }
-}
-
 const tools = { estimate: "House estimator", crack: "Crack checker" } as const;
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
 
-/** e.g. DB-261003-4F9A2C: the date, then enough randomness to never repeat. */
-const newReference = (d: Date) =>
-  `DB-${d.toISOString().slice(2, 10).replace(/-/g, "")}-${randomBytes(3).toString("hex").toUpperCase()}`;
+/** e.g. DB-261003-4F9A2C: the brand, the date, then enough randomness to never repeat. */
+const newReference = (d: Date, prefix = "DB") =>
+  `${prefix}-${d.toISOString().slice(2, 10).replace(/-/g, "")}-${randomBytes(3).toString("hex").toUpperCase()}`;
+
+/**
+ * HomeSpec's logo for its PDF: from disk, else from the site's own fixed
+ * address (a serverless function may not ship /public), else none (the PDF
+ * sets the name in type). Never from the request's URL: its host comes from
+ * the Host header, and fetching that would let a caller aim the server at
+ * any address it likes.
+ */
+async function homespecLogo(): Promise<Uint8Array | undefined> {
+  try {
+    return await readFile(path.join(process.cwd(), "public/demo/homespec/logo.png"));
+  } catch {
+    try {
+      const res = await fetch(`${siteUrl}/demo/homespec/logo.png`, { signal: AbortSignal.timeout(4000), redirect: "error" });
+      const type = res.headers.get("content-type") ?? "";
+      const size = Number(res.headers.get("content-length") ?? 0);
+      if (!res.ok || !type.startsWith("image/png") || size > 200_000) return undefined;
+      return new Uint8Array(await res.arrayBuffer());
+    } catch {
+      return undefined;
+    }
+  }
+}
 
 /** The same token the concept form uses; the tools fetch one when they open. */
 export function GET(request: Request) {
-  if (!isSameOrigin(request) || fromDemoPage(request)) return fail(403, "Forbidden.");
+  if (!isSameOrigin(request)) return fail(403, "Forbidden.");
   if (!rateLimit(`tool-token:${clientIp(request)}`, 30, 10 * 60_000)) return fail(429, "Too many requests.");
   return NextResponse.json({ token: issueFormToken() });
 }
 
 export async function POST(request: Request) {
-  if (!isSameOrigin(request) || fromDemoPage(request)) return fail(403, "Forbidden.");
+  if (!isSameOrigin(request)) return fail(403, "Forbidden.");
   if (!rateLimit(`tool-lead:${clientIp(request)}`, 6, 10 * 60_000)) {
     return fail(429, "Too many requests. Please wait a few minutes and try again.");
   }
@@ -107,23 +126,38 @@ export async function POST(request: Request) {
   // ---- The answer, rebuilt here from the answers alone ----
   const tool = body.tool === "estimate" || body.tool === "crack" ? body.tool : null;
   if (!tool) return fail(400, "Malformed request.");
+  const homespec = body.brand === "homespec";
+  // The HomeSpec page only has the estimator, and only HomeSpec's services.
+  if (homespec && tool !== "estimate") return fail(400, "Malformed request.");
+  // The name goes into an email to whatever address was typed: no links in
+  // it, so the form can't be used to mail someone a URL in HomeSpec's name.
+  if (homespec && /:\/\/|www\.|@|\.(com|net|org|io|co|ru|xyz|info|biz|link|top)\b/i.test(contact.name)) {
+    return NextResponse.json({ ok: false, errors: { name: "Enter your name." } }, { status: 422 });
+  }
   const date = new Date();
-  const reference = newReference(date);
+  const reference = newReference(date, homespec ? "HS" : "DB");
   let doc: QuoteDoc;
   let summary: string;
   let extra: Record<string, string | number | null>;
   if (tool === "estimate") {
     const picks = readPicks(body.picks);
     if (!picks) return fail(400, "Pick at least one repair first.");
+    if (homespec && !picks.every((p) => Object.hasOwn(homespecItems, p.id))) return fail(400, "Pick at least one repair first.");
     const { lines, low, high } = priceEstimate(picks);
-    const rows = lines.map((l) => ({
-      label: l.item.fix,
-      detail: [l.choice, l.item.unit ? `${l.qty.toLocaleString("en-US")} ${l.item.unit}` : ""].filter(Boolean).join(", "),
-      low: l.low,
-      high: l.high,
-    }));
+    const rows = lines.map((l) => {
+      const item = homespec ? homespecItems[l.item.id] : l.item;
+      return {
+        label: item.fix,
+        detail: [l.choice, item.unit ? `${l.qty.toLocaleString("en-US")} ${item.unit}` : homespec ? "Complete install" : ""].filter(Boolean).join(", "),
+        low: l.low,
+        high: l.high,
+      };
+    });
     doc = { kind: "estimate", reference, date, contact, low, high, lines: rows };
-    summary = rows.map((r) => `${r.label}${r.detail ? ` (${r.detail})` : ""}: ${usd(r.low)} – ${usd(r.high)}`).join("\n");
+    summary = [
+      ...(homespec ? ["HomeSpec demo (/demo/homespec)"] : []),
+      ...rows.map((r) => `${r.label}${r.detail ? ` (${r.detail})` : ""}: ${usd(r.low)} – ${usd(r.high)}`),
+    ].join("\n");
     extra = { "Estimate low": low, "Estimate high": high, Severity: null };
   } else {
     const answers = readCrackAnswers(body.answers);
@@ -154,8 +188,24 @@ export async function POST(request: Request) {
     return fail(429, "We're getting a lot of requests right now. Please try again shortly.");
   }
 
-  const pdf = await renderQuotePdf(doc);
-  const filename = `${tool === "estimate" ? "Repair-estimate" : "Crack-check"}-${reference}.pdf`;
+  const pdf =
+    homespec && doc.kind === "estimate"
+      ? await createHomeSpecPdf({
+          name: contact.name,
+          zip: contact.zip,
+          phone: contact.phone,
+          email: contact.email,
+          reference,
+          date,
+          low: doc.low,
+          high: doc.high,
+          lines: doc.lines.map((l) => ({ fix: l.label, size: l.detail, low: l.low, high: l.high })),
+          logo: await homespecLogo(),
+        })
+      : await renderQuotePdf(doc);
+  const filename = homespec
+    ? `HomeSpec-estimate-${reference}.pdf`
+    : `${tool === "estimate" ? "Repair-estimate" : "Crack-check"}-${reference}.pdf`;
 
   // A local copy while developing, so you can open what was sent. Never in
   // production: the server's disk isn't kept, and it holds people's details.
@@ -210,7 +260,22 @@ export async function POST(request: Request) {
   let status = "Not set up";
   if (emailConfigured()) {
     try {
-      await sendEmail({ to: contact.email, ...quoteEmail(doc), attachments: [{ filename, bytes: pdf }] });
+      const message =
+        homespec && doc.kind === "estimate"
+          ? {
+              ...homespecEmail({
+                name: contact.name,
+                zip: contact.zip,
+                reference,
+                date,
+                low: doc.low,
+                high: doc.high,
+                lines: doc.lines.map((l) => ({ fix: l.label, size: l.detail, low: l.low, high: l.high })),
+              }),
+              fromName: "HomeSpec Estimates (Daybreak demo)",
+            }
+          : quoteEmail(doc);
+      await sendEmail({ to: contact.email, ...message, attachments: [{ filename, bytes: pdf }] });
       emailed = true;
       status = "Sent";
     } catch (err) {

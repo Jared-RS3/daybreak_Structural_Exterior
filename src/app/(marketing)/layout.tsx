@@ -41,7 +41,6 @@ export default function MarketingLayout({
           "/how-it-works",
           "/calculator",
           "/estimator",
-          "/demo/",
           "/foundation-repair-websites",
           "/crawl-space-websites",
           "/siding-websites",

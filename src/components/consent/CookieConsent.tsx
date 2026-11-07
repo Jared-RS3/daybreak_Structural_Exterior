@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { consentCookie, consentDays } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -102,11 +103,15 @@ export function CookieConsent({ gaId }: { gaId: string }) {
   const [analytics, setAnalytics] = useState(false);
   const titleId = useId();
   const switchId = useId();
+  // Concept demos for prospects (/demo/…) wear the prospect's brand, not
+  // Daybreak's: no Daybreak banner there, and no analytics either way.
+  const demo = usePathname().startsWith("/demo/");
 
   useEffect(() => {
+    if (demo) return;
     if (state === "granted") startAnalytics(gaId);
     else if (state === "denied" || state === "signal") stopAnalytics(gaId);
-  }, [state, gaId]);
+  }, [state, gaId, demo]);
 
   useEffect(() => {
     const reopen = () => {
@@ -118,7 +123,7 @@ export function CookieConsent({ gaId }: { gaId: string }) {
     return () => window.removeEventListener(OPEN, reopen);
   }, []);
 
-  if (state === "server" || (!open && state !== "unset")) return null;
+  if (demo || state === "server" || (!open && state !== "unset")) return null;
 
   const decide = (choice: Choice) => {
     save(choice);

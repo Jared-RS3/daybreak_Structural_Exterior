@@ -4,10 +4,8 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { Img } from "@/components/ui/Img";
 import { track } from "@/lib/analytics";
-import { daybreakEstimatorConfig, type ContractorEstimatorConfig } from "@/lib/contractors/config";
-import { ContractorDemoFlow } from "./ContractorDemoFlow";
 import { cn, newTab } from "@/lib/utils";
-import { defaultQty, priceEstimate, sceneImages, type Area, type Hotspot } from "@/lib/estimator";
+import { areas, categories, defaultQty, itemsById, priceEstimate, sceneImages, type Area, type Hotspot } from "@/lib/estimator";
 import type { ToolLeadResult } from "@/lib/tool-lead";
 import { AreaTag } from "./AreaTag";
 import { HouseScene, scenes } from "./EstimatorScenes";
@@ -44,20 +42,12 @@ function chipPos(p: Hotspot) {
 export function RepairEstimator({
   cta,
   focus,
-  config = daybreakEstimatorConfig,
 }: {
   cta?: { href: string; label: string; onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void };
   /** A section to open first, e.g. "siding" on the siding page. */
   focus?: string;
-  config?: ContractorEstimatorConfig;
 }) {
   const uid = useId();
-  const demo = config.mode === "demo";
-  const catalog = config.categories;
-  const houseAreas = config.areas;
-  const catalogItems = Object.fromEntries(catalog.flatMap((c) => c.items.map((i) => [i.id, { ...i, category: c.id }])));
-  const emit = (event: string, data: Record<string, string | number>) => { if (config.features.analytics) track(event, data); };
-  const [demoRun, setDemoRun] = useState(0);
   const [areaId, setAreaId] = useState<Area["id"] | null>(null);
   const [spot, setSpot] = useState<number | null>(null);
   /** Repair id → quantity. */
@@ -76,41 +66,41 @@ export function RepairEstimator({
   const cardOver = useRef<HTMLDivElement>(null);
   const cardUnder = useRef<HTMLDivElement>(null);
 
-  const area = houseAreas.find((a) => a.id === areaId) ?? null;
+  const area = areas.find((a) => a.id === areaId) ?? null;
   const Scene = area ? scenes[area.id] : HouseScene;
-  const photo = demo ? null : sceneImages[area ? area.id : "house"];
+  const photo = sceneImages[area ? area.id : "house"];
   const active = area && spot !== null ? area.hotspots[spot] : null;
 
   const picks = Object.entries(picked).map(([id, qty]) => ({ id, qty, variant: variant[id] ?? 0 }));
   const { lines, low, high } = priceEstimate(picks);
 
   const toggle = (id: string) => {
-    if (!(id in picked)) emit("estimator_add", { repair: id, from: "list" });
+    if (!(id in picked)) track("estimator_add", { repair: id, from: "list" });
     setPicked((cur) => {
       const next = { ...cur };
       if (id in next) delete next[id];
-      else next[id] = defaultQty(catalogItems[id]);
+      else next[id] = defaultQty(itemsById[id]);
       return next;
     });
   };
-  const setQty = (id: string, qty: number) => setPicked((cur) => ({ ...cur, [id]: demo ? Math.min(config.measurements[id]?.max ?? 10000, Math.max(1, Math.round(qty) || 1)) : Math.max(1, Math.round(qty) || 1) }));
+  const setQty = (id: string, qty: number) => setPicked((cur) => ({ ...cur, [id]: Math.max(1, Math.round(qty) || 1) }));
 
   /** Looks inside one part of the house. */
   const enter = (id: Area["id"]) => {
     setAreaId(id);
-    emit("estimator_area", { area: id });
+    track("estimator_area", { area: id });
   };
 
   /** Opens or closes a problem's card on the picture. */
   const tap = (i: number) => {
-    if (spot !== i && area) emit("estimator_problem", { area: area.id, repair: area.hotspots[i].item });
+    if (spot !== i && area) track("estimator_problem", { area: area.id, repair: area.hotspots[i].item });
     setSpot(spot === i ? null : i);
   };
 
   /** From a hotspot: add the repair, open its list and bring it into view. */
   const price = (h: Hotspot) => {
-    const item = catalogItems[h.item];
-    if (!(h.item in picked)) emit("estimator_add", { repair: h.item, from: "picture" });
+    const item = itemsById[h.item];
+    if (!(h.item in picked)) track("estimator_add", { repair: h.item, from: "picture" });
     setPicked((cur) => (h.item in cur ? cur : { ...cur, [h.item]: defaultQty(item) }));
     setOpen(open.includes(item.category) ? open : [...open, item.category]);
     setSpot(null);
@@ -143,8 +133,7 @@ export function RepairEstimator({
   };
 
   const reveal = () => {
-    emit("estimator_see_price", { repairs: lines.length });
-    if (demo) setDemoRun((n) => n + 1);
+    track("estimator_see_price", { repairs: lines.length });
     setStep("form");
     setSent(null);
     dialog.current?.showModal();
@@ -163,15 +152,15 @@ export function RepairEstimator({
   return (
     // A container: everything below is laid out by the estimator's own
     // width, so it works in the small tools window and full screen alike.
-    <div className="@container bg-card text-fg" style={demo ? { "--color-fg": config.brand.ink, "--color-sun": config.brand.pale, "--color-card": "#F8FAFB", "--color-rule": "#CDD6DC", "--color-muted": "#405260" } as React.CSSProperties : undefined}>
+    <div className="@container bg-card text-fg">
       {/* ---- Look inside ---- */}
       <div className="p-5 @xl:p-7">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-[1.3rem] font-bold leading-tight tracking-[-0.02em] @xl:text-[1.85rem]">
-            {area ? area.title : demo ? "Choose a part of the house" : "Click an area to look inside"}
+            {area ? area.title : "Click an area to look inside"}
           </p>
           <p className="mt-1.5 text-[14px] leading-snug text-muted @xl:text-[15.5px]">
-            {area ? (demo ? "Tap a number to explore a visible concern." : "Tap a number to see what it means and get pricing.") : (demo ? "Explore foundation, basement, crawl space and concrete concerns." : "Step into the basement, crawl space, foundation and more, then get pricing.")}
+            {area ? "Tap a number to see what it means and get pricing." : "Step into the basement, crawl space, foundation and more, then get pricing."}
           </p>
           {area && (
             <button
@@ -192,7 +181,7 @@ export function RepairEstimator({
           {photo ? <Img src={photo.src} alt={photo.alt} sizes="100vw" /> : <Scene />}
 
           {!area &&
-            houseAreas.map((a, i) => (
+            areas.map((a, i) => (
               <button
                 key={a.id}
                 type="button"
@@ -239,14 +228,14 @@ export function RepairEstimator({
                 ...(active.y > 55 ? { bottom: `calc(${100 - active.y}% + 22px)` } : { top: `calc(${active.y}% + 22px)` }),
               }}
             >
-              <SpotCard h={active} added={active.item in picked} demo={demo} onPrice={() => price(active)} onClose={() => setSpot(null)} />
+              <SpotCard h={active} added={active.item in picked} onPrice={() => price(active)} onClose={() => setSpot(null)} />
             </div>
           )}
         </div>
 
         {/* Phones: the labels as a list, and the card under the picture. */}
         <ol className="mt-3 grid gap-1.5 @xl:hidden">
-          {(area ? area.hotspots : houseAreas).map((x, i) => {
+          {(area ? area.hotspots : areas).map((x, i) => {
             const on = area ? spot === i : false;
             return (
               <li key={x.label}>
@@ -265,7 +254,7 @@ export function RepairEstimator({
         </ol>
         {active && (
           <div ref={cardUnder} className="mt-2 scroll-mb-4 @xl:hidden">
-            <SpotCard h={active} added={active.item in picked} demo={demo} onPrice={() => price(active)} onClose={() => setSpot(null)} />
+            <SpotCard h={active} added={active.item in picked} onPrice={() => price(active)} onClose={() => setSpot(null)} />
           </div>
         )}
       </div>
@@ -285,7 +274,7 @@ export function RepairEstimator({
         </p>
 
         <div className="mt-4 grid items-start gap-2 @4xl:grid-cols-2">
-          {catalog.map((c) => {
+          {categories.map((c) => {
             const isOpen = open.includes(c.id);
             const count = c.items.filter((i) => i.id in picked).length;
             return (
@@ -334,7 +323,7 @@ export function RepairEstimator({
                             </span>
                             <span>
                               <span className="block text-[14.5px] font-medium leading-snug">
-                                {item.symptom}{!demo && <> <span className="text-muted">&mdash;</span> {item.fix}</>}
+                                {item.symptom} <span className="text-muted">&mdash;</span> {item.fix}
                               </span>
                               <span className="mt-0.5 block text-[13px] text-muted">{item.note}</span>
                             </span>
@@ -392,7 +381,6 @@ export function RepairEstimator({
                                       <input
                                         type="number"
                                         min={1}
-                                        max={demo ? config.measurements[item.id]?.max : undefined}
                                         inputMode="numeric"
                                         value={qty}
                                         onChange={(e) => setQty(item.id, Number(e.target.value))}
@@ -429,7 +417,7 @@ export function RepairEstimator({
                                   Added
                                 </span>
                               </div>
-                              {!demo && <PhotoUpload variant="inline" />}
+                              <PhotoUpload variant="inline" />
                             </div>
                           )}
                         </li>
@@ -446,10 +434,10 @@ export function RepairEstimator({
       {/* ---- The estimate, always in reach ---- */}
       <div className="sticky bottom-0 z-40 flex flex-col gap-2.5 border-t-[3px] border-sun bg-white px-4 py-3 shadow-[0_-12px_30px_-18px_rgb(0_0_0/0.5)] @xl:flex-row @xl:items-center @xl:justify-between @xl:gap-3 @xl:px-7 @xl:py-4">
         <div aria-live="polite">
-          <p className="mono-label hidden text-[11px] text-muted @xl:block">{demo ? "Your selected concerns" : "Your instant ballpark estimate"}</p>
+          <p className="mono-label hidden text-[11px] text-muted @xl:block">Your instant ballpark estimate</p>
           <p className="text-[14px] font-medium @xl:mt-1 @xl:text-[14.5px]">
             {lines.length
-              ? demo ? `Your ${lines.length} ${lines.length === 1 ? "concern is" : "concerns are"} ready to review.` : `Your estimate is ready: ${lines.length} ${lines.length === 1 ? "repair" : "repairs"}.`
+              ? `Your estimate is ready: ${lines.length} ${lines.length === 1 ? "repair" : "repairs"}.`
               : "Pick an area or tick a symptom to start."}
           </p>
         </div>
@@ -468,15 +456,15 @@ export function RepairEstimator({
             disabled={!lines.length}
             className="mono-label inline-flex h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap bg-fg px-4 text-[12px] text-white transition-colors hover:bg-[#333] disabled:opacity-40 @xl:flex-none @xl:px-5"
           >
-            {demo ? "Review my concerns" : <>See my <span className="hidden @xl:inline">instant</span> estimate</>}
+            See my <span className="hidden @xl:inline">instant</span> estimate
             <Icon name="arrowRight" className="size-4" />
           </button>
         </div>
       </div>
       <p className="px-5 py-4 text-[12.5px] leading-snug text-muted @xl:px-7">
-        {demo ? config.pricing.disclaimer : <>A ballpark only, from typical projects and what you told us. The exact price comes from a free in-person
+        A ballpark only, from typical projects and what you told us. The exact price comes from a free in-person
         inspection: soil, access, depth and how far the problem has gone all change it. Sample prices for a demo company;
-        your site uses yours.</>}
+        your site uses yours.
       </p>
 
       {/* ---- Details first, then the number ---- */}
@@ -489,14 +477,14 @@ export function RepairEstimator({
         <div className="p-6 sm:p-8">
           <div className="flex items-start justify-between gap-4">
             <p id={`${uid}-dialog`} className="font-home text-[1.6rem] leading-tight tracking-[-0.02em]">
-              {demo ? config.lead.heading : step === "form" ? "See your instant estimate" : "Your ballpark estimate"}
+              {step === "form" ? "See your instant estimate" : "Your ballpark estimate"}
             </p>
             <button type="button" onClick={() => dialog.current?.close()} aria-label="Close" className="-mr-2 -mt-1 p-2">
               <Icon name="close" className="size-5" />
             </button>
           </div>
 
-          {demo ? <ContractorDemoFlow key={demoRun} config={config} picks={picks} onBack={() => dialog.current?.close()} /> : step === "form" ? (
+          {step === "form" ? (
             <div className="mt-3">
               <p className="mb-5 text-[14.5px] leading-[1.55] text-muted">
                 Enter your details to see your ballpark range now. We&rsquo;ll email you a PDF copy, and a specialist
@@ -508,7 +496,7 @@ export function RepairEstimator({
                 payload={() => ({ picks })}
                 submitLabel="Show my instant estimate"
                 onDone={(r) => {
-                  emit("estimator_complete", { repairs: lines.length, low, high });
+                  track("estimator_complete", { repairs: lines.length, low, high });
                   setSent(r);
                   setStep("result");
                 }}
@@ -567,7 +555,7 @@ export function RepairEstimator({
   );
 }
 
-function SpotCard({ h, added, demo, onPrice, onClose }: { h: Hotspot; added: boolean; demo: boolean; onPrice: () => void; onClose: () => void }) {
+function SpotCard({ h, added, onPrice, onClose }: { h: Hotspot; added: boolean; onPrice: () => void; onClose: () => void }) {
   return (
     <div className="border-t-[3px] border-sun bg-white p-4 text-left shadow-[0_18px_40px_-16px_rgb(0_0_0/0.45)]">
       <div className="flex items-start justify-between gap-3">
@@ -582,7 +570,7 @@ function SpotCard({ h, added, demo, onPrice, onClose }: { h: Hotspot; added: boo
         onClick={onPrice}
         className="mono-label mt-3 inline-flex h-10 w-full items-center justify-center gap-2 bg-fg text-[11.5px] text-white transition-colors hover:bg-[#333]"
       >
-        {added ? "Added: see it below" : demo ? "Explore concern" : "Get pricing"}
+        {added ? "Added: see it below" : "Get pricing"}
         <Icon name="arrowRight" className="size-3.5" />
       </button>
     </div>
