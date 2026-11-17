@@ -221,3 +221,13 @@ export const homespecScenes = {
   driveway: sceneImages.driveway!,
 } as Record<"house" | Area["id"], { src: string; alt: string }>;
 
+
+/* ---- After the estimate: asking for the inspection ---- */
+
+/** What the details form and the inspection request ask, checked on both sides. */
+export const homespecAsk = {
+  /** The optional "anything else we should know?" box. */
+  notesMax: 500,
+  times: ["Weekday mornings", "Weekday afternoons", "Weekday evenings", "Saturdays"],
+  reach: ["Call me", "Text me", "Email me"],
+} as const;

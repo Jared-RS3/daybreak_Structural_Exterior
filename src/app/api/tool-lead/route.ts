@@ -12,15 +12,16 @@ import { emailConfigured, sendEmail } from "@/lib/server/email";
 import { homespecEmail } from "@/lib/server/homespec-email";
 import { quoteEmail } from "@/lib/server/quote-email";
 import { createHomeSpecPdf } from "@/lib/demos/homespec-pdf";
-import { homespecItems } from "@/lib/demos/homespec";
+import { homespecAsk, homespecItems } from "@/lib/demos/homespec";
 import { homespecLogoPng } from "@/lib/demos/homespec-logo";
 import { PHOTO_BODY_BYTES } from "@/lib/lead-photos";
 import { readPhotos, type LeadPhoto } from "@/lib/server/lead-photos";
-import { checkFormToken, issueFormToken } from "@/lib/server/form-token";
+import { checkFormToken, issueBookingToken, issueFormToken } from "@/lib/server/form-token";
 import { renderQuotePdf, type QuoteDoc } from "@/lib/server/quote-pdf";
 import { checkTurnstile } from "@/lib/server/turnstile";
 import { clientIp, isSameOrigin, rateLimit } from "@/lib/server/rate-limit";
 import { readCapped, sourcePage } from "@/lib/server/request";
+import { cleanText } from "@/lib/lead";
 import { randomBytes } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -54,8 +55,14 @@ import { NextResponse } from "next/server";
  * The HomeSpec estimator can also send photos of the problems (up to six,
  * shrunk in the browser: lib/lead-photos.ts). They go into the row's
  * "Photos" column, named after the reference and the repair they show, and
- * aren't emailed. Its requests may be that much larger; everyone else's
- * stay small.
+ * on a second page of the PDF. Its requests may be that much larger;
+ * everyone else's stay small. It also sends whether the problem is urgent
+ * and an optional note, and gets back a signed token for asking for the
+ * inspection afterwards (app/api/tool-lead/booking).
+ *
+ * Columns added after the table was first made (Urgent, Notes) are written
+ * in a second, separate update, so a base that doesn't have them yet still
+ * keeps the lead. The Summary carries the same facts either way.
  */
 const MAX_BODY_BYTES = 8_000;
 const MIN_FILL_MS = 2_500;
@@ -128,6 +135,9 @@ export async function POST(request: Request) {
   let summary: string;
   let extra: Record<string, string | number | null>;
   let photos: LeadPhoto[] = [];
+  // HomeSpec's details form: "is it urgent?" and "anything else?".
+  const urgent = homespec && body.urgent === true;
+  const notes = homespec ? cleanText(body.notes).slice(0, homespecAsk.notesMax) : "";
   if (tool === "estimate") {
     const picks = readPicks(body.picks);
     if (!picks) return fail(400, "Pick at least one repair first.");
@@ -154,8 +164,10 @@ export async function POST(request: Request) {
       return n ? ` · ${n} photo${n === 1 ? "" : "s"}` : "";
     };
     summary = [
+      ...(urgent ? ["URGENT: water is coming in now, or it's getting worse fast"] : []),
       ...(homespec ? ["HomeSpec demo (/demo/homespec)"] : []),
       ...rows.map((r) => `${r.label}${r.detail ? ` (${r.detail})` : ""}: ${usd(r.low)} – ${usd(r.high)}${shots(r.id)}`),
+      ...(notes ? [`Notes: ${notes}`] : []),
     ].join("\n");
     extra = { "Estimate low": low, "Estimate high": high, Severity: null };
   } else {
@@ -200,6 +212,7 @@ export async function POST(request: Request) {
           high: doc.high,
           lines: doc.lines.map((l) => ({ fix: l.label, size: l.detail, low: l.low, high: l.high })),
           logo: Buffer.from(homespecLogoPng, "base64"),
+          photos: photos.map((p) => ({ fix: homespecItems[p.item].fix, bytes: p.bytes })),
         })
       : await renderQuotePdf(doc);
   const filename = homespec
@@ -311,6 +324,12 @@ export async function POST(request: Request) {
   if (recordId) {
     await Promise.all([
       upload,
+      // Their own update: a base without these columns yet still keeps the lead.
+      homespec
+        ? updateAirtableRecord(TABLE(), recordId, { Urgent: urgent, Notes: notes ? noFormula(notes) : null }).catch((err) =>
+            console.error("[tool-lead] Couldn't record urgency and notes (are the Urgent and Notes columns there?)", reference, err),
+          )
+        : null,
       updateAirtableRecord(TABLE(), recordId, { "Email status": status }).catch((err) =>
         console.error("[tool-lead] Couldn't record the email status", reference, err),
       ),
@@ -323,5 +342,6 @@ export async function POST(request: Request) {
     emailed,
     pdf: Buffer.from(pdf).toString("base64"),
     photos: kept,
+    ...(homespec ? { booking: issueBookingToken(recordId, reference) } : {}),
   } satisfies ToolLeadResult);
 }

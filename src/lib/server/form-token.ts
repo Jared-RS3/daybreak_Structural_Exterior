@@ -36,9 +36,9 @@ const formSecret = () => {
 const key = () =>
   formSecret() || process.env.AIRTABLE_TOKEN || "development-only";
 
-const sign = (payload: string) =>
+const sign = (payload: string, purpose = "lead-form") =>
   createHmac("sha256", key())
-    .update(`lead-form:${payload}`)
+    .update(`${purpose}:${payload}`)
     .digest("base64url");
 
 export function issueFormToken(): string {
@@ -66,4 +66,28 @@ export function checkFormToken(
   const age = Date.now() - Number(payload.split(".")[0]);
   if (!Number.isFinite(age) || age < 0 || age > MAX_AGE_MS) return "invalid";
   return age < minFillMs ? "fast" : "ok";
+}
+
+/**
+ * Handed back with a saved estimate, so the visitor's inspection request
+ * (app/api/tool-lead/booking) can update that row and no other: the row id
+ * and reference, signed. "-" stands in for the row when Airtable isn't set
+ * up. Good for MAX_AGE_MS, like the form token.
+ */
+export function issueBookingToken(recordId: string | null, reference: string): string {
+  const payload = `${recordId ?? "-"}.${reference}.${Date.now()}`;
+  return `${payload}.${sign(payload, "booking")}`;
+}
+
+export function readBookingToken(token: unknown): { recordId: string | null; reference: string } | null {
+  if (typeof token !== "string" || token.length > 200) return null;
+  const parts = token.split(".");
+  if (parts.length !== 4) return null;
+  const payload = parts.slice(0, 3).join(".");
+  const given = Buffer.from(parts[3]);
+  const expected = Buffer.from(sign(payload, "booking"));
+  if (given.length !== expected.length || !timingSafeEqual(given, expected)) return null;
+  const age = Date.now() - Number(parts[2]);
+  if (!Number.isFinite(age) || age < 0 || age > MAX_AGE_MS) return null;
+  return { recordId: parts[0] === "-" ? null : parts[0], reference: parts[1] };
 }

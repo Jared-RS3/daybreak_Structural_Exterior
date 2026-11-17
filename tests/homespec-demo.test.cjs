@@ -105,3 +105,32 @@ test('photos: only JPEGs, only for picked repairs, within the limits', () => {
   // Six photos at the largest still fit under Netlify's 6 MB function payload.
   assert.ok(PHOTO_BODY_BYTES < 6_000_000);
 });
+
+test('the PDF puts their photos on a second page, and skips one it cannot read', async () => {
+  const photo = require('node:fs').readFileSync(path.join(__dirname, 'fixture-photo.jpg'));
+  const base = {
+    name: 'Alex Morgan', zip: '48197', phone: '(734) 555-0142', email: 'alex@example.com', reference: 'HS-261117-ABC123',
+    low: 1600, high: 1900, lines: [{ fix: 'Sump pump system', size: 'Complete install', low: 1550, high: 1850 }],
+  };
+  const two = await PDFDocument.load(await createHomeSpecPdf({ ...base, photos: [{ fix: 'Sump pump system', bytes: photo }] }));
+  assert.equal(two.getPageCount(), 2);
+  // A "JPEG" that only has the right first bytes is left out, not fatal.
+  const junk = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(300)]);
+  const mixed = await PDFDocument.load(await createHomeSpecPdf({ ...base, photos: [{ fix: 'A', bytes: junk }, { fix: 'B', bytes: photo }] }));
+  assert.equal(mixed.getPageCount(), 2);
+});
+
+test('booking tokens: only the server can make one, and it names its own row', () => {
+  const { issueBookingToken, readBookingToken } = require('../src/lib/server/form-token.ts');
+  const t = issueBookingToken('recAbc123', 'HS-261117-ABC123');
+  assert.deepEqual(readBookingToken(t), { recordId: 'recAbc123', reference: 'HS-261117-ABC123' });
+  assert.deepEqual(readBookingToken(issueBookingToken(null, 'HS-1')), { recordId: null, reference: 'HS-1' });
+  // Another row with the same signature, or a tampered one, is refused.
+  const [, ref, at, sig] = t.split('.');
+  assert.equal(readBookingToken(['recOther999', ref, at, sig].join('.')), null);
+  assert.equal(readBookingToken(t.slice(0, -2) + 'xx'), null);
+  assert.equal(readBookingToken('nope'), null);
+  // A form token is not a booking token.
+  const { issueFormToken } = require('../src/lib/server/form-token.ts');
+  assert.equal(readBookingToken(issueFormToken()), null);
+});

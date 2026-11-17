@@ -47,4 +47,6 @@ export type ToolLeadResult = {
   pdf: string;
   /** How many of the photos sent with it were stored (HomeSpec estimator only). */
   photos: number;
+  /** Signed, for asking for the inspection afterwards (HomeSpec estimator only). */
+  booking?: string;
 };

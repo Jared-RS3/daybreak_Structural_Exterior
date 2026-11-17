@@ -35,12 +35,16 @@ export function DemoPrivacyNotice({ client, effective }: { client: string; effec
 
       <h2 className={h2}>What we collect</h2>
       <ul>
-        <li>What you type into the estimate form: your name, email address, phone number and ZIP code.</li>
+        <li>
+          What you type into the estimate form: your name, email address, phone number and ZIP code, whether you marked it
+          urgent, and anything you add in the notes box.
+        </li>
         <li>The repairs and sizes you picked, the estimate worked out from them, and its reference number.</li>
         <li>
           Any photos you choose to add of the problem. Your browser makes a smaller copy before it is sent, which also removes
-          the hidden details a camera saves with a photo, such as where it was taken. They are not emailed back to you.
+          the hidden details a camera saves with a photo, such as where it was taken. They are added to your PDF.
         </li>
+        <li>If you ask for an inspection afterwards: the times that suit you and how you would like us to confirm.</li>
         <li>The address of this page, and the time you sent it.</li>
         <li>
           Your IP address, held briefly in memory to stop the form being flooded. It is not stored with your request.
@@ -62,7 +66,7 @@ export function DemoPrivacyNotice({ client, effective }: { client: string; effec
       <p>Only the service providers that run the demo for us, under their data processing terms:</p>
       <ul>
         <li>Netlify, which hosts the page and runs the form.</li>
-        <li>Airtable, where the request and any photos are stored.</li>
+        <li>Airtable, where the request, any photos and any inspection request are stored.</li>
         <li>Resend, which sends the email with your PDF.</li>
         <li>Cloudflare Turnstile, if it is switched on, to check the form is sent by a person.</li>
       </ul>

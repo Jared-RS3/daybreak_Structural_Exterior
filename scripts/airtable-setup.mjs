@@ -9,7 +9,9 @@
  *   2. AIRTABLE_SETUP_TOKEN=pat... node scripts/airtable-setup.mjs
  *   3. Delete that token afterwards. The site never needs it.
  *
- * Safe to run twice: it stops if the table already exists.
+ * Safe to run twice. If the table already exists, it adds only the columns
+ * it's missing (Photos, Urgent, Notes and Booking request came later, for
+ * the HomeSpec estimator) and changes nothing else.
  */
 import { readFileSync } from "node:fs";
 
@@ -44,6 +46,10 @@ const fields = [
   { name: "Severity", ...select("Keep an eye on it", "Worth an inspection", "Book an inspection soon") },
   { name: "Summary", type: "multilineText" },
   { name: "Quote PDF", type: "multipleAttachments" },
+  { name: "Photos", type: "multipleAttachments" },
+  { name: "Urgent", type: "checkbox", options: { icon: "flag", color: "redBright" } },
+  { name: "Notes", type: "multilineText" },
+  { name: "Booking request", type: "multilineText" },
   { name: "Reference", type: "singleLineText" },
   { name: "Email status", ...select("Sending", "Sent", "Failed", "Not set up") },
   { name: "Consent", type: "checkbox", options: { icon: "check", color: "greenBright" } },
@@ -66,8 +72,16 @@ const api = async (path, init = {}) => {
 };
 
 const { tables } = await api("/tables");
-if (tables.some((t) => t.name === name)) {
-  console.log(`"${name}" already exists in ${base}. Nothing to do.`);
+const existing = tables.find((t) => t.name === name);
+if (existing) {
+  const missing = fields.filter((f) => !existing.fields.some((x) => x.name === f.name));
+  for (const f of missing) await api(`/tables/${existing.id}/fields`, { method: "POST", body: JSON.stringify(f) });
+  console.log(
+    missing.length
+      ? `Added ${missing.map((f) => `"${f.name}"`).join(", ")} to "${name}" in ${base}.`
+      : `"${name}" already has every column. Nothing to do.`,
+  );
+  console.log("You can delete the setup token now.");
   process.exit(0);
 }
 const made = await api("/tables", {

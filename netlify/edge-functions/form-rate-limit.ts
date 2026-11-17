@@ -15,7 +15,7 @@
 export default async function formRateLimit() {}
 
 export const config = {
-  path: ["/api/tool-lead", "/api/growth-audit"],
+  path: ["/api/tool-lead", "/api/tool-lead/booking", "/api/growth-audit"],
   rateLimit: {
     windowLimit: 20,
     windowSize: 60,

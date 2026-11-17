@@ -12,6 +12,7 @@ import { turnstileOn } from "@/lib/turnstile";
 import { PHOTO_MAX_PER_ITEM, PHOTO_MAX_TOTAL, shrinkPhoto } from "@/lib/lead-photos";
 import {
   homespec,
+  homespecAsk,
   homespecAreas,
   homespecCategories,
   homespecItems,
@@ -35,12 +36,16 @@ import {
 
    Each ticked repair can carry up to three photos of the problem (six in
    all). They're shrunk in the browser (lib/lead-photos.ts), stay there until
-   the form is sent, and go into the Airtable row's "Photos" column. Colours and
+   the form is sent, and go into the Airtable row's "Photos" column and the
+   PDF. The details form also asks whether it's urgent and for any notes.
+   After the estimate, "Schedule My Free Inspection" asks when suits them and
+   how to confirm, and adds that to the same row (api/tool-lead/booking). Colours and
    the heading face come from the page (app/demo/homespec/page.tsx) as
    --hs-* custom properties.
    ========================================================================== */
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
+const reachSaid: Record<string, string> = { "Call me": "by phone", "Text me": "by text", "Email me": "by email" };
 const still = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const head = "font-(family-name:--font-hs-head) font-extrabold tracking-[-0.01em]";
 const pill = "inline-flex items-center justify-center gap-2 rounded-full font-bold transition-colors focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-(--hs-blue)";
@@ -98,7 +103,16 @@ export function HomeSpecEstimator() {
   const [sent, setSent] = useState<(ToolLeadResult & { email: string }) | null>(null);
   /** Which picks the result was priced on; changing them means sending again. */
   const [sentFor, setSentFor] = useState("");
-  const [booked, setBooked] = useState(false);
+  const [urgent, setUrgent] = useState(false);
+  const [notes, setNotes] = useState("");
+  /** The inspection request, after the estimate: shown, picked, sent, saved. */
+  const [booking, setBooking] = useState(false);
+  const [times, setTimes] = useState<string[]>([]);
+  const [reach, setReach] = useState("");
+  const [bookErrors, setBookErrors] = useState<{ times?: string; reach?: string }>({});
+  const [bookSending, setBookSending] = useState(false);
+  const [bookFailure, setBookFailure] = useState("");
+  const [booked, setBooked] = useState<{ when: string; reach: string } | null>(null);
   /** Repair id → the photos added to it. */
   const [photos, setPhotos] = useState<Record<string, Photo[]>>({});
   /** The repair whose photos are being prepared, and any problem with them. */
@@ -224,7 +238,6 @@ export function HomeSpecEstimator() {
   const reveal = () => {
     // Same picks as last time: straight to the result. Changed: send again.
     setStep(sent && sentFor === pickKey ? "result" : "details");
-    setBooked(false);
     setFailure("");
     dialog.current?.showModal();
   };
@@ -269,6 +282,8 @@ export function HomeSpecEstimator() {
           consent: "yes",
           picks,
           photos: Object.entries(photos).flatMap(([item, list]) => list.map((p) => ({ item, data: p.data }))),
+          urgent,
+          notes: notes.trim(),
           tool: "estimate",
           brand: "homespec",
           token: token.current,
@@ -283,6 +298,10 @@ export function HomeSpecEstimator() {
       if (res.ok && json.ok) {
         setSent({ ...(json as ToolLeadResult), email });
         setSentFor(pickKey);
+        // A new estimate is a new lead: its inspection request starts fresh.
+        setBooking(false);
+        setBooked(null);
+        setBookFailure("");
         setStep("result");
         return;
       }
@@ -298,6 +317,43 @@ export function HomeSpecEstimator() {
       setFailure("That didn't go through. Check your connection and try again.");
     } finally {
       setSending(false);
+    }
+  };
+
+  /** Adds when suits them and how to confirm to the lead just saved. */
+  const book = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const found = {
+      ...(times.length ? {} : { times: "Pick at least one time that suits you." }),
+      ...(reach ? {} : { reach: "Pick how we should confirm." }),
+    };
+    setBookErrors(found);
+    if (found.times || found.reach || !sent?.booking) return;
+    setBookSending(true);
+    setBookFailure("");
+    try {
+      const res = await fetch("/api/tool-lead/booking", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ booking: sent.booking, times, reach }),
+      });
+      const json = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        when?: string;
+        reach?: string;
+        error?: string;
+        errors?: { times?: string; reach?: string };
+      };
+      if (res.ok && json.ok && json.when && json.reach) {
+        setBooked({ when: json.when, reach: json.reach });
+        return;
+      }
+      if (json.errors) setBookErrors(json.errors);
+      setBookFailure(json.error ?? (json.errors ? "" : "That didn't go through. Please try again."));
+    } catch {
+      setBookFailure("That didn't go through. Check your connection and try again.");
+    } finally {
+      setBookSending(false);
     }
   };
 
@@ -689,6 +745,34 @@ export function HomeSpecEstimator() {
                 {field("phone", "Phone Number", { type: "tel", inputMode: "tel", autoComplete: "tel" })}
                 {field("email", "Email Address", { type: "email", inputMode: "email", autoComplete: "email" })}
               </div>
+              <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-lg bg-(--hs-gray) p-3.5 text-[14.5px] leading-snug">
+                <input
+                  type="checkbox"
+                  checked={urgent}
+                  onChange={(e) => setUrgent(e.target.checked)}
+                  className="mt-0.5 size-5 shrink-0 cursor-pointer accent-(--hs-blue-ink)"
+                />
+                <span>
+                  <strong>It’s urgent.</strong> Water is coming in right now, or it’s getting worse fast.
+                </span>
+              </label>
+              <label className="mt-4 block">
+                <span className="text-[14px] font-bold text-(--hs-ink)">
+                  Anything else we should know? <span className="font-normal text-(--hs-muted)">Optional</span>
+                </span>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value.slice(0, homespecAsk.notesMax))}
+                  maxLength={homespecAsk.notesMax}
+                  rows={3}
+                  placeholder="e.g. It only leaks after heavy rain, and the crack has grown since spring."
+                  aria-describedby={`${uid}-notes-count`}
+                  className="mt-1.5 block w-full resize-y rounded-md border border-[#c9ced5] bg-white px-3.5 py-2.5 text-[16px] leading-snug text-(--hs-ink) outline-none transition-shadow placeholder:text-[#8a9099] focus:border-(--hs-blue) focus:ring-3 focus:ring-(--hs-blue)/25"
+                />
+                <span id={`${uid}-notes-count`} className="mt-1 block text-right text-[12.5px] text-(--hs-muted)">
+                  {notes.length}/{homespecAsk.notesMax}
+                </span>
+              </label>
               <label className="mt-5 flex cursor-pointer items-start gap-3 text-[14px] leading-normal">
                 <input
                   id={`${uid}-f-consent`}
@@ -749,6 +833,7 @@ export function HomeSpecEstimator() {
               <p className="mt-1 text-[14px] text-(--hs-muted)">
                 For {contact.first.trim()} · ZIP {contact.zip.trim()}
                 {sent?.reference && <> · Ref. {sent.reference}</>}
+                {urgent && <> · <strong className="text-[#9a3412]">Marked urgent</strong></>}
               </p>
               <div className="mt-5 rounded-lg border-l-[5px] border-(--hs-blue) bg-[#eef4fe] px-5 py-4">
                 <p className="text-[12px] font-bold uppercase tracking-[0.08em] text-(--hs-navy)">Estimated range</p>
@@ -814,13 +899,78 @@ export function HomeSpecEstimator() {
                 <p role="status" className="mt-3 flex gap-2.5 rounded-lg bg-[#eef4fe] p-4 text-[14.5px] leading-snug text-(--hs-ink)">
                   <Icon name="calendar" className="mt-0.5 size-5 shrink-0 text-(--hs-blue-ink)" />
                   <span>
-                    <strong>This is where the booking happens.</strong> On HomeSpec’s live site, this sends your request to their
-                    team, who call to set up your free inspection. This is a concept demo, so no inspection is booked and HomeSpec
-                    hasn’t received your details; to book a real one, call {homespec.phone}.
+                    <strong>
+                      Request saved:{" "}
+                      {new Intl.ListFormat("en", { type: "conjunction" }).format(
+                        booked.when.split(", ").map((t) => t.replace(/^Weekday/, "weekday")),
+                      )}
+                      , {reachSaid[booked.reach] ?? booked.reach.toLowerCase()}.
+                    </strong>{" "}
+                    On HomeSpec’s live site, this goes straight to their team, who confirm your free inspection. This is a concept
+                    demo, so no inspection is booked and HomeSpec hasn’t received your details; to book a real one, call{" "}
+                    {homespec.phone}.
                   </span>
                 </p>
+              ) : booking && sent?.booking ? (
+                <form onSubmit={book} noValidate className="mt-5 rounded-lg border-2 border-(--hs-line) p-4">
+                  <p className={cn(head, "text-[18px] leading-snug")}>Schedule your free inspection</p>
+                  <fieldset className="mt-3">
+                    <legend className="text-[14px] font-bold">When suits you? <span className="font-normal text-(--hs-muted)">Pick any that work</span></legend>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {homespecAsk.times.map((t) => (
+                        <Chip
+                          key={t}
+                          on={times.includes(t)}
+                          onClick={() => {
+                            setTimes((cur) => (cur.includes(t) ? cur.filter((x) => x !== t) : [...cur, t]));
+                            setBookErrors((x) => ({ ...x, times: undefined }));
+                          }}
+                        >
+                          {t}
+                        </Chip>
+                      ))}
+                    </div>
+                    {bookErrors.times && <p className="mt-1.5 text-[13px] text-[#c62828]">{bookErrors.times}</p>}
+                  </fieldset>
+                  <fieldset className="mt-4">
+                    <legend className="text-[14px] font-bold">How should we confirm?</legend>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {homespecAsk.reach.map((r) => (
+                        <Chip
+                          key={r}
+                          on={reach === r}
+                          onClick={() => {
+                            setReach(r);
+                            setBookErrors((x) => ({ ...x, reach: undefined }));
+                          }}
+                        >
+                          {r}
+                        </Chip>
+                      ))}
+                    </div>
+                    {bookErrors.reach && <p className="mt-1.5 text-[13px] text-[#c62828]">{bookErrors.reach}</p>}
+                  </fieldset>
+                  <button type="submit" disabled={bookSending} className={cn(pillBlack, "mt-5 h-12 w-full text-[15px] disabled:cursor-progress")}>
+                    {bookSending ? (
+                      <>
+                        <span aria-hidden className="size-4 animate-spin rounded-full border-2 border-white/35 border-t-white" />
+                        Sending your request
+                      </>
+                    ) : (
+                      <>
+                        <Icon name="calendar" className="size-5" />
+                        Request My Inspection
+                      </>
+                    )}
+                  </button>
+                  {bookFailure && (
+                    <p role="alert" className="mt-3 text-[14px] text-[#c62828]">
+                      {bookFailure}
+                    </p>
+                  )}
+                </form>
               ) : (
-                <button type="button" onClick={() => setBooked(true)} className={cn(pillBlack, "mt-5 h-13 w-full text-[16px]")}>
+                <button type="button" onClick={() => setBooking(true)} className={cn(pillBlack, "mt-5 h-13 w-full text-[16px]")}>
                   <Icon name="calendar" className="size-5" />
                   Schedule My Free Inspection
                 </button>
@@ -844,6 +994,24 @@ export function HomeSpecEstimator() {
         </div>
       </dialog>
     </div>
+  );
+}
+
+/** A pill that's on or off: the inspection request's times and ways to confirm. */
+function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
+      className={cn(
+        "inline-flex min-h-10 items-center gap-1.5 rounded-full border-2 px-3.5 text-[13.5px] font-bold transition-colors",
+        on ? "border-(--hs-blue-ink) bg-(--hs-blue-ink) text-white" : "border-[#d3d7dd] bg-white hover:border-black",
+      )}
+    >
+      {on && <Icon name="check" className="size-3.5" />}
+      {children}
+    </button>
   );
 }
 

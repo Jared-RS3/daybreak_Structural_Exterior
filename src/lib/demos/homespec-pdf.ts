@@ -19,6 +19,8 @@ export type PdfInput = {
   date?: Date;
   /** The logo PNG. Left out, or unreadable, the header falls back to the name in type. */
   logo?: Uint8Array;
+  /** Their photos of the problems (JPEGs), on a page of their own after the estimate. */
+  photos?: { fix: string; bytes: Uint8Array }[];
 };
 
 const usd = (n: number) => `$${n.toLocaleString("en-US")}`;
@@ -111,7 +113,12 @@ export async function createHomeSpecPdf(input: PdfInput): Promise<Uint8Array> {
   page.drawRectangle({ x: M, y: y - 14, width: 5, height: 58, color: blue });
   text(page, "YOUR BALLPARK RANGE", M + 22, y + 22, 8.5, bold, navy);
   text(page, `${usd(input.low)} – ${usd(input.high)}`, M + 22, y - 2, 22, bold, navy);
-  right(page, `${input.lines.length} ${input.lines.length === 1 ? "repair" : "repairs"}`, W - M - 18, y + 4, 10, regular, muted);
+  const shots = input.photos?.length ?? 0;
+  right(
+    page,
+    `${input.lines.length} ${input.lines.length === 1 ? "repair" : "repairs"}${shots ? ` • ${shots} photo${shots === 1 ? "" : "s"} on page 2` : ""}`,
+    W - M - 18, y + 4, 10, regular, muted,
+  );
 
   // ---- What happens next ----
   y -= 60;
@@ -129,5 +136,56 @@ export async function createHomeSpecPdf(input: PdfInput): Promise<Uint8Array> {
     M, 76, W - 2 * M, 8.5, regular,
   );
 
+  if (shots) await photoPage(doc, input, { regular, bold, text, right });
   return doc.save();
+}
+
+/**
+ * Page 2: their photos, two across, each fitted inside its box and named by
+ * the repair it shows. A photo pdf-lib can't read is left out rather than
+ * losing the whole estimate (the route only passes JPEGs it has checked).
+ */
+async function photoPage(
+  doc: PDFDocument,
+  input: PdfInput,
+  t: {
+    regular: PDFFont;
+    bold: PDFFont;
+    text: (p: PDFPage, s: string, x: number, y: number, size: number, font: PDFFont, color?: ReturnType<typeof rgb>) => unknown;
+    right: (p: PDFPage, s: string, xRight: number, y: number, size: number, font: PDFFont, color?: ReturnType<typeof rgb>) => unknown;
+  },
+) {
+  const W = 612;
+  const M = 48;
+  const gap = 20;
+  const boxW = (W - 2 * M - gap) / 2;
+  const boxH = 170;
+  const page = doc.addPage([612, 792]);
+  page.drawRectangle({ x: 0, y: 784, width: W, height: 8, color: blue });
+  t.text(page, "Your photos", M, 740, 18, t.bold);
+  t.text(page, "What you showed us, by repair.", M, 720, 10.5, t.regular, muted);
+  page.drawLine({ start: { x: M, y: 92 }, end: { x: W - M, y: 92 }, thickness: 0.6, color: rule });
+  t.text(page, "Sample estimate from a concept demo built for HomeSpec by Daybreak StructureWorks. HomeSpec has not received your details.", M, 76, 8.5, t.regular, muted);
+  t.right(page, `Ref. ${input.reference}`, W - M, 744, 10, t.regular, muted);
+
+  let i = 0;
+  for (const photo of input.photos ?? []) {
+    let img;
+    try {
+      img = await doc.embedJpg(photo.bytes);
+    } catch {
+      continue;
+    }
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const x = M + col * (boxW + gap);
+    const top = 690 - row * (boxH + 40);
+    page.drawRectangle({ x, y: top - boxH, width: boxW, height: boxH, color: rgb(0.96, 0.96, 0.97) });
+    const scale = Math.min(boxW / img.width, boxH / img.height);
+    const w = img.width * scale;
+    const h = img.height * scale;
+    page.drawImage(img, { x: x + (boxW - w) / 2, y: top - boxH + (boxH - h) / 2, width: w, height: h });
+    t.text(page, photo.fix, x, top - boxH - 15, 10, t.bold);
+    i++;
+  }
 }
