@@ -37,14 +37,18 @@ export function DemoPrivacyNotice({ client, effective }: { client: string; effec
       <ul>
         <li>What you type into the estimate form: your name, email address, phone number and ZIP code.</li>
         <li>The repairs and sizes you picked, the estimate worked out from them, and its reference number.</li>
+        <li>
+          Any photos you choose to add of the problem. Your browser makes a smaller copy before it is sent, which also removes
+          the hidden details a camera saves with a photo, such as where it was taken. They are not emailed back to you.
+        </li>
         <li>The address of this page, and the time you sent it.</li>
         <li>
           Your IP address, held briefly in memory to stop the form being flooded. It is not stored with your request.
         </li>
       </ul>
       <p>
-        This page uses no analytics, advertising or tracking cookies. Picking repairs on the house happens in your browser;
-        nothing is sent until you press &ldquo;Show My Estimate&rdquo;.
+        This page uses no analytics, advertising or tracking cookies. Picking repairs and adding photos happen in your
+        browser; nothing is sent until you press &ldquo;Show My Estimate&rdquo;.
       </p>
 
       <h2 className={h2}>Why we use it</h2>
@@ -58,7 +62,7 @@ export function DemoPrivacyNotice({ client, effective }: { client: string; effec
       <p>Only the service providers that run the demo for us, under their data processing terms:</p>
       <ul>
         <li>Netlify, which hosts the page and runs the form.</li>
-        <li>Airtable, where the request is stored.</li>
+        <li>Airtable, where the request and any photos are stored.</li>
         <li>Resend, which sends the email with your PDF.</li>
         <li>Cloudflare Turnstile, if it is switched on, to check the form is sent by a person.</li>
       </ul>

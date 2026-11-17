@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function HomeSpecPrivacyPage() {
   return (
     <HomeSpecShell title="Privacy Notice">
-      <DemoPrivacyNotice client={homespec.short} effective="November 7, 2026" />
+      <DemoPrivacyNotice client={homespec.short} effective="November 17, 2026" />
     </HomeSpecShell>
   );
 }

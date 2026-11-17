@@ -81,3 +81,27 @@ test('the HomeSpec email carries the range and escapes what the visitor typed', 
   const odd = homespecEmail({ ...{ zip: '48197', reference: 'HS-1', date: new Date(), low: 1, high: 2, lines: [] }, name: 'evil.example/x Smith' });
   assert.ok(odd.text.startsWith('Hi there,'));
 });
+
+test('photos: only JPEGs, only for picked repairs, within the limits', () => {
+  const { readPhotos } = require('../src/lib/server/lead-photos.ts');
+  const { PHOTO_MAX_BYTES, PHOTO_BODY_BYTES } = require('../src/lib/lead-photos.ts');
+  const jpeg = (n = 200) => Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(n)]).toString('base64');
+  const png = Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47]), Buffer.alloc(200)]).toString('base64');
+  const picked = ['sump-pump', 'slab-lift'];
+
+  assert.deepEqual(readPhotos(undefined, picked), []);
+  const ok = readPhotos([{ item: 'sump-pump', data: jpeg() }, { item: 'slab-lift', data: jpeg() }], picked);
+  assert.equal(ok.length, 2);
+  assert.equal(ok[0].item, 'sump-pump');
+  assert.equal(ok[0].bytes[0], 0xff);
+
+  assert.equal(readPhotos([{ item: 'sump-pump', data: png }], picked), null, 'not a JPEG');
+  assert.equal(readPhotos([{ item: 'wall-anchors', data: jpeg() }], picked), null, 'a repair that was not picked');
+  assert.equal(readPhotos([{ item: 'sump-pump', data: 'not base64!' + jpeg() }], picked), null);
+  assert.equal(readPhotos([{ item: 'sump-pump', data: jpeg(PHOTO_MAX_BYTES) }], picked), null, 'too large');
+  assert.equal(readPhotos(Array(4).fill({ item: 'sump-pump', data: jpeg() }), picked), null, 'four on one repair');
+  assert.equal(readPhotos([...Array(3).fill({ item: 'sump-pump', data: jpeg() }), ...Array(4).fill({ item: 'slab-lift', data: jpeg() })], picked), null, 'seven in all');
+  assert.equal(readPhotos({ item: 'sump-pump' }, picked), null);
+  // Six photos at the largest still fit under Netlify's 6 MB function payload.
+  assert.ok(PHOTO_BODY_BYTES < 6_000_000);
+});

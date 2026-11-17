@@ -45,4 +45,6 @@ export type ToolLeadResult = {
   emailed: boolean;
   /** The PDF itself, base64, so it can be downloaded straight away. */
   pdf: string;
+  /** How many of the photos sent with it were stored (HomeSpec estimator only). */
+  photos: number;
 };

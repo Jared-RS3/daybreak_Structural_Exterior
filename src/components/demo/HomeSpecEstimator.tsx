@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { priceEstimate, type Area, type Hotspot } from "@/lib/estimator";
 import type { ToolLeadResult } from "@/lib/tool-lead";
 import { turnstileOn } from "@/lib/turnstile";
+import { PHOTO_MAX_PER_ITEM, PHOTO_MAX_TOTAL, shrinkPhoto } from "@/lib/lead-photos";
 import {
   homespec,
   homespecAreas,
@@ -30,7 +31,11 @@ import {
    brand "homespec". Same signed form token, honeypot, consent, Turnstile and
    rate limits as ToolLeadForm; the server re-prices the picks, saves the row
    to Airtable, emails the HomeSpec PDF and hands it back for download. Only
-   the server's answer says "sent". No analytics on this page. Colours and
+   the server's answer says "sent". No analytics on this page.
+
+   Each ticked repair can carry up to three photos of the problem (six in
+   all). They're shrunk in the browser (lib/lead-photos.ts), stay there until
+   the form is sent, and go into the Airtable row's "Photos" column. Colours and
    the heading face come from the page (app/demo/homespec/page.tsx) as
    --hs-* custom properties.
    ========================================================================== */
@@ -55,6 +60,9 @@ function chipPos(p: Hotspot) {
 
 const sizeText = (item: DemoItem, qty: number) =>
   item.unit ? `${qty.toLocaleString("en-US")} ${item.unit}` : "Complete install";
+
+/** A photo added to a repair: its preview (an object URL) and the JPEG to send. */
+type Photo = { key: string; url: string; data: string };
 
 type Contact = { zip: string; first: string; last: string; phone: string; email: string; consent: boolean };
 const blank: Contact = { zip: "", first: "", last: "", phone: "", email: "", consent: false };
@@ -91,6 +99,11 @@ export function HomeSpecEstimator() {
   /** Which picks the result was priced on; changing them means sending again. */
   const [sentFor, setSentFor] = useState("");
   const [booked, setBooked] = useState(false);
+  /** Repair id → the photos added to it. */
+  const [photos, setPhotos] = useState<Record<string, Photo[]>>({});
+  /** The repair whose photos are being prepared, and any problem with them. */
+  const [shrinking, setShrinking] = useState<string | null>(null);
+  const [photoNote, setPhotoNote] = useState<Record<string, string | undefined>>({});
   const dialog = useRef<HTMLDialogElement>(null);
   // Signed by the server when the page loads (lib/server/form-token.ts); it
   // has to be a few seconds old by the time they send, as with ToolLeadForm.
@@ -105,7 +118,15 @@ export function HomeSpecEstimator() {
 
   const picks = Object.entries(picked).map(([id, qty]) => ({ id, qty, variant: 0 }));
   const { lines, low, high } = priceEstimate(picks);
-  const pickKey = JSON.stringify(picks);
+  const photoCount = Object.values(photos).reduce((n, list) => n + list.length, 0);
+  const pickKey = JSON.stringify([picks, Object.values(photos).flatMap((list) => list.map((p) => p.key))]);
+
+  // The previews are object URLs: let them go when the estimator does.
+  const photosNow = useRef(photos);
+  useEffect(() => {
+    photosNow.current = photos;
+  }, [photos]);
+  useEffect(() => () => Object.values(photosNow.current).flat().forEach((p) => URL.revokeObjectURL(p.url)), []);
 
   const fetchToken = () =>
     fetch("/api/tool-lead", { cache: "no-store" })
@@ -118,13 +139,52 @@ export function HomeSpecEstimator() {
     fetchToken();
   }, []);
 
-  const toggle = (id: string) =>
+  const toggle = (id: string) => {
+    if (id in picked) dropPhotos([id]);
     setPicked((cur) => {
       const next = { ...cur };
       if (id in next) delete next[id];
       else next[id] = defaultQty(homespecItems[id]);
       return next;
     });
+  };
+
+  /** Shrinks the chosen files and adds them to a repair, up to the limits. */
+  const addPhotos = async (id: string, files: File[]) => {
+    const room = Math.min(PHOTO_MAX_PER_ITEM - (photos[id]?.length ?? 0), PHOTO_MAX_TOTAL - photoCount);
+    const take = files.slice(0, Math.max(0, room));
+    let note =
+      files.length > take.length
+        ? `Added the first ${take.length}: an estimate takes up to ${PHOTO_MAX_PER_ITEM} photos per repair, ${PHOTO_MAX_TOTAL} in all.`
+        : "";
+    if (!take.length) return;
+    setShrinking(id);
+    setPhotoNote((x) => ({ ...x, [id]: undefined }));
+    const added: Photo[] = [];
+    for (const file of take) {
+      try {
+        const { blob, base64 } = await shrinkPhoto(file);
+        added.push({ key: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, url: URL.createObjectURL(blob), data: base64 });
+      } catch {
+        note = "We couldn’t open one of those. Try a JPG or PNG photo.";
+      }
+    }
+    setPhotos((cur) => ({ ...cur, [id]: [...(cur[id] ?? []), ...added] }));
+    setPhotoNote((x) => ({ ...x, [id]: note || undefined }));
+    setShrinking(null);
+  };
+  const removePhoto = (id: string, key: string) => {
+    const gone = photos[id]?.find((p) => p.key === key);
+    if (gone) URL.revokeObjectURL(gone.url);
+    setPhotos((cur) => ({ ...cur, [id]: (cur[id] ?? []).filter((p) => p.key !== key) }));
+    setPhotoNote((x) => ({ ...x, [id]: undefined }));
+  };
+  /** Unticking a repair, or starting over, takes its photos with it. */
+  const dropPhotos = (ids: string[]) => {
+    ids.forEach((id) => photos[id]?.forEach((p) => URL.revokeObjectURL(p.url)));
+    setPhotos((cur) => Object.fromEntries(Object.entries(cur).filter(([id]) => !ids.includes(id))));
+    setPhotoNote((x) => Object.fromEntries(Object.entries(x).filter(([id]) => !ids.includes(id))));
+  };
   const setQty = (id: string, qty: number) =>
     setPicked((cur) => ({ ...cur, [id]: Math.min(100_000, Math.max(1, Math.round(qty) || 1)) }));
 
@@ -154,6 +214,7 @@ export function HomeSpecEstimator() {
   }, [areaId, spot]);
 
   const reset = () => {
+    dropPhotos(Object.keys(photos));
     setPicked({});
     setAreaId(null);
     setSpot(null);
@@ -183,6 +244,10 @@ export function HomeSpecEstimator() {
       setFailure("That didn't go through. Give it a second and try again.");
       return;
     }
+    if (shrinking) {
+      setFailure("Your photos are still being prepared. Give it a second and try again.");
+      return;
+    }
     setSending(true);
     setFailure("");
     const check2 = turnstileOn ? ((await human.current?.get()) ?? "") : "";
@@ -203,6 +268,7 @@ export function HomeSpecEstimator() {
           zip: contact.zip.trim(),
           consent: "yes",
           picks,
+          photos: Object.entries(photos).flatMap(([item, list]) => list.map((p) => ({ item, data: p.data }))),
           tool: "estimate",
           brand: "homespec",
           token: token.current,
@@ -538,6 +604,16 @@ export function HomeSpecEstimator() {
                                   Added to estimate
                                 </span>
                               </div>
+                              <PhotoPicker
+                                name={item.fix}
+                                list={photos[item.id] ?? []}
+                                busy={shrinking === item.id}
+                                blocked={shrinking !== null && shrinking !== item.id}
+                                totalFull={photoCount >= PHOTO_MAX_TOTAL}
+                                note={photoNote[item.id]}
+                                onAdd={(files) => addPhotos(item.id, files)}
+                                onRemove={(key) => removePhoto(item.id, key)}
+                              />
                             </div>
                           )}
                         </li>
@@ -688,6 +764,14 @@ export function HomeSpecEstimator() {
                       <span>
                         <span className="font-bold">{item.fix}</span>
                         <span className="text-(--hs-muted)">, {sizeText(item, l.qty)}</span>
+                        {Boolean(photos[l.item.id]?.length) && (
+                          <span className="mt-1.5 flex gap-1.5">
+                            {photos[l.item.id].map((p, i) => (
+                              // eslint-disable-next-line @next/next/no-img-element -- a local preview (object URL)
+                              <img key={p.key} src={p.url} alt={`Your photo ${i + 1}: ${item.fix}`} className="size-10 rounded object-cover ring-1 ring-[#d3d7dd]" />
+                            ))}
+                          </span>
+                        )}
                       </span>
                       <span className="shrink-0 tabular-nums">
                         {usd(l.low)} – {usd(l.high)}
@@ -712,6 +796,16 @@ export function HomeSpecEstimator() {
                     ) : (
                       "Saved. Your PDF is ready to download."
                     )}
+                    {sent.photos > 0 && ` Your ${sent.photos === 1 ? "photo is" : `${sent.photos} photos are`} saved with your request.`}
+                  </span>
+                </p>
+              )}
+              {sent && photoCount > (sent.photos ?? 0) && (
+                <p role="alert" className="mt-3 flex gap-2.5 rounded-lg bg-[#fdf3e7] p-4 text-[14.5px] leading-snug text-[#7a4a10]">
+                  <Icon name="alert" className="mt-0.5 size-5 shrink-0" />
+                  <span>
+                    {sent.photos ? `${photoCount - sent.photos} of your photos didn’t save` : "Your photos didn’t save"}, but your estimate
+                    did. You can show them to the inspector at your visit.
                   </span>
                 </p>
               )}
@@ -749,6 +843,101 @@ export function HomeSpecEstimator() {
           )}
         </div>
       </dialog>
+    </div>
+  );
+}
+
+/** A ticked repair's photos: thumbnails to check and remove, and a button to add more. */
+function PhotoPicker({
+  name,
+  list,
+  busy,
+  blocked,
+  totalFull,
+  note,
+  onAdd,
+  onRemove,
+}: {
+  name: string;
+  list: Photo[];
+  busy: boolean;
+  /** Another repair's photos are being prepared. */
+  blocked: boolean;
+  totalFull: boolean;
+  note?: string;
+  onAdd: (files: File[]) => void;
+  onRemove: (key: string) => void;
+}) {
+  const itemFull = list.length >= PHOTO_MAX_PER_ITEM;
+  const off = busy || blocked;
+  return (
+    <div className="mt-3 border-t border-[#dfe2e6] pt-3">
+      <p className="text-[14px] font-bold">
+        Have a photo of it? <span className="font-normal text-(--hs-muted)">Optional</span>
+      </p>
+      <p className="mt-0.5 text-[13.5px] leading-snug text-(--hs-muted)">It helps the inspector see the problem before they visit.</p>
+      <div className="mt-2.5 flex flex-wrap items-center gap-2">
+        {list.map((p, i) => (
+          <span key={p.key} className="relative size-16 overflow-hidden rounded-md bg-white ring-1 ring-[#d3d7dd]">
+            {/* eslint-disable-next-line @next/next/no-img-element -- a local preview (object URL), not a site image */}
+            <img src={p.url} alt={`Your photo ${i + 1}: ${name}`} className="size-full object-cover" />
+            <button
+              type="button"
+              onClick={() => onRemove(p.key)}
+              aria-label={`Remove photo ${i + 1} of ${name}`}
+              className="absolute right-0.5 top-0.5 flex size-6 items-center justify-center rounded-full bg-black/80 text-white hover:bg-black focus-visible:outline-2 focus-visible:outline-white"
+            >
+              <Icon name="close" className="size-3.5" />
+            </button>
+          </span>
+        ))}
+        {!itemFull && !totalFull && (
+          <label
+            className={cn(
+              pillLine,
+              "h-10 px-4 text-[13.5px] has-[input:focus-visible]:outline-3 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-(--hs-blue)",
+              off ? "cursor-not-allowed opacity-50 hover:bg-white hover:text-black" : "cursor-pointer",
+            )}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              disabled={off}
+              className="sr-only"
+              onChange={(e) => {
+                const files = Array.from(e.target.files ?? []);
+                // Cleared, so choosing the same photo again still counts as a change.
+                e.target.value = "";
+                if (files.length) onAdd(files);
+              }}
+            />
+            {busy ? (
+              <>
+                <span aria-hidden className="size-4 animate-spin rounded-full border-2 border-black/25 border-t-black" />
+                <span role="status">Preparing photo…</span>
+              </>
+            ) : (
+              <>
+                <Icon name="camera" className="size-4.5" />
+                {list.length ? "Add another" : "Add photos"}
+              </>
+            )}
+          </label>
+        )}
+      </div>
+      {(itemFull || totalFull) && (
+        <p className="mt-2 text-[13px] text-(--hs-muted)">
+          {itemFull
+            ? `That’s ${PHOTO_MAX_PER_ITEM} photos for this repair, the most it takes.`
+            : `That’s ${PHOTO_MAX_TOTAL} photos in all, the most one estimate takes.`}
+        </p>
+      )}
+      {note && (
+        <p role="alert" className="mt-2 text-[13px] text-[#c62828]">
+          {note}
+        </p>
+      )}
     </div>
   );
 }

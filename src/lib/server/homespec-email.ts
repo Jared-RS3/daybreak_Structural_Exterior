@@ -33,6 +33,8 @@ export type HomeSpecEmailInput = {
   low: number;
   high: number;
   lines: { fix: string; size: string; low: number; high: number }[];
+  /** Photos they added to the request; they're kept with it, not emailed. */
+  photos?: number;
 };
 
 /** The greeting: a plain first name, or "there" when it isn't one. */
@@ -80,7 +82,7 @@ export function homespecEmail(d: HomeSpecEmailInput) {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef4fe;border-left:5px solid ${blue}"><tr><td style="padding:18px 20px">
 ${label("Your ballpark estimate")}
 <div style="font-family:${sans};font-size:36px;line-height:1.1;font-weight:bold;color:${blueInk};margin-top:8px;letter-spacing:-.01em">${usd(d.low)} – ${usd(d.high)}</div>
-<div style="font-family:${sans};font-size:13.5px;color:${muted};margin-top:6px">${d.lines.length} repair${d.lines.length === 1 ? "" : "s"}</div>
+<div style="font-family:${sans};font-size:13.5px;color:${muted};margin-top:6px">${d.lines.length} repair${d.lines.length === 1 ? "" : "s"}${d.photos ? ` · ${d.photos} photo${d.photos === 1 ? "" : "s"} with your request` : ""}</div>
 </td></tr></table>
 </td></tr>
 

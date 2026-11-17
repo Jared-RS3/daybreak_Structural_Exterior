@@ -14,6 +14,8 @@ import { quoteEmail } from "@/lib/server/quote-email";
 import { createHomeSpecPdf } from "@/lib/demos/homespec-pdf";
 import { homespecItems } from "@/lib/demos/homespec";
 import { homespecLogoPng } from "@/lib/demos/homespec-logo";
+import { PHOTO_BODY_BYTES } from "@/lib/lead-photos";
+import { readPhotos, type LeadPhoto } from "@/lib/server/lead-photos";
 import { checkFormToken, issueFormToken } from "@/lib/server/form-token";
 import { renderQuotePdf, type QuoteDoc } from "@/lib/server/quote-pdf";
 import { checkTurnstile } from "@/lib/server/turnstile";
@@ -48,11 +50,18 @@ import { NextResponse } from "next/server";
  * Same checks, same table, same email account; the estimate is told in
  * HomeSpec's words (lib/demos/homespec.ts), the reference starts HS-, and the
  * PDF and email wear HomeSpec's look. Prices are the same sample figures.
+ *
+ * The HomeSpec estimator can also send photos of the problems (up to six,
+ * shrunk in the browser: lib/lead-photos.ts). They go into the row's
+ * "Photos" column, named after the reference and the repair they show, and
+ * aren't emailed. Its requests may be that much larger; everyone else's
+ * stay small.
  */
 const MAX_BODY_BYTES = 8_000;
 const MIN_FILL_MS = 2_500;
 const TABLE = () => process.env.AIRTABLE_TOOL_TABLE || "Homeowner Leads";
 const PDF_FIELD = "Quote PDF";
+const PHOTO_FIELD = "Photos";
 
 const fail = (status: number, error: string) => NextResponse.json({ ok: false, error }, { status });
 
@@ -77,8 +86,8 @@ export async function POST(request: Request) {
     return fail(429, "Too many requests. Please wait a few minutes and try again.");
   }
   if (!request.headers.get("content-type")?.startsWith("application/json")) return fail(415, "Unsupported request.");
-  const raw = await readCapped(request, MAX_BODY_BYTES);
-  if (raw === null) return fail(413, "Request too large.");
+  const raw = await readCapped(request, PHOTO_BODY_BYTES);
+  if (raw === null) return fail(413, "Those photos are too large to send. Remove one and try again.");
 
   let body: Record<string, unknown>;
   try {
@@ -93,7 +102,7 @@ export async function POST(request: Request) {
   if (token === "invalid") return fail(400, "This form has expired. Refresh the page and try again.");
   // Bots: report success so they don't learn to adapt. No PDF, no email.
   if (String(body.fax ?? "").trim() || token === "fast") {
-    return NextResponse.json({ ok: true, reference: "", emailed: false, pdf: "" } satisfies ToolLeadResult);
+    return NextResponse.json({ ok: true, reference: "", emailed: false, pdf: "", photos: 0 } satisfies ToolLeadResult);
   }
 
   const contact = readToolContact((k) => body[k]);
@@ -104,6 +113,8 @@ export async function POST(request: Request) {
   const tool = body.tool === "estimate" || body.tool === "crack" ? body.tool : null;
   if (!tool) return fail(400, "Malformed request.");
   const homespec = body.brand === "homespec";
+  // Only the HomeSpec estimator sends photos; any other request stays small.
+  if (!homespec && Buffer.byteLength(raw) > MAX_BODY_BYTES) return fail(413, "Request too large.");
   // The HomeSpec page only has the estimator, and only HomeSpec's services.
   if (homespec && tool !== "estimate") return fail(400, "Malformed request.");
   // The name goes into an email to whatever address was typed: no links in
@@ -116,14 +127,21 @@ export async function POST(request: Request) {
   let doc: QuoteDoc;
   let summary: string;
   let extra: Record<string, string | number | null>;
+  let photos: LeadPhoto[] = [];
   if (tool === "estimate") {
     const picks = readPicks(body.picks);
     if (!picks) return fail(400, "Pick at least one repair first.");
     if (homespec && !picks.every((p) => Object.hasOwn(homespecItems, p.id))) return fail(400, "Pick at least one repair first.");
+    if (homespec) {
+      const checked = readPhotos(body.photos, picks.map((p) => p.id));
+      if (!checked) return fail(400, "One of your photos couldn't be sent. Remove it and try again.");
+      photos = checked;
+    }
     const { lines, low, high } = priceEstimate(picks);
     const rows = lines.map((l) => {
       const item = homespec ? homespecItems[l.item.id] : l.item;
       return {
+        id: l.item.id,
         label: item.fix,
         detail: [l.choice, item.unit ? `${l.qty.toLocaleString("en-US")} ${item.unit}` : homespec ? "Complete install" : ""].filter(Boolean).join(", "),
         low: l.low,
@@ -131,9 +149,13 @@ export async function POST(request: Request) {
       };
     });
     doc = { kind: "estimate", reference, date, contact, low, high, lines: rows };
+    const shots = (id: string) => {
+      const n = photos.filter((p) => p.item === id).length;
+      return n ? ` · ${n} photo${n === 1 ? "" : "s"}` : "";
+    };
     summary = [
       ...(homespec ? ["HomeSpec demo (/demo/homespec)"] : []),
-      ...rows.map((r) => `${r.label}${r.detail ? ` (${r.detail})` : ""}: ${usd(r.low)} – ${usd(r.high)}`),
+      ...rows.map((r) => `${r.label}${r.detail ? ` (${r.detail})` : ""}: ${usd(r.low)} – ${usd(r.high)}${shots(r.id)}`),
     ].join("\n");
     extra = { "Estimate low": low, "Estimate high": high, Severity: null };
   } else {
@@ -183,6 +205,11 @@ export async function POST(request: Request) {
   const filename = homespec
     ? `HomeSpec-estimate-${reference}.pdf`
     : `${tool === "estimate" ? "Repair-estimate" : "Crack-check"}-${reference}.pdf`;
+  // e.g. HS-261117-4F9A2C-sump-pump-1.jpg: whose, and which repair it shows.
+  const photoFiles = photos.map((p, i) => ({
+    ...p,
+    filename: `${reference}-${p.item}-${photos.slice(0, i + 1).filter((x) => x.item === p.item).length}.jpg`,
+  }));
 
   // A local copy while developing, so you can open what was sent. Never in
   // production: the server's disk isn't kept, and it holds people's details.
@@ -191,6 +218,7 @@ export async function POST(request: Request) {
       const dir = path.join(process.cwd(), "quotes");
       await mkdir(dir, { recursive: true });
       await writeFile(path.join(dir, filename), pdf);
+      for (const p of photoFiles) await writeFile(path.join(dir, p.filename), p.bytes);
     } catch (err) {
       console.warn("[tool-lead] Couldn't save the local PDF copy", err);
     }
@@ -233,6 +261,24 @@ export async function POST(request: Request) {
         (err) => console.error("[tool-lead] PDF upload to Airtable failed", reference, err),
       )
     : null;
+  // One at a time, so they stay inside Airtable's five requests a second
+  // alongside the PDF. The first failure (most likely a missing "Photos"
+  // column) stops the rest; the visitor is told how many were kept.
+  const keepPhotos = async () => {
+    if (!recordId) return photoFiles.length;
+    let kept = 0;
+    for (const p of photoFiles) {
+      try {
+        await uploadAirtableAttachment(recordId, PHOTO_FIELD, { bytes: p.bytes, filename: p.filename, contentType: "image/jpeg" });
+        kept++;
+      } catch (err) {
+        console.error("[tool-lead] Photo upload to Airtable failed", reference, err);
+        break;
+      }
+    }
+    return kept;
+  };
+  const photosKept = photoFiles.length ? keepPhotos() : Promise.resolve(0);
   let emailed = false;
   let status = "Not set up";
   if (emailConfigured()) {
@@ -248,6 +294,7 @@ export async function POST(request: Request) {
                 low: doc.low,
                 high: doc.high,
                 lines: doc.lines.map((l) => ({ fix: l.label, size: l.detail, low: l.low, high: l.high })),
+                photos: photos.length,
               }),
               fromName: "HomeSpec Estimates (Daybreak demo)",
             }
@@ -260,6 +307,7 @@ export async function POST(request: Request) {
       status = "Failed";
     }
   }
+  const kept = await photosKept;
   if (recordId) {
     await Promise.all([
       upload,
@@ -274,5 +322,6 @@ export async function POST(request: Request) {
     reference,
     emailed,
     pdf: Buffer.from(pdf).toString("base64"),
+    photos: kept,
   } satisfies ToolLeadResult);
 }

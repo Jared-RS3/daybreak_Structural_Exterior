@@ -226,6 +226,12 @@ const paths: Record<string, React.ReactNode> = {
     </>
   ),
   bolt: <path d="M13.5 2.5 5 13.5h6l-.5 8L19 10.5h-6z" />,
+  camera: (
+    <>
+      <path d="M3.5 8.5A1.5 1.5 0 0 1 5 7h2.5l1.5-2.5h6L16.5 7H19a1.5 1.5 0 0 1 1.5 1.5v10A1.5 1.5 0 0 1 19 20H5a1.5 1.5 0 0 1-1.5-1.5Z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </>
+  ),
   loop: (
     <>
       <path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5" />
